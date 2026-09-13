@@ -1,9 +1,2123 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
-  </head>
-  <body>
-    
-  </body>
-</html>
+<style>
+
+:root {
+  --primary: #16458f;
+  --primary-2: #2476c9;
+  --primary-soft: #eaf3ff;
+
+  --green: #16a34a;
+  --red: #dc2626;
+
+  --text: #172033;
+  --muted: #728096;
+
+  --bg: #eef4fa;
+  --card: rgba(255,255,255,.92);
+
+  --border: rgba(148,163,184,.18);
+
+  --sidebar: 260px;
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+
+  font-family:
+    Inter,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+
+  color: var(--text);
+
+  background:
+    radial-gradient(
+      circle at 0% 0%,
+      rgba(36,118,201,.14),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(14,165,233,.10),
+      transparent 28%
+    ),
+    linear-gradient(
+      135deg,
+      #eef4fa,
+      #f7faff
+    );
+
+  min-height: 100vh;
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.jnda-sidebar {
+
+  position: fixed;
+
+  left: 0;
+  top: 0;
+
+  width: var(--sidebar);
+  height: 100vh;
+
+  background:
+    linear-gradient(
+      180deg,
+      #123b7c,
+      #0d2d61
+    );
+
+  color: white;
+
+  z-index: 1000;
+
+  display: flex;
+
+  flex-direction: column;
+
+  transition:
+    transform .25s ease;
+}
+
+
+.sidebar-nav {
+
+  flex: 1;
+
+  padding: 25px 13px;
+
+  overflow-y: auto;
+}
+
+
+.nav-section-title {
+
+  padding:
+    12px 13px 7px;
+
+  font-size: 9px;
+
+  color:
+    rgba(255,255,255,.45);
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+}
+
+
+.nav-item {
+
+  width: 100%;
+
+  border: 0;
+
+  background: transparent;
+
+  color:
+    rgba(255,255,255,.72);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding:
+    12px 13px;
+
+  margin-bottom: 4px;
+
+  border-radius: 11px;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+
+.nav-item:hover {
+
+  background:
+    rgba(255,255,255,.09);
+
+  color: white;
+}
+
+
+.nav-item.active {
+
+  background:
+    rgba(255,255,255,.16);
+
+  color: white;
+
+  box-shadow:
+    inset 3px 0 0 #53b4ff;
+}
+
+
+.nav-icon {
+
+  width: 22px;
+
+  text-align: center;
+
+  font-size: 16px;
+}
+
+
+/* =========================================================
+   SIDEBAR FOOTER
+   ========================================================= */
+
+.sidebar-footer {
+
+  padding: 14px;
+
+  border-top:
+    1px solid
+    rgba(255,255,255,.08);
+}
+
+
+.logout-button {
+
+  width: 100%;
+
+  border: 0;
+
+  border-radius: 10px;
+
+  background:
+    rgba(255,255,255,.08);
+
+  color:
+    rgba(255,255,255,.78);
+
+  padding: 11px;
+
+  cursor: pointer;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   OVERLAY
+   ========================================================= */
+
+.sidebar-overlay {
+
+  display: none;
+
+  position: fixed;
+
+  inset: 0;
+
+  background:
+    rgba(15,23,42,.48);
+
+  z-index: 900;
+}
+
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+.jnda-main {
+
+  margin-left: var(--sidebar);
+
+  min-height: 100vh;
+}
+
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.jnda-topbar {
+
+  height: 76px;
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 800;
+
+  background:
+    rgba(255,255,255,.88);
+
+  backdrop-filter:
+    blur(15px);
+
+  border-bottom:
+    1px solid
+    var(--border);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding:
+    0 28px;
+}
+
+
+.topbar-left {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+}
+
+
+.mobile-menu-button {
+
+  display: none;
+
+  width: 40px;
+  height: 40px;
+
+  border: 1px solid #dce4ef;
+
+  border-radius: 11px;
+
+  background: white;
+
+  color: var(--primary);
+
+  font-size: 20px;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   3 LOGOS NAVBAR
+   ========================================================= */
+
+.navbar-logos {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+}
+
+
+.navbar-logo.jn {
+
+  width: 120px;
+
+  height: 50px;
+}
+
+
+.navbar-logo.partner {
+
+  width: 70px;
+
+  height: 44px;
+}
+
+
+.navbar-logo {
+
+  object-fit: contain;
+
+  object-position: center;
+
+  background: transparent;
+}
+
+
+.logo-divider {
+
+  width: 1px;
+
+  height: 30px;
+
+  background:
+    #dce3ed;
+}
+
+
+/* =========================================================
+   TOP USER
+   ========================================================= */
+
+.top-user {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+
+.top-avatar {
+
+  width: 38px;
+
+  height: 38px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #16458f,
+      #2476c9
+    );
+
+  color: white;
+
+  font-weight: 800;
+}
+
+
+.top-user-name {
+
+  font-size: 11px;
+
+  font-weight: 800;
+}
+
+
+.top-user-role {
+
+  margin-top: 2px;
+
+  font-size: 9px;
+
+  color: var(--muted);
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.jnda-content {
+
+  max-width: 1500px;
+
+  margin: auto;
+
+  padding:
+    25px 28px 40px;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.welcome-card {
+
+  position: relative;
+
+  min-height: 300px;
+
+  overflow: hidden;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5,29,67,.95),
+      rgba(10,64,130,.72),
+      rgba(10,64,130,.10)
+    ),
+    url("https://drive.google.com/thumbnail?id=1iiQ50buH6f-re9v1MFQ3BKF0axih1fTz&sz=w1600")
+    center / cover no-repeat;
+
+  box-shadow:
+    0 18px 45px
+    rgba(22,69,143,.16);
+}
+
+
+.welcome-content {
+
+  position: relative;
+
+  z-index: 2;
+
+  max-width: 650px;
+
+  padding: 36px;
+
+  color: white;
+}
+
+
+.welcome-kicker {
+
+  display: inline-flex;
+
+  padding:
+    7px 11px;
+
+  border-radius: 30px;
+
+  background:
+    rgba(255,255,255,.13);
+
+  border:
+    1px solid
+    rgba(255,255,255,.16);
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: .8px;
+
+  text-transform: uppercase;
+}
+
+
+.welcome-title {
+
+  margin:
+    20px 0 4px;
+
+  font-size:
+    clamp(27px,4vw,43px);
+
+  line-height: 1.1;
+
+  font-weight: 800;
+}
+
+
+.welcome-name {
+
+  font-size: 20px;
+
+  font-weight: 700;
+
+  color:
+    #dcecff;
+}
+
+
+.welcome-meta {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 8px 18px;
+
+  margin-top: 15px;
+
+  font-size: 11px;
+
+  color:
+    rgba(255,255,255,.86);
+}
+
+
+/* =========================================================
+   ATTENDANCE BUTTON
+   ========================================================= */
+
+.attendance-actions {
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 14px;
+
+  margin-top: 16px;
+}
+
+
+.attendance-button {
+
+  border: 0;
+
+  border-radius: 17px;
+
+  min-height: 76px;
+
+  padding: 13px 17px;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 25px
+    rgba(15,23,42,.10);
+
+  transition: .2s;
+}
+
+
+.attendance-button:hover {
+
+  transform:
+    translateY(-2px);
+}
+
+
+.attendance-button.check-in {
+
+  background:
+    linear-gradient(
+      135deg,
+      #159447,
+      #22b95c
+    );
+}
+
+
+.attendance-button.check-out {
+
+  background:
+    linear-gradient(
+      135deg,
+      #cf2730,
+      #ed4850
+    );
+}
+
+
+.attendance-button-icon {
+
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    rgba(255,255,255,.15);
+
+  font-size: 18px;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.jnda-card {
+
+  background:
+    var(--card);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 9px 30px
+    rgba(15,23,42,.045);
+
+  overflow: hidden;
+}
+
+
+.card-header {
+
+  padding: 17px 19px;
+
+  border-bottom:
+    1px solid
+    #edf1f5;
+}
+
+
+.card-title {
+
+  margin: 0;
+
+  font-size: 13px;
+
+  font-weight: 800;
+}
+
+
+.card-subtitle {
+
+  margin-top: 3px;
+
+  font-size: 9px;
+
+  color: var(--muted);
+}
+
+
+.card-body {
+
+  padding: 19px;
+}
+
+
+/* =========================================================
+   GRID
+   ========================================================= */
+
+.dashboard-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0,1.4fr)
+    minmax(300px,.7fr);
+
+  gap: 16px;
+
+  margin-top: 18px;
+}
+
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+.profile-layout {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+}
+
+
+.profile-avatar {
+
+  width: 58px;
+
+  height: 58px;
+
+  border-radius: 16px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    var(--primary-soft);
+
+  color:
+    var(--primary);
+
+  font-weight: 800;
+
+  font-size: 19px;
+}
+
+
+.profile-name {
+
+  font-size: 15px;
+
+  font-weight: 800;
+}
+
+
+.profile-nip {
+
+  margin-top: 3px;
+
+  font-size: 10px;
+
+  color: var(--muted);
+}
+
+
+.profile-context {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 6px;
+
+  margin-top: 8px;
+}
+
+
+.context-chip {
+
+  padding:
+    5px 8px;
+
+  border-radius: 7px;
+
+  background:
+    #f0f6ff;
+
+  color:
+    #35649b;
+
+  font-size: 9px;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.today-status {
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 10px;
+}
+
+
+.status-box {
+
+  padding: 13px;
+
+  border-radius: 12px;
+
+  background:
+    #f6f9fd;
+
+  border:
+    1px solid
+    #e9eff6;
+}
+
+
+.status-label {
+
+  font-size: 9px;
+
+  color: var(--muted);
+}
+
+
+.status-value {
+
+  margin-top: 5px;
+
+  font-size: 15px;
+
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   MANAGEMENT
+   ========================================================= */
+
+.management-section {
+
+  display: none;
+
+  margin-top: 18px;
+}
+
+
+.management-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap: 10px;
+}
+
+
+.management-stat {
+
+  padding: 15px;
+
+  border-radius: 13px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f2f7ff,
+      #ffffff
+    );
+
+  border:
+    1px solid
+    #e1eaf5;
+}
+
+
+.management-stat-label {
+
+  font-size: 9px;
+
+  color: var(--muted);
+
+  font-weight: 700;
+}
+
+
+.management-stat-value {
+
+  margin-top: 6px;
+
+  font-size: 22px;
+
+  color: var(--primary);
+
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.attendance-table-wrapper {
+
+  overflow-x: auto;
+}
+
+
+.attendance-table {
+
+  width: 100%;
+
+  min-width: 550px;
+
+  border-collapse: collapse;
+}
+
+
+.attendance-table th {
+
+  padding: 10px;
+
+  background:
+    #f4f7fb;
+
+  color:
+    #718096;
+
+  font-size: 9px;
+
+  text-align: left;
+}
+
+
+.attendance-table td {
+
+  padding: 12px 10px;
+
+  border-top:
+    1px solid
+    #edf1f5;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.dashboard-loading {
+
+  min-height: 400px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  color: var(--muted);
+}
+
+
+.loading-spinner {
+
+  width: 35px;
+
+  height: 35px;
+
+  border:
+    3px solid
+    #dce6f2;
+
+  border-top-color:
+    var(--primary);
+
+  border-radius: 50%;
+
+  animation:
+    jnda-spin .8s linear infinite;
+}
+
+
+@keyframes jnda-spin {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.jnda-footer {
+
+  padding: 25px;
+
+  text-align: center;
+
+  font-size: 9px;
+
+  color:
+    #93a0b2;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .jnda-sidebar {
+
+    transform:
+      translateX(-100%);
+  }
+
+
+  .jnda-sidebar.mobile-open {
+
+    transform:
+      translateX(0);
+
+    box-shadow:
+      12px 0 40px
+      rgba(15,23,42,.18);
+  }
+
+
+  .sidebar-overlay.mobile-open {
+
+    display: block;
+  }
+
+
+  .jnda-main {
+
+    margin-left: 0;
+  }
+
+
+  .mobile-menu-button {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+  }
+
+
+  .jnda-topbar {
+
+    height: 66px;
+
+    padding:
+      0 14px;
+  }
+
+
+  .navbar-logo.jn {
+
+    width: 90px;
+
+    height: 42px;
+  }
+
+
+  .navbar-logo.partner {
+
+    width: 50px;
+
+    height: 36px;
+  }
+
+
+  .navbar-logos {
+
+    gap: 7px;
+  }
+
+
+  .logo-divider {
+
+    height: 22px;
+  }
+
+
+  .top-user-text {
+
+    display: none;
+  }
+
+
+  .jnda-content {
+
+    padding:
+      14px;
+  }
+
+
+  .welcome-card {
+
+    min-height: 320px;
+
+    border-radius: 19px;
+
+    background-position:
+      62% center;
+  }
+
+
+  .welcome-content {
+
+    padding:
+      24px 20px;
+  }
+
+
+  .dashboard-grid {
+
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .management-grid {
+
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+}
+
+
+@media (max-width: 560px) {
+
+  .navbar-logo.partner {
+
+    display: none;
+  }
+
+
+  .logo-divider {
+
+    display: none;
+  }
+
+
+  .navbar-logo.jn {
+
+    width: 105px;
+  }
+
+
+  .attendance-actions {
+
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .welcome-card {
+
+    min-height: 335px;
+  }
+
+
+  .welcome-title {
+
+    font-size: 27px;
+  }
+
+
+  .welcome-name {
+
+    font-size: 17px;
+  }
+
+
+  .today-status {
+
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+}
+
+</style>
+
+
+<div class="jnda-app">
+
+
+  <!-- =====================================================
+       SIDEBAR
+       ====================================================== -->
+
+  <aside
+    id="jndaSidebar"
+    class="jnda-sidebar">
+
+    <nav class="sidebar-nav">
+
+      <div class="nav-section-title">
+        Utama
+      </div>
+
+
+      <button
+        class="nav-item active"
+        onclick="navigateTo('dashboard')">
+
+        <span class="nav-icon">
+          🏠
+        </span>
+
+        Dashboard
+
+      </button>
+
+
+      <!-- SEMUA PEGAWAI -->
+
+      <div id="employeeMenuGroup">
+
+        <button
+          class="nav-item"
+          onclick="openAttendance('in')">
+
+          <span class="nav-icon">
+            🟢
+          </span>
+
+          Absen Masuk
+
+        </button>
+
+
+        <button
+          class="nav-item"
+          onclick="openAttendance('out')">
+
+          <span class="nav-icon">
+            🔴
+          </span>
+
+          Absen Pulang
+
+        </button>
+
+
+        <button
+          class="nav-item"
+          onclick="navigateTo('attendance-history')">
+
+          <span class="nav-icon">
+            📋
+          </span>
+
+          Riwayat Kehadiran
+
+        </button>
+
+
+        <button
+          class="nav-item"
+          onclick="navigateTo('leave')">
+
+          <span class="nav-icon">
+            📅
+          </span>
+
+          Cuti / Izin
+
+        </button>
+
+      </div>
+
+
+      <!-- MANAGEMENT -->
+
+      <div
+        id="managementMenuGroup"
+        style="display:none;">
+
+        <div class="nav-section-title">
+          Monitoring
+        </div>
+
+
+        <button
+          class="nav-item"
+          onclick="navigateTo('report')">
+
+          <span class="nav-icon">
+            📊
+          </span>
+
+          Laporan
+
+        </button>
+
+
+        <button
+          class="nav-item"
+          onclick="navigateTo('monitoring')">
+
+          <span class="nav-icon">
+            👥
+          </span>
+
+          Monitoring
+
+        </button>
+
+      </div>
+
+
+      <!-- ADMIN -->
+
+      <div
+        id="adminMenuGroup"
+        style="display:none;">
+
+        <div class="nav-section-title">
+          Administrator
+        </div>
+
+
+        <button
+          class="nav-item"
+          onclick="navigateTo('users')">
+
+          <span class="nav-icon">
+            👤
+          </span>
+
+          User Management
+
+        </button>
+
+
+        <button
+          class="nav-item"
+          onclick="navigateTo('master')">
+
+          <span class="nav-icon">
+            ⚙️
+          </span>
+
+          Master Data
+
+        </button>
+
+
+        <button
+          class="nav-item"
+          onclick="navigateTo('backup')">
+
+          <span class="nav-icon">
+            💾
+          </span>
+
+          Backup
+
+        </button>
+
+      </div>
+
+    </nav>
+
+
+    <div class="sidebar-footer">
+
+      <button
+        class="logout-button"
+        onclick="logoutUser()">
+
+        🚪 &nbsp; Keluar
+
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- MOBILE OVERLAY -->
+
+  <div
+    id="sidebarOverlay"
+    class="sidebar-overlay"
+    onclick="closeMobileSidebar()">
+  </div>
+
+
+  <!-- =====================================================
+       MAIN
+       ====================================================== -->
+
+  <main class="jnda-main">
+
+
+    <!-- NAVBAR -->
+
+    <header class="jnda-topbar">
+
+
+      <div class="topbar-left">
+
+        <button
+          class="mobile-menu-button"
+          onclick="toggleMobileSidebar()">
+
+          ☰
+
+        </button>
+
+
+        <!-- 3 LOGO DI NAVBAR -->
+
+        <div class="navbar-logos">
+
+          <img
+            class="navbar-logo jn"
+            src="https://drive.google.com/thumbnail?id=1UiZRAwhuxTzgYAEKDmF1-qTF8D9K_bH&sz=w400"
+            alt="PT Jembatan Nusantara">
+
+
+          <span class="logo-divider"></span>
+
+
+          <img
+            class="navbar-logo partner"
+            src="https://drive.google.com/thumbnail?id=1HCOqgfla9hUzaW3bF3beymYn8q64zAdA&sz=w250"
+            alt="Danantara">
+
+
+          <span class="logo-divider"></span>
+
+
+          <img
+            class="navbar-logo partner"
+            src="https://drive.google.com/thumbnail?id=1J5YLMEAbsoVkqFbWxeT2FTRcCYpooHzZ&sz=w250"
+            alt="ASDP">
+
+        </div>
+
+      </div>
+
+
+      <div class="top-user">
+
+        <div
+          id="topAvatar"
+          class="top-avatar">
+
+          P
+
+        </div>
+
+
+        <div class="top-user-text">
+
+          <div
+            id="topUserName"
+            class="top-user-name">
+
+            Pegawai
+
+          </div>
+
+
+          <div
+            id="topUserRole"
+            class="top-user-role">
+
+            PEGAWAI
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- CONTENT -->
+
+    <section class="jnda-content">
+
+
+      <!-- LOADING -->
+
+      <div
+        id="dashboardLoading"
+        class="jnda-card dashboard-loading">
+
+        <div class="loading-spinner"></div>
+
+        <div>
+          Memuat dashboard...
+        </div>
+
+      </div>
+
+
+      <!-- DASHBOARD -->
+
+      <div
+        id="dashboardContent"
+        style="display:none;">
+
+
+        <!-- HERO -->
+
+        <section class="welcome-card">
+
+          <div class="welcome-content">
+
+            <div class="welcome-kicker">
+              JN Daily Attendance · V3
+            </div>
+
+
+            <h1
+              id="welcomeTitle"
+              class="welcome-title">
+
+              Selamat datang
+
+            </h1>
+
+
+            <div
+              id="welcomeName"
+              class="welcome-name">
+
+              Pegawai
+
+            </div>
+
+
+            <div class="welcome-meta">
+
+              <span>
+                🪪 NIP:
+                <strong
+                  id="welcomeEmployeeId">
+                  -
+                </strong>
+              </span>
+
+
+              <span>
+                📍
+                <strong
+                  id="welcomeContext">
+                  Penempatan
+                </strong>
+              </span>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ABSEN -->
+
+        <section class="attendance-actions">
+
+
+          <button
+            class="attendance-button check-in"
+            onclick="openAttendance('in')">
+
+            <div class="attendance-button-icon">
+              🟢
+            </div>
+
+            <div>
+
+              <div style="
+                font-size:10px;
+                opacity:.8;
+              ">
+                KEHADIRAN
+              </div>
+
+              <div style="
+                font-size:16px;
+                font-weight:800;
+              ">
+                Absen Masuk
+              </div>
+
+              <div style="
+                font-size:9px;
+                opacity:.75;
+                margin-top:3px;
+              ">
+                Catat lokasi dan waktu masuk
+              </div>
+
+            </div>
+
+          </button>
+
+
+          <button
+            class="attendance-button check-out"
+            onclick="openAttendance('out')">
+
+            <div class="attendance-button-icon">
+              🔴
+            </div>
+
+            <div>
+
+              <div style="
+                font-size:10px;
+                opacity:.8;
+              ">
+                KEHADIRAN
+              </div>
+
+              <div style="
+                font-size:16px;
+                font-weight:800;
+              ">
+                Absen Pulang
+              </div>
+
+              <div style="
+                font-size:9px;
+                opacity:.75;
+                margin-top:3px;
+              ">
+                Catat waktu kepulangan
+              </div>
+
+            </div>
+
+          </button>
+
+
+        </section>
+
+
+        <!-- MAIN GRID -->
+
+        <section class="dashboard-grid">
+
+
+          <!-- LEFT -->
+
+          <div>
+
+
+            <!-- PROFILE -->
+
+            <div class="jnda-card">
+
+              <div class="card-header">
+
+                <div class="card-title">
+                  Profil Pegawai
+                </div>
+
+                <div class="card-subtitle">
+                  Informasi akun dan penempatan
+                </div>
+
+              </div>
+
+
+              <div class="card-body">
+
+                <div class="profile-layout">
+
+                  <div
+                    id="profileAvatar"
+                    class="profile-avatar">
+
+                    P
+
+                  </div>
+
+
+                  <div>
+
+                    <div
+                      id="profileName"
+                      class="profile-name">
+
+                      Pegawai
+
+                    </div>
+
+
+                    <div
+                      id="profileEmployeeId"
+                      class="profile-nip">
+
+                      NIP: -
+
+                    </div>
+
+
+                    <div
+                      id="profileContext"
+                      class="profile-context">
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- RECENT -->
+
+            <div
+              class="jnda-card"
+              style="margin-top:16px;">
+
+              <div class="card-header">
+
+                <div class="card-title">
+                  Riwayat Kehadiran
+                </div>
+
+                <div class="card-subtitle">
+                  Data terakhir
+                </div>
+
+              </div>
+
+
+              <div class="card-body">
+
+                <div class="attendance-table-wrapper">
+
+                  <table class="attendance-table">
+
+                    <thead>
+
+                      <tr>
+
+                        <th>Tanggal</th>
+                        <th>Masuk</th>
+                        <th>Pulang</th>
+                        <th>Durasi</th>
+                        <th>Status</th>
+
+                      </tr>
+
+                    </thead>
+
+
+                    <tbody
+                      id="recentAttendanceBody">
+
+                      <tr>
+
+                        <td colspan="5">
+                          Belum ada data.
+                        </td>
+
+                      </tr>
+
+                    </tbody>
+
+                  </table>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- RIGHT -->
+
+          <div>
+
+
+            <!-- TODAY -->
+
+            <div class="jnda-card">
+
+              <div class="card-header">
+
+                <div class="card-title">
+                  Status Hari Ini
+                </div>
+
+                <div class="card-subtitle">
+                  Kehadiran hari ini
+                </div>
+
+              </div>
+
+
+              <div class="card-body">
+
+                <div class="today-status">
+
+                  <div class="status-box">
+
+                    <div class="status-label">
+                      Absen Masuk
+                    </div>
+
+                    <div
+                      id="todayCheckIn"
+                      class="status-value">
+                      -
+                    </div>
+
+                  </div>
+
+
+                  <div class="status-box">
+
+                    <div class="status-label">
+                      Absen Pulang
+                    </div>
+
+                    <div
+                      id="todayCheckOut"
+                      class="status-value">
+                      -
+                    </div>
+
+                  </div>
+
+
+                  <div class="status-box">
+
+                    <div class="status-label">
+                      Durasi Kerja
+                    </div>
+
+                    <div
+                      id="todayWorkingHours"
+                      class="status-value">
+                      -
+                    </div>
+
+                  </div>
+
+
+                  <div class="status-box">
+
+                    <div class="status-label">
+                      Status
+                    </div>
+
+                    <div
+                      id="todayStatus"
+                      class="status-value">
+                      Belum Absen
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- PLACEMENT -->
+
+            <div
+              class="jnda-card"
+              style="margin-top:16px;">
+
+              <div class="card-header">
+
+                <div class="card-title">
+                  Penempatan Kerja
+                </div>
+
+                <div class="card-subtitle">
+                  Informasi otomatis dari database
+                </div>
+
+              </div>
+
+
+              <div class="card-body">
+
+                <div style="
+                  display:grid;
+                  gap:10px;
+                ">
+
+
+                  <div class="status-box">
+
+                    <div class="status-label">
+                      UNIT / CABANG
+                    </div>
+
+                    <div
+                      id="infoBranch"
+                      class="status-value"
+                      style="font-size:12px;">
+                      -
+                    </div>
+
+                  </div>
+
+
+                  <div class="status-box">
+
+                    <div class="status-label">
+                      KAPAL
+                    </div>
+
+                    <div
+                      id="infoShip"
+                      class="status-value"
+                      style="font-size:12px;">
+                      -
+                    </div>
+
+                  </div>
+
+
+                  <div class="status-box">
+
+                    <div class="status-label">
+                      JABATAN
+                    </div>
+
+                    <div
+                      id="infoPosition"
+                      class="status-value"
+                      style="font-size:12px;">
+                      -
+                    </div>
+
+                  </div>
+
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- MANAGEMENT -->
+
+        <section
+          id="managementSection"
+          class="management-section">
+
+          <div class="jnda-card">
+
+            <div class="card-header">
+
+              <div class="card-title">
+                Monitoring Pegawai
+              </div>
+
+              <div class="card-subtitle">
+                Ringkasan kehadiran
+              </div>
+
+            </div>
+
+
+            <div class="card-body">
+
+              <div class="management-grid">
+
+                <div class="management-stat">
+
+                  <div class="management-stat-label">
+                    Pegawai Aktif
+                  </div>
+
+                  <div
+                    id="managementEmployees"
+                    class="management-stat-value">
+                    0
+                  </div>
+
+                </div>
+
+
+                <div class="management-stat">
+
+                  <div class="management-stat-label">
+                    Hadir
+                  </div>
+
+                  <div
+                    id="managementPresent"
+                    class="management-stat-value">
+                    0
+                  </div>
+
+                </div>
+
+
+                <div class="management-stat">
+
+                  <div class="management-stat-label">
+                    Belum Absen
+                  </div>
+
+                  <div
+                    id="managementAbsent"
+                    class="management-stat-value">
+                    0
+                  </div>
+
+                </div>
+
+
+                <div class="management-stat">
+
+                  <div class="management-stat-label">
+                    Terlambat
+                  </div>
+
+                  <div
+                    id="managementLate"
+                    class="management-stat-value">
+                    0
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <footer class="jnda-footer">
+
+          JN Daily Attendance · V3
+          <br>
+          PT Jembatan Nusantara
+
+        </footer>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
