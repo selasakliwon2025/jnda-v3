@@ -1,0 +1,2662 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+  <base target="_top">
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Dashboard - JN Daily Attendance</title>
+
+
+  <!-- =====================================================
+       FONT
+       ===================================================== -->
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+
+  <style>
+
+    /* =====================================================
+       RESET
+       ===================================================== */
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+    }
+
+
+    body {
+
+      font-family: 'Inter', sans-serif;
+
+      background:
+        radial-gradient(
+          circle at 0% 0%,
+          rgba(35, 139, 208, .08),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 100% 100%,
+          rgba(14, 165, 233, .07),
+          transparent 30%
+        ),
+        #f5f8fc;
+
+      color: #172033;
+
+      min-height: 100vh;
+
+      overflow-x: hidden;
+    }
+
+
+    button {
+      font-family: inherit;
+    }
+
+
+    /* =====================================================
+       APP
+       ===================================================== */
+
+    .app-shell {
+
+      min-height: 100vh;
+
+      display: flex;
+
+      flex-direction: column;
+    }
+
+
+    /* =====================================================
+       TOPBAR
+       ===================================================== */
+
+    .topbar {
+
+      height: 76px;
+
+      padding:
+        0 34px;
+
+      background: rgba(255,255,255,.92);
+
+      border-bottom:
+        1px solid #e8edf3;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      position: sticky;
+
+      top: 0;
+
+      z-index: 50;
+
+      backdrop-filter:
+        blur(14px);
+    }
+
+
+    .brand {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 12px;
+    }
+
+
+    .brand-logo {
+
+      width: 42px;
+
+      height: 42px;
+
+      border-radius: 13px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      background:
+        linear-gradient(
+          135deg,
+          #1769aa,
+          #238bd0
+        );
+
+      color: white;
+
+      font-size: 14px;
+
+      font-weight: 800;
+
+      box-shadow:
+        0 7px 18px
+        rgba(23,105,170,.18);
+    }
+
+
+    .brand-name {
+
+      font-size: 13px;
+
+      font-weight: 800;
+
+      color: #172033;
+    }
+
+
+    .brand-version {
+
+      display: block;
+
+      font-size: 9px;
+
+      font-weight: 600;
+
+      color: #94a0b0;
+
+      margin-top: 2px;
+
+      letter-spacing: .8px;
+    }
+
+
+    .topbar-right {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 15px;
+    }
+
+
+    .connection-status {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 7px;
+
+      font-size: 10px;
+
+      font-weight: 600;
+
+      color: #7b8798;
+    }
+
+
+    .status-dot {
+
+      width: 7px;
+
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: #22c55e;
+
+      box-shadow:
+        0 0 0 4px
+        rgba(34,197,94,.10);
+    }
+
+
+    .logout-button {
+
+      height: 35px;
+
+      padding:
+        0 13px;
+
+      border:
+        1px solid #e5eaf0;
+
+      background: #ffffff;
+
+      border-radius: 10px;
+
+      color: #667085;
+
+      font-size: 10px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition: .2s;
+    }
+
+
+    .logout-button:hover {
+
+      background: #f8fafc;
+
+      color: #172033;
+    }
+
+
+    /* =====================================================
+       MAIN
+       ===================================================== */
+
+    .main {
+
+      width: 100%;
+
+      max-width: 1180px;
+
+      margin: 0 auto;
+
+      padding:
+        32px 30px 45px;
+    }
+
+
+    /* =====================================================
+       WELCOME
+       ===================================================== */
+
+    .welcome-section {
+
+      display: flex;
+
+      align-items: flex-end;
+
+      justify-content: space-between;
+
+      gap: 20px;
+
+      margin-bottom: 22px;
+    }
+
+
+    .welcome-label {
+
+      font-size: 11px;
+
+      font-weight: 700;
+
+      color: #2385c4;
+
+      text-transform: uppercase;
+
+      letter-spacing: 1.2px;
+
+      margin-bottom: 6px;
+    }
+
+
+    .welcome-title {
+
+      font-size: 29px;
+
+      line-height: 1.2;
+
+      font-weight: 800;
+
+      letter-spacing: -1px;
+
+      color: #172033;
+    }
+
+
+    .welcome-subtitle {
+
+      font-size: 12px;
+
+      color: #7c8797;
+
+      margin-top: 7px;
+    }
+
+
+    .date-box {
+
+      text-align: right;
+
+      color: #7b8798;
+
+      font-size: 11px;
+
+      line-height: 1.6;
+    }
+
+
+    .date-box strong {
+
+      display: block;
+
+      color: #374151;
+
+      font-size: 13px;
+    }
+
+
+    /* =====================================================
+       EMPLOYEE CONTEXT
+       ===================================================== */
+
+    .employee-card {
+
+      background:
+        linear-gradient(
+          135deg,
+          #eef7fd,
+          #f8fbfe
+        );
+
+      border:
+        1px solid #dcecf8;
+
+      border-radius: 18px;
+
+      padding: 17px 20px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 20px;
+
+      margin-bottom: 20px;
+    }
+
+
+    .employee-left {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 13px;
+    }
+
+
+    .employee-avatar {
+
+      width: 42px;
+
+      height: 42px;
+
+      border-radius: 13px;
+
+      background: white;
+
+      color: #1769aa;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 14px;
+
+      font-weight: 800;
+
+      box-shadow:
+        0 5px 15px
+        rgba(23,105,170,.08);
+    }
+
+
+    .employee-name {
+
+      font-size: 13px;
+
+      font-weight: 800;
+
+      color: #263246;
+    }
+
+
+    .employee-meta {
+
+      margin-top: 3px;
+
+      font-size: 10px;
+
+      color: #8390a0;
+    }
+
+
+    .work-context {
+
+      text-align: right;
+    }
+
+
+    .context-label {
+
+      display: block;
+
+      font-size: 9px;
+
+      text-transform: uppercase;
+
+      letter-spacing: .8px;
+
+      color: #94a0ae;
+
+      margin-bottom: 3px;
+    }
+
+
+    .context-value {
+
+      font-size: 11px;
+
+      font-weight: 700;
+
+      color: #1769aa;
+    }
+
+
+    /* =====================================================
+       ATTENDANCE ACTION
+       ===================================================== */
+
+    .attendance-section {
+
+      margin-bottom: 22px;
+    }
+
+
+    .section-heading {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-bottom: 12px;
+    }
+
+
+    .section-title {
+
+      font-size: 13px;
+
+      font-weight: 800;
+
+      color: #263246;
+    }
+
+
+    .section-description {
+
+      font-size: 10px;
+
+      color: #9aa5b4;
+    }
+
+
+    .attendance-actions {
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 14px;
+    }
+
+
+    .attendance-button {
+
+      min-height: 104px;
+
+      border: 0;
+
+      border-radius: 18px;
+
+      padding: 17px 20px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 15px;
+
+      text-align: left;
+
+      cursor: pointer;
+
+      transition:
+        transform .2s,
+        box-shadow .2s,
+        opacity .2s;
+    }
+
+
+    .attendance-button:hover {
+
+      transform:
+        translateY(-2px);
+    }
+
+
+    .attendance-button:active {
+
+      transform:
+        translateY(0);
+    }
+
+
+    .attendance-button:disabled {
+
+      cursor: not-allowed;
+
+      opacity: .65;
+
+      transform: none;
+    }
+
+
+    .checkin-button {
+
+      background:
+        linear-gradient(
+          135deg,
+          #1769aa,
+          #238bd0
+        );
+
+      color: white;
+
+      box-shadow:
+        0 13px 28px
+        rgba(23,105,170,.17);
+    }
+
+
+    .checkout-button {
+
+      background:
+        linear-gradient(
+          135deg,
+          #536579,
+          #718397
+        );
+
+      color: white;
+
+      box-shadow:
+        0 13px 28px
+        rgba(71,85,105,.13);
+    }
+
+
+    .attendance-icon {
+
+      width: 49px;
+
+      height: 49px;
+
+      flex: 0 0 49px;
+
+      border-radius: 15px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      background:
+        rgba(255,255,255,.15);
+
+      border:
+        1px solid
+        rgba(255,255,255,.13);
+
+      font-size: 20px;
+    }
+
+
+    .attendance-content {
+
+      min-width: 0;
+    }
+
+
+    .attendance-label {
+
+      font-size: 10px;
+
+      font-weight: 600;
+
+      opacity: .78;
+
+      margin-bottom: 4px;
+    }
+
+
+    .attendance-title {
+
+      font-size: 17px;
+
+      font-weight: 800;
+
+      letter-spacing: -.3px;
+    }
+
+
+    .attendance-hint {
+
+      font-size: 9px;
+
+      opacity: .68;
+
+      margin-top: 5px;
+    }
+
+
+    /* =====================================================
+       STATUS CARDS
+       ===================================================== */
+
+    .summary-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr 1fr;
+
+      gap: 14px;
+
+      margin-bottom: 22px;
+    }
+
+
+    .summary-card {
+
+      background: white;
+
+      border:
+        1px solid #e8edf3;
+
+      border-radius: 16px;
+
+      padding: 17px 18px;
+
+      min-height: 108px;
+
+      box-shadow:
+        0 7px 25px
+        rgba(15,23,42,.035);
+    }
+
+
+    .summary-label {
+
+      font-size: 9px;
+
+      font-weight: 700;
+
+      color: #98a3b2;
+
+      text-transform: uppercase;
+
+      letter-spacing: .8px;
+
+      margin-bottom: 9px;
+    }
+
+
+    .summary-value {
+
+      font-size: 22px;
+
+      font-weight: 800;
+
+      color: #263246;
+
+      letter-spacing: -.8px;
+    }
+
+
+    .summary-small {
+
+      font-size: 9px;
+
+      color: #9ba5b3;
+
+      margin-top: 5px;
+    }
+
+
+    .status-badge {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 6px;
+
+      padding:
+        6px 9px;
+
+      border-radius: 8px;
+
+      background: #f1f5f9;
+
+      color: #64748b;
+
+      font-size: 9px;
+
+      font-weight: 700;
+
+      margin-top: 3px;
+    }
+
+
+    .status-badge .mini-dot {
+
+      width: 6px;
+
+      height: 6px;
+
+      border-radius: 50%;
+
+      background: #94a3b8;
+    }
+
+
+    /* =====================================================
+       LOWER GRID
+       ===================================================== */
+
+    .content-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        1.3fr
+        .7fr;
+
+      gap: 14px;
+    }
+
+
+    .panel {
+
+      background: white;
+
+      border:
+        1px solid #e8edf3;
+
+      border-radius: 18px;
+
+      padding: 20px;
+
+      box-shadow:
+        0 7px 25px
+        rgba(15,23,42,.035);
+    }
+
+
+    .panel-header {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-bottom: 17px;
+    }
+
+
+    .panel-title {
+
+      font-size: 12px;
+
+      font-weight: 800;
+
+      color: #263246;
+    }
+
+
+    .panel-link {
+
+      border: 0;
+
+      background: transparent;
+
+      color: #2385c4;
+
+      font-size: 9px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+    }
+
+
+    /* =====================================================
+       LOCATION
+       ===================================================== */
+
+    .location-box {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 13px;
+
+      padding: 14px;
+
+      border-radius: 13px;
+
+      background: #f8fafc;
+
+      border:
+        1px solid #edf1f5;
+    }
+
+
+    .location-icon {
+
+      width: 40px;
+
+      height: 40px;
+
+      border-radius: 12px;
+
+      background: #eef7fd;
+
+      color: #2385c4;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 17px;
+    }
+
+
+    .location-name {
+
+      font-size: 11px;
+
+      font-weight: 700;
+
+      color: #374151;
+    }
+
+
+    .location-status {
+
+      font-size: 9px;
+
+      color: #9aa5b4;
+
+      margin-top: 4px;
+    }
+
+
+    .location-loader {
+
+      margin-left: auto;
+
+      width: 15px;
+
+      height: 15px;
+
+      border:
+        2px solid #dcecf8;
+
+      border-top-color:
+        #2385c4;
+
+      border-radius: 50%;
+
+      animation:
+        spin .7s linear infinite;
+    }
+
+
+    @keyframes spin {
+
+      to {
+        transform: rotate(360deg);
+      }
+
+    }
+
+
+    /* =====================================================
+       ACTIVITY
+       ===================================================== */
+
+    .activity-empty {
+
+      padding: 18px;
+
+      text-align: center;
+
+      border-radius: 13px;
+
+      background: #f8fafc;
+
+      color: #9aa5b4;
+
+      font-size: 10px;
+
+      line-height: 1.6;
+    }
+
+
+    /* =====================================================
+       NAVIGATION
+       ===================================================== */
+
+    .bottom-nav {
+
+      display: none;
+    }
+
+
+    /* =====================================================
+       TOAST
+       ===================================================== */
+
+    .toast {
+
+      position: fixed;
+
+      left: 50%;
+
+      bottom: 25px;
+
+      transform:
+        translate(-50%, 20px);
+
+      opacity: 0;
+
+      pointer-events: none;
+
+      z-index: 100;
+
+      padding:
+        11px 16px;
+
+      border-radius: 11px;
+
+      background: #172033;
+
+      color: white;
+
+      font-size: 10px;
+
+      font-weight: 600;
+
+      box-shadow:
+        0 12px 30px
+        rgba(15,23,42,.18);
+
+      transition: .25s;
+    }
+
+
+    .toast.show {
+
+      opacity: 1;
+
+      transform:
+        translate(-50%, 0);
+    }
+
+
+    /* =====================================================
+       LOADING SCREEN
+       ===================================================== */
+
+    .page-loading {
+
+      position: fixed;
+
+      inset: 0;
+
+      z-index: 200;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      background: #f5f8fc;
+    }
+
+
+    .loading-content {
+
+      text-align: center;
+    }
+
+
+    .loading-spinner {
+
+      width: 30px;
+
+      height: 30px;
+
+      border:
+        3px solid #dcecf8;
+
+      border-top-color:
+        #2385c4;
+
+      border-radius: 50%;
+
+      animation:
+        spin .7s linear infinite;
+
+      margin:
+        0 auto 12px;
+    }
+
+
+    .loading-text {
+
+      font-size: 10px;
+
+      color: #8995a5;
+
+      font-weight: 600;
+    }
+
+
+    /* =====================================================
+       DESKTOP LARGE
+       ===================================================== */
+
+    @media (min-width: 1200px) {
+
+      .main {
+        padding-top: 36px;
+      }
+
+    }
+
+
+    /* =====================================================
+       TABLET
+       ===================================================== */
+
+    @media (max-width: 850px) {
+
+      .topbar {
+        padding: 0 20px;
+      }
+
+
+      .main {
+        padding:
+          25px 20px 35px;
+      }
+
+
+      .content-grid {
+
+        grid-template-columns:
+          1fr;
+      }
+
+    }
+
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 600px) {
+
+      body {
+        padding-bottom: 72px;
+      }
+
+
+      .topbar {
+
+        height: 64px;
+
+        padding:
+          0 16px;
+      }
+
+
+      .brand-logo {
+
+        width: 37px;
+
+        height: 37px;
+
+        border-radius: 11px;
+
+        font-size: 12px;
+      }
+
+
+      .brand-name {
+        font-size: 11px;
+      }
+
+
+      .connection-status {
+        display: none;
+      }
+
+
+      .logout-button {
+
+        height: 32px;
+
+        padding:
+          0 10px;
+
+        font-size: 9px;
+      }
+
+
+      .main {
+
+        padding:
+          20px 15px 25px;
+      }
+
+
+      .welcome-section {
+
+        display: block;
+
+        margin-bottom: 17px;
+      }
+
+
+      .welcome-label {
+
+        font-size: 9px;
+
+        margin-bottom: 5px;
+      }
+
+
+      .welcome-title {
+
+        font-size: 23px;
+
+        letter-spacing: -.8px;
+      }
+
+
+      .welcome-subtitle {
+
+        font-size: 10px;
+
+        margin-top: 5px;
+      }
+
+
+      .date-box {
+
+        text-align: left;
+
+        margin-top: 9px;
+
+        font-size: 9px;
+      }
+
+
+      .date-box strong {
+
+        font-size: 10px;
+      }
+
+
+      .employee-card {
+
+        padding:
+          13px 14px;
+
+        border-radius: 15px;
+
+        margin-bottom: 16px;
+      }
+
+
+      .employee-avatar {
+
+        width: 38px;
+
+        height: 38px;
+
+        border-radius: 11px;
+
+        font-size: 12px;
+      }
+
+
+      .employee-name {
+
+        font-size: 11px;
+      }
+
+
+      .employee-meta {
+
+        font-size: 8px;
+      }
+
+
+      .context-label {
+
+        font-size: 7px;
+      }
+
+
+      .context-value {
+
+        font-size: 9px;
+      }
+
+
+      .attendance-section {
+
+        margin-bottom: 18px;
+      }
+
+
+      .section-heading {
+
+        margin-bottom: 9px;
+      }
+
+
+      .section-title {
+
+        font-size: 11px;
+      }
+
+
+      .section-description {
+
+        font-size: 8px;
+      }
+
+
+      .attendance-actions {
+
+        gap: 9px;
+      }
+
+
+      .attendance-button {
+
+        min-height: 88px;
+
+        border-radius: 15px;
+
+        padding:
+          13px;
+
+        gap: 10px;
+      }
+
+
+      .attendance-icon {
+
+        width: 39px;
+
+        height: 39px;
+
+        flex: 0 0 39px;
+
+        border-radius: 11px;
+
+        font-size: 16px;
+      }
+
+
+      .attendance-label {
+
+        font-size: 8px;
+      }
+
+
+      .attendance-title {
+
+        font-size: 13px;
+      }
+
+
+      .attendance-hint {
+
+        font-size: 7px;
+
+        margin-top: 3px;
+      }
+
+
+      .summary-grid {
+
+        grid-template-columns:
+          1fr 1fr 1fr;
+
+        gap: 8px;
+
+        margin-bottom: 16px;
+      }
+
+
+      .summary-card {
+
+        min-height: 88px;
+
+        padding:
+          13px 11px;
+
+        border-radius: 13px;
+      }
+
+
+      .summary-label {
+
+        font-size: 7px;
+
+        margin-bottom: 6px;
+      }
+
+
+      .summary-value {
+
+        font-size: 17px;
+      }
+
+
+      .summary-small {
+
+        font-size: 7px;
+
+        margin-top: 3px;
+      }
+
+
+      .status-badge {
+
+        font-size: 7px;
+
+        padding:
+          5px 6px;
+      }
+
+
+      .content-grid {
+
+        grid-template-columns:
+          1fr;
+
+        gap: 9px;
+      }
+
+
+      .panel {
+
+        border-radius: 15px;
+
+        padding: 15px;
+      }
+
+
+      .panel-title {
+
+        font-size: 10px;
+      }
+
+
+      .location-box {
+
+        padding: 11px;
+
+        border-radius: 11px;
+      }
+
+
+      .location-icon {
+
+        width: 34px;
+
+        height: 34px;
+
+        border-radius: 10px;
+
+        font-size: 14px;
+      }
+
+
+      .location-name {
+
+        font-size: 9px;
+      }
+
+
+      .location-status {
+
+        font-size: 7px;
+      }
+
+
+      .activity-empty {
+
+        padding: 14px;
+
+        font-size: 8px;
+      }
+
+
+      /* ================================================
+         MOBILE BOTTOM NAV
+         ================================================ */
+
+      .bottom-nav {
+
+        position: fixed;
+
+        display: grid;
+
+        grid-template-columns:
+          repeat(4, 1fr);
+
+        left: 0;
+
+        right: 0;
+
+        bottom: 0;
+
+        height: 64px;
+
+        background:
+          rgba(255,255,255,.96);
+
+        border-top:
+          1px solid #e8edf3;
+
+        z-index: 80;
+
+        backdrop-filter:
+          blur(15px);
+      }
+
+
+      .nav-item {
+
+        border: 0;
+
+        background: transparent;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 4px;
+
+        color: #9aa5b4;
+
+        font-size: 8px;
+
+        font-weight: 600;
+
+        cursor: pointer;
+      }
+
+
+      .nav-item.active {
+
+        color: #2385c4;
+      }
+
+
+      .nav-icon {
+
+        font-size: 16px;
+
+        line-height: 1;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <!-- =====================================================
+       PAGE LOADING
+       ===================================================== -->
+
+  <div
+    class="page-loading"
+    id="pageLoading"
+  >
+
+    <div class="loading-content">
+
+      <div class="loading-spinner"></div>
+
+      <div class="loading-text">
+        Memeriksa sesi...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       APP
+       ===================================================== -->
+
+  <div
+    class="app-shell"
+    id="appShell"
+    style="display:none;"
+  >
+
+
+    <!-- ===================================================
+         TOPBAR
+         =================================================== -->
+
+    <header class="topbar">
+
+
+      <div class="brand">
+
+        <div class="brand-logo">
+          JN
+        </div>
+
+        <div>
+
+          <div class="brand-name">
+            JN Daily Attendance
+          </div>
+
+          <span class="brand-version">
+            JNDA • V3
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="topbar-right">
+
+
+        <div class="connection-status">
+
+          <span class="status-dot"></span>
+
+          Sesi aktif
+
+        </div>
+
+
+        <button
+          class="logout-button"
+          onclick="logout()"
+        >
+          Keluar
+        </button>
+
+
+      </div>
+
+
+    </header>
+
+
+    <!-- ===================================================
+         MAIN
+         =================================================== -->
+
+    <main class="main">
+
+
+      <!-- =================================================
+           WELCOME
+           ================================================= -->
+
+      <section class="welcome-section">
+
+
+        <div>
+
+          <div class="welcome-label">
+            Dashboard
+          </div>
+
+
+          <h1
+            class="welcome-title"
+            id="welcomeTitle"
+          >
+            Selamat datang
+          </h1>
+
+
+          <p class="welcome-subtitle">
+            Kelola kehadiran Anda dengan mudah hari ini.
+          </p>
+
+        </div>
+
+
+        <div class="date-box">
+
+          Hari ini
+
+          <strong id="todayDate">
+            Memuat tanggal...
+          </strong>
+
+        </div>
+
+
+      </section>
+
+
+      <!-- =================================================
+           EMPLOYEE CONTEXT
+           ================================================= -->
+
+      <section class="employee-card">
+
+
+        <div class="employee-left">
+
+
+          <div
+            class="employee-avatar"
+            id="employeeAvatar"
+          >
+            JN
+          </div>
+
+
+          <div>
+
+            <div
+              class="employee-name"
+              id="employeeName"
+            >
+              Memuat data pegawai...
+            </div>
+
+
+            <div
+              class="employee-meta"
+              id="employeeMeta"
+            >
+              Employee ID
+            </div>
+
+          </div>
+
+
+        </div>
+
+
+        <div class="work-context">
+
+
+          <span class="context-label">
+            Penempatan
+          </span>
+
+
+          <span
+            class="context-value"
+            id="workContext"
+          >
+            Memuat...
+          </span>
+
+
+        </div>
+
+
+      </section>
+
+
+      <!-- =================================================
+           ATTENDANCE
+           ================================================= -->
+
+      <section class="attendance-section">
+
+
+        <div class="section-heading">
+
+          <div class="section-title">
+            Presensi hari ini
+          </div>
+
+          <div class="section-description">
+            Tekan tombol untuk melakukan presensi
+          </div>
+
+        </div>
+
+
+        <div class="attendance-actions">
+
+
+          <!-- ABSEN MASUK -->
+
+          <button
+            type="button"
+            class="attendance-button checkin-button"
+            id="checkInButton"
+            onclick="handleCheckIn()"
+          >
+
+            <div class="attendance-icon">
+              ↓
+            </div>
+
+
+            <div class="attendance-content">
+
+              <div class="attendance-label">
+                PRESENSI
+              </div>
+
+              <div class="attendance-title">
+                Absen Masuk
+              </div>
+
+              <div class="attendance-hint">
+                Belum melakukan absen masuk
+              </div>
+
+            </div>
+
+          </button>
+
+
+          <!-- ABSEN PULANG -->
+
+          <button
+            type="button"
+            class="attendance-button checkout-button"
+            id="checkOutButton"
+            onclick="handleCheckOut()"
+          >
+
+            <div class="attendance-icon">
+              ↑
+            </div>
+
+
+            <div class="attendance-content">
+
+              <div class="attendance-label">
+                PRESENSI
+              </div>
+
+              <div class="attendance-title">
+                Absen Pulang
+              </div>
+
+              <div class="attendance-hint">
+                Belum melakukan absen pulang
+              </div>
+
+            </div>
+
+          </button>
+
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           SUMMARY
+           ================================================= -->
+
+      <section class="summary-grid">
+
+
+        <div class="summary-card">
+
+          <div class="summary-label">
+            Check In
+          </div>
+
+          <div
+            class="summary-value"
+            id="checkInTime"
+          >
+            --:--
+          </div>
+
+          <div class="summary-small">
+            Waktu masuk
+          </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+          <div class="summary-label">
+            Check Out
+          </div>
+
+          <div
+            class="summary-value"
+            id="checkOutTime"
+          >
+            --:--
+          </div>
+
+          <div class="summary-small">
+            Waktu pulang
+          </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+          <div class="summary-label">
+            Status
+          </div>
+
+          <div
+            class="status-badge"
+            id="attendanceStatus"
+          >
+
+            <span class="mini-dot"></span>
+
+            Belum Absen
+
+          </div>
+
+          <div class="summary-small">
+            Status hari ini
+          </div>
+
+        </div>
+
+
+      </section>
+
+
+      <!-- =================================================
+           LOWER CONTENT
+           ================================================= -->
+
+      <section class="content-grid">
+
+
+        <!-- LOCATION -->
+
+        <div class="panel">
+
+
+          <div class="panel-header">
+
+            <div class="panel-title">
+              Lokasi Presensi
+            </div>
+
+            <button
+              class="panel-link"
+              onclick="refreshLocation()"
+            >
+              Perbarui
+            </button>
+
+          </div>
+
+
+          <div class="location-box">
+
+
+            <div class="location-icon">
+              ●
+            </div>
+
+
+            <div>
+
+              <div
+                class="location-name"
+                id="locationName"
+              >
+                Mendeteksi lokasi...
+              </div>
+
+
+              <div
+                class="location-status"
+                id="locationStatus"
+              >
+                Lokasi digunakan saat presensi
+              </div>
+
+            </div>
+
+
+            <div
+              class="location-loader"
+              id="locationLoader"
+            ></div>
+
+
+          </div>
+
+
+        </div>
+
+
+        <!-- ACTIVITY -->
+
+        <div class="panel">
+
+
+          <div class="panel-header">
+
+            <div class="panel-title">
+              Aktivitas Terakhir
+            </div>
+
+
+            <button
+              class="panel-link"
+              onclick="openPage('history')"
+            >
+              Lihat
+            </button>
+
+          </div>
+
+
+          <div class="activity-empty">
+
+            Belum ada aktivitas presensi
+            yang tercatat hari ini.
+
+          </div>
+
+
+        </div>
+
+
+      </section>
+
+
+    </main>
+
+
+    <!-- ===================================================
+         MOBILE NAV
+         =================================================== -->
+
+    <nav class="bottom-nav">
+
+
+      <button
+        class="nav-item active"
+        onclick="openPage('dashboard')"
+      >
+
+        <span class="nav-icon">⌂</span>
+
+        Dashboard
+
+      </button>
+
+
+      <button
+        class="nav-item"
+        onclick="openPage('history')"
+      >
+
+        <span class="nav-icon">◷</span>
+
+        Riwayat
+
+      </button>
+
+
+      <button
+        class="nav-item"
+        onclick="openPage('leave')"
+      >
+
+        <span class="nav-icon">▣</span>
+
+        Izin/Cuti
+
+      </button>
+
+
+      <button
+        class="nav-item"
+        onclick="openPage('profile')"
+      >
+
+        <span class="nav-icon">●</span>
+
+        Profil
+
+      </button>
+
+
+    </nav>
+
+
+  </div>
+
+
+  <!-- =====================================================
+       TOAST
+       ===================================================== -->
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+  <script>
+
+    /* =====================================================
+       GLOBAL
+       ===================================================== */
+
+    let SESSION_TOKEN = null;
+
+    let CURRENT_SESSION = null;
+
+
+    /* =====================================================
+       INITIALIZE
+       ===================================================== */
+
+    window.addEventListener(
+      'load',
+      initializeDashboard
+    );
+
+
+    function initializeDashboard() {
+
+      try {
+
+        SESSION_TOKEN =
+          localStorage.getItem(
+            'JNDA_SESSION_TOKEN'
+          );
+
+      } catch (error) {
+
+        console.error(error);
+
+        redirectToLogin();
+
+        return;
+      }
+
+
+      if (!SESSION_TOKEN) {
+
+        redirectToLogin();
+
+        return;
+      }
+
+
+      /*
+       * Validasi token ke server.
+       *
+       * Browser tidak dipercaya sebagai sumber
+       * identitas pegawai.
+       */
+
+      google.script.run
+
+        .withSuccessHandler(
+          handleSessionValidation
+        )
+
+        .withFailureHandler(
+          handleSessionValidationError
+        )
+
+        .validateSession(
+          SESSION_TOKEN
+        );
+    }
+
+
+    /* =====================================================
+       SESSION VALIDATION
+       ===================================================== */
+
+    function handleSessionValidation(result) {
+
+      if (
+        !result ||
+        result.valid !== true
+      ) {
+
+        clearSession();
+
+        redirectToLogin();
+
+        return;
+      }
+
+
+      CURRENT_SESSION =
+        result.session;
+
+
+      renderUserContext();
+
+
+      hideLoading();
+
+
+      /*
+       * Untuk tahap UI pertama,
+       * lokasi belum digunakan untuk submit presensi.
+       *
+       * Engine GPS akan kita hubungkan
+       * setelah SVC_Attendance selesai.
+       */
+
+      showLocationWaiting();
+    }
+
+
+    function handleSessionValidationError(error) {
+
+      console.error(
+        'SESSION VALIDATION ERROR:',
+        error
+      );
+
+
+      clearSession();
+
+      redirectToLogin();
+    }
+
+
+    /* =====================================================
+       RENDER USER
+       ===================================================== */
+
+    function renderUserContext() {
+
+      if (!CURRENT_SESSION) {
+        return;
+      }
+
+
+      const userId =
+        CURRENT_SESSION.userId || '-';
+
+
+      const employeeId =
+        CURRENT_SESSION.employeeId || '-';
+
+
+      const username =
+        CURRENT_SESSION.username || 'Pegawai';
+
+
+      const displayName =
+        username;
+
+
+      document.getElementById(
+        'welcomeTitle'
+      ).textContent =
+        'Selamat datang, ' + displayName;
+
+
+      document.getElementById(
+        'employeeName'
+      ).textContent =
+        displayName;
+
+
+      document.getElementById(
+        'employeeMeta'
+      ).textContent =
+        'Employee ID: ' + employeeId;
+
+
+      document.getElementById(
+        'employeeAvatar'
+      ).textContent =
+        getInitials(displayName);
+
+
+      /*
+       * Untuk sementara kita tampilkan konteks
+       * berdasarkan data session.
+       *
+       * Nanti akan diganti oleh Employee Context:
+       *
+       * Branch / Unit / Ship
+       */
+
+      document.getElementById(
+        'workContext'
+      ).textContent =
+        'Memuat penempatan...';
+
+
+      updateDate();
+    }
+
+
+    /* =====================================================
+       DATE
+       ===================================================== */
+
+    function updateDate() {
+
+      const now =
+        new Date();
+
+
+      const days = [
+
+        'Minggu',
+        'Senin',
+        'Selasa',
+        'Rabu',
+        'Kamis',
+        'Jumat',
+        'Sabtu'
+
+      ];
+
+
+      const months = [
+
+        'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember'
+
+      ];
+
+
+      const text =
+        days[now.getDay()] +
+        ', ' +
+        now.getDate() +
+        ' ' +
+        months[now.getMonth()] +
+        ' ' +
+        now.getFullYear();
+
+
+      document.getElementById(
+        'todayDate'
+      ).textContent =
+        text;
+    }
+
+
+    /* =====================================================
+       INITIALS
+       ===================================================== */
+
+    function getInitials(name) {
+
+      if (!name) {
+        return 'JN';
+      }
+
+
+      const parts =
+        String(name)
+          .trim()
+          .split(/\s+/);
+
+
+      if (parts.length === 1) {
+
+        return parts[0]
+          .substring(0, 2)
+          .toUpperCase();
+
+      }
+
+
+      return (
+        parts[0].charAt(0) +
+        parts[1].charAt(0)
+      ).toUpperCase();
+    }
+
+
+    /* =====================================================
+       LOCATION PLACEHOLDER
+       ===================================================== */
+
+    function showLocationWaiting() {
+
+      document.getElementById(
+        'locationName'
+      ).textContent =
+        'Siap mendeteksi lokasi';
+
+
+      document.getElementById(
+        'locationStatus'
+      ).textContent =
+        'Lokasi akan digunakan saat presensi';
+
+
+      document.getElementById(
+        'locationLoader'
+      ).style.display =
+        'none';
+    }
+
+
+    function refreshLocation() {
+
+      showToast(
+        'GPS akan diaktifkan saat engine presensi V3 siap.'
+      );
+    }
+
+
+    /* =====================================================
+       CHECK IN
+       ===================================================== */
+
+    function handleCheckIn() {
+
+      showToast(
+        'Modul Absen Masuk sedang disiapkan.'
+      );
+
+
+      /*
+       * JANGAN mengirim employee ID dari browser.
+       *
+       * Nantinya:
+       *
+       * Dashboard
+       *     ↓
+       * SVC_Attendance.checkIn(sessionToken, GPS)
+       *     ↓
+       * server resolve employee
+       *     ↓
+       * policy
+       * shift
+       * location
+       * GPS
+       *     ↓
+       * HR_Attendance
+       */
+    }
+
+
+    /* =====================================================
+       CHECK OUT
+       ===================================================== */
+
+    function handleCheckOut() {
+
+      showToast(
+        'Modul Absen Pulang sedang disiapkan.'
+      );
+    }
+
+
+    /* =====================================================
+       NAVIGATION
+       ===================================================== */
+
+    function openPage(page) {
+
+      window.top.location.href =
+        '?page=' +
+        encodeURIComponent(page);
+    }
+
+
+    /* =====================================================
+       LOGOUT
+       ===================================================== */
+
+    function logout() {
+
+      const token =
+        SESSION_TOKEN;
+
+
+      clearSession();
+
+
+      /*
+       * Destroy session server-side.
+       */
+
+      if (token) {
+
+        google.script.run
+          .withFailureHandler(
+            function(error) {
+
+              console.error(
+                'LOGOUT ERROR:',
+                error
+              );
+
+            }
+          )
+          .destroySession(
+            token
+          );
+      }
+
+
+      redirectToLogin();
+    }
+
+
+    /* =====================================================
+       CLEAR SESSION
+       ===================================================== */
+
+    function clearSession() {
+
+      SESSION_TOKEN = null;
+
+      CURRENT_SESSION = null;
+
+
+      try {
+
+        localStorage.removeItem(
+          'JNDA_SESSION_TOKEN'
+        );
+
+      } catch (error) {
+
+        console.error(error);
+      }
+    }
+
+
+    /* =====================================================
+       REDIRECT LOGIN
+       ===================================================== */
+
+    function redirectToLogin() {
+
+      window.top.location.href =
+        '?page=login';
+    }
+
+
+    /* =====================================================
+       LOADING
+       ===================================================== */
+
+    function hideLoading() {
+
+      const loading =
+        document.getElementById(
+          'pageLoading'
+        );
+
+
+      const app =
+        document.getElementById(
+          'appShell'
+        );
+
+
+      loading.style.display =
+        'none';
+
+
+      app.style.display =
+        'flex';
+    }
+
+
+    /* =====================================================
+       TOAST
+       ===================================================== */
+
+    let toastTimer = null;
+
+
+    function showToast(message) {
+
+      const toast =
+        document.getElementById(
+          'toast'
+        );
+
+
+      toast.textContent =
+        message;
+
+
+      toast.classList.add(
+        'show'
+      );
+
+
+      clearTimeout(
+        toastTimer
+      );
+
+
+      toastTimer =
+        setTimeout(
+          function() {
+
+            toast.classList.remove(
+              'show'
+            );
+
+          },
+          3000
+        );
+    }
+
+  </script>
+
+
+</body>
+
+</html>
