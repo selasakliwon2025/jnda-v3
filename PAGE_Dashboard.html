@@ -2504,9 +2504,7 @@
 
     function openPage(page) {
 
-      window.top.location.href =
-        '?page=' +
-        encodeURIComponent(page);
+      navigateTo(page);
     }
 
 
@@ -2549,6 +2547,13 @@
       redirectToLogin();
     }
 
+    function navigateTo(page) {
+
+      window.top.location.href =
+        '<?= WEB_APP_URL ?>?page=' +
+        encodeURIComponent(page);
+    }
+
 
     /* =====================================================
        CLEAR SESSION
@@ -2580,8 +2585,7 @@
 
     function redirectToLogin() {
 
-      window.top.location.href =
-        '?page=login';
+      navigateTo('login');
     }
 
 
