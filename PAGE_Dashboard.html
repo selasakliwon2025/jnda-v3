@@ -1093,30 +1093,26 @@
        NAVIGATION MPA
        ======================================================= */
 
-    function navigateTo(
-      page,
-      mode
-    ) {
+    function navigateTo(page, mode) {
 
       closeMobileSidebar();
 
       let url =
-        '<?= WEB_APP_URL ?>?page=' +
-        encodeURIComponent(
-          page
-        );
+        '?page=' +
+        encodeURIComponent(page);
 
       if (mode) {
 
         url +=
           '&mode=' +
-          encodeURIComponent(
-            mode
-          );
+          encodeURIComponent(mode);
 
       }
 
-      navigateApp(url);
+      window.open(
+        url,
+        '_top'
+      );
 
     }
 
@@ -1127,16 +1123,16 @@
 
     function redirectToLogin() {
 
-      localStorage.removeItem(
-        'JNDA_SESSION_TOKEN'
-      );
+        localStorage.removeItem(
+          'JNDA_SESSION_TOKEN'
+        );
 
-      const url =
-        '<?= WEB_APP_URL ?>?page=login';
+        window.open(
+          '?page=login',
+          '_top'
+        );
 
-      navigateApp(url);
-
-    }
+      }
 
 
     function goToLogin() {
@@ -1167,11 +1163,8 @@
             'JNDA_SESSION_TOKEN'
           );
 
-
         /*
-        * Hapus token browser SEGERA.
-        * Jadi user tetap dianggap logout
-        * walaupun server gagal merespons.
+        * Hapus token lokal terlebih dahulu.
         */
         localStorage.removeItem(
           'JNDA_SESSION_TOKEN'
@@ -1181,8 +1174,8 @@
 
 
         /*
-        * Tidak ada token.
-        * Langsung ke login.
+        * Kalau tidak ada token,
+        * langsung kembali ke login.
         */
         if (!token) {
 
@@ -1194,7 +1187,7 @@
 
 
         /*
-        * Hapus session server.
+        * Hapus session di server.
         */
         google.script.run
 
@@ -1215,8 +1208,8 @@
               );
 
               /*
-              * Token browser sudah dihapus.
-              * Jadi tetap arahkan ke login.
+              * Walaupun server gagal,
+              * token lokal sudah dihapus.
               */
               redirectToLogin();
 
@@ -1918,22 +1911,6 @@
         );
 
     }
-
-    function navigateApp(
-        url
-      ) {
-
-        if (!url) {
-          return;
-        }
-
-        window.open(
-          url,
-          '_top'
-        );
-
-      }
-
 
     /* =======================================================
        CLOSE SIDEBAR WHEN ESC PRESSED
