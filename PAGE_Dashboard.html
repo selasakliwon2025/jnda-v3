@@ -1100,25 +1100,23 @@
 
       closeMobileSidebar();
 
-      const baseUrl =
-        window.top.location.href
-          .split('?')[0];
-
       let url =
-        baseUrl +
-        '?page=' +
-        encodeURIComponent(page);
+        '<?= WEB_APP_URL ?>?page=' +
+        encodeURIComponent(
+          page
+        );
 
       if (mode) {
 
         url +=
           '&mode=' +
-          encodeURIComponent(mode);
+          encodeURIComponent(
+            mode
+          );
 
       }
 
-      window.top.location.href =
-        url;
+      navigateApp(url);
 
     }
 
@@ -1133,9 +1131,10 @@
         'JNDA_SESSION_TOKEN'
       );
 
+      const url =
+        '<?= WEB_APP_URL ?>?page=login';
 
-      window.top.location.href =
-       goToLogin();
+      navigateApp(url);
 
     }
 
@@ -1160,7 +1159,7 @@
        LOGOUT
        ======================================================= */
 
-    function logoutUser() {
+      function logoutUser() {
 
         const token =
           SESSION_TOKEN ||
@@ -1168,41 +1167,62 @@
             'JNDA_SESSION_TOKEN'
           );
 
-        // Hapus token lokal SEGERA
+
+        /*
+        * Hapus token browser SEGERA.
+        * Jadi user tetap dianggap logout
+        * walaupun server gagal merespons.
+        */
         localStorage.removeItem(
           'JNDA_SESSION_TOKEN'
         );
 
+        SESSION_TOKEN = '';
+
+
+        /*
+        * Tidak ada token.
+        * Langsung ke login.
+        */
         if (!token) {
 
-          goToLogin();
+          redirectToLogin();
 
           return;
 
         }
 
+
+        /*
+        * Hapus session server.
+        */
         google.script.run
+
           .withSuccessHandler(
             function () {
 
-              goToLogin();
+              redirectToLogin();
 
             }
           )
+
           .withFailureHandler(
             function (error) {
 
               console.error(
-                'Logout error:',
+                'Logout server error:',
                 error
               );
 
-              // Tetap logout walaupun
-              // server gagal
-              goToLogin();
+              /*
+              * Token browser sudah dihapus.
+              * Jadi tetap arahkan ke login.
+              */
+              redirectToLogin();
 
             }
           )
+
           .destroySession(
             token
           );
@@ -1898,6 +1918,21 @@
         );
 
     }
+
+    function navigateApp(
+        url
+      ) {
+
+        if (!url) {
+          return;
+        }
+
+        window.open(
+          url,
+          '_top'
+        );
+
+      }
 
 
     /* =======================================================
