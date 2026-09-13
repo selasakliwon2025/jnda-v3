@@ -131,50 +131,81 @@
 
     function handleDashboardError(error) {
 
-      console.error(
-        'Dashboard error:',
-        error
-      );
-
-
-      hideDashboardLoading();
-
-
-      const loading =
-        document.getElementById(
-          'dashboardLoading'
+        console.error(
+          'Dashboard error:',
+          error
         );
 
+        const loading =
+          document.getElementById(
+            'dashboardLoading'
+          );
 
-      if (loading) {
+        if (loading) {
 
-        loading.innerHTML = `
-          <div style="
-            font-size:30px;
-            margin-bottom:8px;
-          ">
-            ⚠️
-          </div>
+          loading.style.display = 'flex';
 
-          <div style="
-            font-weight:800;
-            color:#172033;
-          ">
-            Dashboard gagal dimuat
-          </div>
+          loading.innerHTML = `
 
-          <div style="
-            margin-top:5px;
-            font-size:11px;
-            text-align:center;
-          ">
-            Silakan login kembali.
-          </div>
-        `;
+            <div style="
+              width:100%;
+              max-width:420px;
+              padding:30px;
+              border-radius:20px;
+              background:#ffffff;
+              box-shadow:0 15px 45px rgba(15,23,42,.12);
+              text-align:center;
+            ">
+
+              <div style="
+                font-size:38px;
+                margin-bottom:12px;
+              ">
+                ⚠️
+              </div>
+
+              <div style="
+                font-size:18px;
+                font-weight:800;
+                color:#172033;
+              ">
+                Dashboard gagal dimuat
+              </div>
+
+              <div style="
+                margin-top:8px;
+                font-size:12px;
+                color:#728096;
+                line-height:1.6;
+              ">
+                Terjadi masalah saat mengambil
+                data dashboard.
+              </div>
+
+              <button
+                type="button"
+                onclick="location.reload()"
+                style="
+                  margin-top:18px;
+                  border:0;
+                  border-radius:10px;
+                  padding:11px 18px;
+                  background:#16458f;
+                  color:#fff;
+                  font-weight:700;
+                  cursor:pointer;
+                "
+              >
+                Coba Lagi
+              </button>
+
+            </div>
+
+          `;
+
+        }
 
       }
-
-    }
 
 
     /* =======================================================
@@ -237,6 +268,15 @@
         );
 
 
+      const employeeNip =
+        firstValidValue(
+          employee.nip,
+          employee.NIP,
+          employeeId,
+          '-'
+        );
+
+
       /*
        * =====================================================
        * ROLE
@@ -260,40 +300,36 @@
        * =====================================================
        */
 
+      const organization =
+        data.organization || {};
+
+
       const branchName =
         firstValidValue(
+          organization.branch,
           employee.branchName,
           employee.BRANCH_NAME,
           employee.branch,
-          data.branchName,
           '-'
         );
 
 
       const shipName =
         firstValidValue(
+          organization.ship,
           employee.shipName,
           employee.SHIP_NAME,
           employee.ship,
-          data.shipName,
           '-'
         );
 
 
       const positionName =
         firstValidValue(
+          organization.position,
           employee.positionName,
           employee.POSITION_NAME,
           employee.position,
-          '-'
-        );
-
-
-      const shiftName =
-        firstValidValue(
-          employee.shiftName,
-          employee.SHIFT_NAME,
-          employee.shift,
           '-'
         );
 
@@ -339,7 +375,7 @@
 
       setText(
         'profileEmployeeId',
-        'NIP: ' + employeeId
+        'NIP: ' + employeeNip
       );
 
 
