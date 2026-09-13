@@ -333,6 +333,15 @@
           '-'
         );
 
+      const shiftName =
+        firstValidValue(
+          organization.shift,
+          employee.shiftName,
+          employee.SHIFT_NAME,
+          employee.shift,
+          '-'
+        );
+
 
       /*
        * =====================================================
@@ -1091,24 +1100,22 @@
 
       closeMobileSidebar();
 
+      const baseUrl =
+        window.top.location.href
+          .split('?')[0];
 
       let url =
-        '<?= WEB_APP_URL ?>?page=' +
-        encodeURIComponent(
-          page
-        );
-
+        baseUrl +
+        '?page=' +
+        encodeURIComponent(page);
 
       if (mode) {
 
         url +=
           '&mode=' +
-          encodeURIComponent(
-            mode
-          );
+          encodeURIComponent(mode);
 
       }
-
 
       window.top.location.href =
         url;
@@ -1128,7 +1135,23 @@
 
 
       window.top.location.href =
-        '<?= WEB_APP_URL ?>?page=login';
+       goToLogin();
+
+    }
+
+
+    function goToLogin() {
+
+      localStorage.removeItem(
+        'JNDA_SESSION_TOKEN'
+      );
+
+      const baseUrl =
+        window.top.location.href
+          .split('?')[0];
+
+      window.top.location.href =
+        baseUrl + '?page=login';
 
     }
 
@@ -1139,64 +1162,52 @@
 
     function logoutUser() {
 
-      const token =
-        SESSION_TOKEN ||
-        localStorage.getItem(
+        const token =
+          SESSION_TOKEN ||
+          localStorage.getItem(
+            'JNDA_SESSION_TOKEN'
+          );
+
+        // Hapus token lokal SEGERA
+        localStorage.removeItem(
           'JNDA_SESSION_TOKEN'
         );
 
+        if (!token) {
 
-      if (!token) {
+          goToLogin();
 
-        redirectToLogin();
+          return;
 
-        return;
+        }
+
+        google.script.run
+          .withSuccessHandler(
+            function () {
+
+              goToLogin();
+
+            }
+          )
+          .withFailureHandler(
+            function (error) {
+
+              console.error(
+                'Logout error:',
+                error
+              );
+
+              // Tetap logout walaupun
+              // server gagal
+              goToLogin();
+
+            }
+          )
+          .destroySession(
+            token
+          );
 
       }
-
-
-      google.script.run
-        .withSuccessHandler(
-          function () {
-
-            localStorage.removeItem(
-              'JNDA_SESSION_TOKEN'
-            );
-
-
-            window.top.location.href =
-              '<?= WEB_APP_URL ?>?page=login';
-
-          }
-        )
-        .withFailureHandler(
-          function (error) {
-
-            console.error(
-              'Logout error:',
-              error
-            );
-
-
-            /*
-             * Tetap hapus token lokal.
-             */
-
-            localStorage.removeItem(
-              'JNDA_SESSION_TOKEN'
-            );
-
-
-            window.top.location.href =
-              '<?= WEB_APP_URL ?>?page=login';
-
-          }
-        )
-        .destroySession(
-          token
-        );
-
-    }
 
 
     /* =======================================================
