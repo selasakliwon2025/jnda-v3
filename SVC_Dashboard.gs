@@ -1391,3 +1391,16 @@ function isDashboardActiveValue(value) {
     text === 'AKTIF'
   );
 }
+/**
+ * ============================================================
+ * CONFIG COMPATIBILITY
+ * ============================================================
+ *
+ * SVC_Dashboard menggunakan getConfigValue()
+ * sementara konfigurasi V3 menggunakan getConfig().
+ *
+ * Helper ini menjaga kompatibilitas service dashboard.
+ */
+function getConfigValue(key) {
+  return getConfig(key);
+}
