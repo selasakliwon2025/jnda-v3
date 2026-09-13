@@ -55,3 +55,63 @@ function include(filename) {
     .evaluate()
     .getContent();
 }
+
+/**
+ * ============================================================
+ * DATABASE SHEET HELPER
+ * ============================================================
+ *
+ * Mengambil sheet dari database utama JNDA.
+ */
+function getDatabaseSheet(sheetName) {
+
+  if (!sheetName) {
+    throw new Error(
+      'Nama sheet database tidak boleh kosong.'
+    );
+  }
+
+  const spreadsheetId =
+    getConfig(
+      'DATABASE_SPREADSHEET_ID'
+    );
+
+  if (!spreadsheetId) {
+    throw new Error(
+      'DATABASE_SPREADSHEET_ID belum dikonfigurasi.'
+    );
+  }
+
+  const spreadsheet =
+    SpreadsheetApp.openById(
+      spreadsheetId
+    );
+
+  const sheet =
+    spreadsheet.getSheetByName(
+      String(sheetName).trim()
+    );
+
+  if (!sheet) {
+    throw new Error(
+      'Sheet database tidak ditemukan: ' +
+      sheetName
+    );
+  }
+
+  return sheet;
+}
+
+
+/**
+ * ============================================================
+ * CONFIG COMPATIBILITY HELPER
+ * ============================================================
+ *
+ * Dipakai service V3 yang menggunakan getConfigValue().
+ */
+function getConfigValue(key) {
+
+  return getConfig(key);
+
+}
