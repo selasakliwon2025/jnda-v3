@@ -156,12 +156,24 @@ function getDashboardData(sessionToken) {
     success: true,
 
    app: {
-      name: getConfigValue('APP_NAME') || 'JN Daily Attendance',
-      shortName: getConfigValue('APP_SHORT_NAME') || 'JNDA',
-      version: getConfigValue('APP_VERSION') || 'V3',
-      timezone: getConfigValue('TIMEZONE') || 'Asia/Jakarta'
 
-    },
+        name:
+          getConfigValue('APP_NAME') ||
+          'JN Daily Attendance',
+
+        shortName:
+          getConfigValue('APP_SHORT_NAME') ||
+          'JNDA',
+
+        version:
+          getConfigValue('APP_VERSION') ||
+          'V3',
+
+        timezone:
+          getConfigValue('TIMEZONE') ||
+          'Asia/Jakarta'
+
+      },
 
     user: {
 
