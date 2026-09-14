@@ -38,6 +38,9 @@
     let CURRENT_SESSION = null;
     let DASHBOARD_DATA = null;
 
+    const WEB_APP_URL =
+      <?!= JSON.stringify(WEB_APP_URL) ?>;
+
 
     /* =======================================================
        INITIALIZATION
@@ -1098,6 +1101,7 @@
       closeMobileSidebar();
 
       let url =
+        WEB_APP_URL +
         '?page=' +
         encodeURIComponent(page);
 
@@ -1123,32 +1127,23 @@
 
     function redirectToLogin() {
 
-        localStorage.removeItem(
-          'JNDA_SESSION_TOKEN'
-        );
-
-        window.open(
-          '?page=login',
-          '_top'
-        );
-
-      }
-
-
-    function goToLogin() {
-
       localStorage.removeItem(
         'JNDA_SESSION_TOKEN'
       );
 
-      const baseUrl =
-        window.top.location.href
-          .split('?')[0];
+      const url =
+        WEB_APP_URL +
+        '?page=login';
 
-      window.top.location.href =
-        baseUrl + '?page=login';
+      window.open(
+        url,
+        '_top'
+      );
 
     }
+
+
+    
 
 
     /* =======================================================
