@@ -120,32 +120,38 @@ function getDashboardData(sessionToken) {
 
 
   // ----------------------------------------------------------
-  // 6. ATTENDANCE SUMMARY
+  // 6. ATTENDANCE
   // ----------------------------------------------------------
-
-  const attendanceSummary =
-    getDashboardAttendanceSummary(
-      employeeId,
-      roleCategory
-    );
+  // Attendance TIDAK dimuat saat dashboard startup.
+  //
+  // Status attendance hari ini akan diambil terpisah
+  // menggunakan getTodayAttendance(sessionToken)
+  // dari SVC_Attendance.gs.
+  //
+  // Tujuan:
+  // - Dashboard lebih cepat
+  // - Tidak membaca seluruh HR_Attendance
+  // - Tidak membebani Spreadsheet
+  // - Checkout tetap responsif
+  const attendanceSummary = {
+    loaded: false,
+    today: null,
+    recent: []
+  };
 
 
   // ----------------------------------------------------------
   // 7. MANAGEMENT SUMMARY
   // ----------------------------------------------------------
+  // Monitoring management akan dibuat service terpisah
+  // dengan filter + pagination.
+  //
+  // Jangan load data attendance seluruh perusahaan
+  // ketika dashboard pertama kali dibuka.
 
-  let managementSummary = null;
-
-  if (
-    roleCategory === 'MANAGEMENT' ||
-    roleCategory === 'ADMIN'
-  ) {
-    managementSummary =
-      getDashboardManagementSummary(
-        roleCategory
-      );
-  }
-
+  const managementSummary = {
+    loaded: false
+  };
 
   // ----------------------------------------------------------
   // 8. RETURN
