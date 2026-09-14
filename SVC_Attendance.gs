@@ -2,20 +2,27 @@
  * ============================================================
  * JNDA V3 - ATTENDANCE SERVICE
  * File    : SVC_Attendance.gs
- * Version : V3
+ * Version : V3 FINAL
  * ============================================================
  *
- * Prinsip:
- * - EMPLOYEE_ID berasal dari session, bukan client.
- * - Waktu attendance menggunakan server time.
- * - Dashboard TIDAK membaca seluruh HR_Attendance.
- * - Check-in hanya mencari attendance milik employee terkait.
- * - Check-out hanya mencari sesi OPEN milik employee terkait.
- * - Satu employee hanya boleh mempunyai satu sesi OPEN.
- * - Lock digunakan untuk mencegah double submit / race condition.
+ * PRINCIPLE
+ * ------------------------------------------------------------
+ * 1. EMPLOYEE_ID berasal dari session.
+ * 2. Client tidak boleh menentukan EMPLOYEE_ID.
+ * 3. Attendance menggunakan server time.
+ * 4. Dashboard tidak membaca seluruh HR_Attendance.
+ * 5. Check-in/check-out hanya mencari record employee terkait.
+ * 6. Satu employee hanya boleh mempunyai satu attendance
+ *    untuk WORK_DATE yang sama.
+ * 7. Lock digunakan untuk mencegah double submit.
+ * 8. Timezone employee mengikuti:
+ *      - Land  : MS_Branch.TIME_ZONE
+ *      - Crew  : posisi kapal berdasarkan longitude.
+ * 9. Night shift menggunakan tanggal mulai shift sebagai
+ *    WORK_DATE.
+ * 10. GPS belum divalidasi di service ini.
+ *     Validasi GPS akan ditangani SVC_GPS.gs.
  *
- * GPS belum diproses di tahap ini.
- * GPS akan ditangani SVC_GPS.gs.
  * ============================================================
  */
 
@@ -25,56 +32,51 @@
  * ============================================================ */
 
 const ATTENDANCE_SHEET_NAME = 'HR_Attendance';
+const ATTENDANCE_EMPLOYEE_SHIFT_SHEET = 'HR_EmployeeShift';
+const ATTENDANCE_SHIFT_SHEET = 'MS_Shift';
+const ATTENDANCE_BRANCH_SHEET = 'MS_Branch';
+const ATTENDANCE_SHIP_SHEET = 'MS_Ship';
 
 const ATTENDANCE_STATUS_OPEN = 'OPEN';
 const ATTENDANCE_STATUS_CLOSED = 'CLOSED';
 
+const ATTENDANCE_DEFAULT_TIMEZONE = 'Asia/Jakarta';
+const ATTENDANCE_DEFAULT_ZONE_LABEL = 'WIB';
+
 
 /* ============================================================
- * PUBLIC
+ * PUBLIC - CHECK IN
  * ============================================================ */
 
-
 /**
- * ------------------------------------------------------------
- * CHECK-IN
- * ------------------------------------------------------------
+ * Check-in pegawai.
  *
- * Client cukup mengirim:
+ * Client:
+ *   checkIn(sessionToken, payload)
  *
- * {
- *   sessionToken: '...'
- * }
- *
- * EMPLOYEE_ID TIDAK BOLEH dipercaya dari client.
+ * payload saat ini boleh kosong.
+ * GPS nanti akan diproses oleh SVC_GPS.
  */
 function checkIn(sessionToken, payload) {
 
-  const lock =
-    LockService.getScriptLock();
+  const lock = LockService.getScriptLock();
 
   try {
 
-    /*
-     * Cegah dua request check-in bersamaan.
-     */
     lock.waitLock(15000);
 
+    /* --------------------------------------------------------
+     * 1. SESSION + EMPLOYEE
+     * ------------------------------------------------------ */
 
-    /*
-     * Validasi session + employee.
-     */
     const context =
-      _getAttendanceContext(sessionToken);
-
+      _attendanceGetContext(sessionToken);
 
     const employee =
       context.employee;
 
-
     const employeeId =
       String(employee.EMPLOYEE_ID || '').trim();
-
 
     if (!employeeId) {
       throw new Error(
@@ -83,46 +85,80 @@ function checkIn(sessionToken, payload) {
     }
 
 
-    /*
-     * Server time.
-     */
+    /* --------------------------------------------------------
+     * 2. TIMEZONE EMPLOYEE
+     * ------------------------------------------------------ */
+
+    const timezoneInfo =
+      _attendanceGetEmployeeTimezone(employee);
+
+    const timezone =
+      timezoneInfo.timezone;
+
+    const zoneLabel =
+      timezoneInfo.label;
+
+
+    /* --------------------------------------------------------
+     * 3. SERVER TIME
+     * ------------------------------------------------------ */
+
     const now =
       new Date();
 
 
-    /*
-     * WORK_DATE untuk tahap awal:
-     * mengikuti tanggal server aplikasi.
+    /* --------------------------------------------------------
+     * 4. SHIFT EMPLOYEE
+     * ------------------------------------------------------ */
+
+    const shift =
+      _attendanceGetEmployeeShift(employeeId, now);
+
+
+    /* --------------------------------------------------------
+     * 5. WORK DATE
      *
-     * Nanti dapat diperluas untuk night shift.
-     */
+     * Untuk night shift:
+     *
+     * 19:00 - 07:00
+     *
+     * checkout besok pagi tetap menggunakan WORK_DATE
+     * tanggal mulai shift.
+     * ------------------------------------------------------ */
+
     const workDate =
-      _getWorkDate(now);
+      _attendanceResolveWorkDate(
+        now,
+        timezone,
+        shift
+      );
 
 
-    /*
-     * Cari attendance employee + WORK_DATE.
-     *
-     * Penting:
-     * tidak membaca seluruh HR_Attendance.
-     */
+    /* --------------------------------------------------------
+     * 6. CEK ATTENDANCE EXISTING
+     * ------------------------------------------------------ */
+
     const existing =
-      _findAttendanceByEmployeeAndDate(
+      _attendanceFindByEmployeeAndWorkDate(
         employeeId,
         workDate
       );
 
 
-    /*
-     * Jika sudah ada record OPEN,
-     * jangan buat record kedua.
-     */
     if (existing) {
 
+      const existingStatus =
+        _attendanceNormalizeStatus(
+          existing.record.STATUS
+        );
+
+
+      /* ------------------------------------------------------
+       * SUDAH CHECK-IN
+       * ---------------------------------------------------- */
+
       if (
-        String(existing.record.STATUS || '')
-          .trim()
-          .toUpperCase() ===
+        existingStatus ===
         ATTENDANCE_STATUS_OPEN
       ) {
 
@@ -132,22 +168,21 @@ function checkIn(sessionToken, payload) {
           message:
             'Anda sudah melakukan absen masuk.',
           attendance:
-            _buildAttendanceResult(
-              existing.record
+            _attendanceBuildResult(
+              existing.record,
+              timezone,
+              zoneLabel
             )
         };
       }
 
 
-      /*
-       * Jika sudah CLOSED,
-       * berarti employee sudah menyelesaikan
-       * attendance hari tersebut.
-       */
+      /* ------------------------------------------------------
+       * SUDAH SELESAI
+       * ---------------------------------------------------- */
+
       if (
-        String(existing.record.STATUS || '')
-          .trim()
-          .toUpperCase() ===
+        existingStatus ===
         ATTENDANCE_STATUS_CLOSED
       ) {
 
@@ -157,158 +192,135 @@ function checkIn(sessionToken, payload) {
           message:
             'Attendance hari ini sudah selesai.',
           attendance:
-            _buildAttendanceResult(
-              existing.record
+            _attendanceBuildResult(
+              existing.record,
+              timezone,
+              zoneLabel
             )
         };
       }
     }
 
 
-    /*
-     * Generate ATTENDANCE_ID.
-     */
+    /* --------------------------------------------------------
+     * 7. GENERATE ATTENDANCE ID
+     * ------------------------------------------------------ */
+
     const attendanceId =
-      _generateAttendanceId(
+      _attendanceGenerateId(
         employeeId,
         now
       );
 
 
-    /*
-     * Context employee.
-     */
-    const shiftId =
-      String(
-        employee.SHIFT_ID ||
-        employee.ATTENDANCE_SHIFT_ID ||
-        ''
-      ).trim();
+    /* --------------------------------------------------------
+     * 8. MASTER / CONTEXT
+     * ------------------------------------------------------ */
 
+    const shiftId =
+      shift && shift.SHIFT_ID
+        ? String(shift.SHIFT_ID).trim()
+        : '';
 
     const policyId =
-      String(
-        employee.POLICY_ID ||
-        ''
-      ).trim();
-
+      String(employee.POLICY_ID || '').trim();
 
     const shipId =
-      String(
-        employee.SHIP_ID ||
-        ''
-      ).trim();
+      String(employee.SHIP_ID || '').trim();
 
 
     /*
-     * Untuk tahap awal LOCATION_ID
-     * masih kosong.
+     * LOCATION_ID dikosongkan dulu.
      *
-     * Nanti diisi oleh SVC_GPS.
+     * Nanti SVC_GPS akan menentukan lokasi valid.
      */
     const locationId = '';
 
 
-    /*
-     * Payload GPS sengaja belum dipercaya.
-     *
-     * Nanti:
-     * SVC_GPS akan melakukan validasi server-side.
-     */
+    /* --------------------------------------------------------
+     * 9. SHEET
+     * ------------------------------------------------------ */
 
-
-    /*
-     * Insert attendance.
-     */
     const sheet =
       getDatabaseSheet(
         ATTENDANCE_SHEET_NAME
       );
 
-
     const columns =
-      _getAttendanceColumns(sheet);
-
+      _attendanceGetColumns(sheet);
 
     const row =
-      _createEmptyAttendanceRow(
-        columns
-      );
+      _attendanceCreateEmptyRow(columns);
 
 
-    _setAttendanceValue(
+    /* --------------------------------------------------------
+     * 10. BUILD ROW
+     * ------------------------------------------------------ */
+
+    _attendanceSetRowValue(
       row,
       columns,
       'ATTENDANCE_ID',
       attendanceId
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'EMPLOYEE_ID',
       employeeId
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'WORK_DATE',
       workDate
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'CHECK_IN_AT',
       now
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'CHECK_OUT_AT',
       ''
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'STATUS',
       ATTENDANCE_STATUS_OPEN
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'SHIFT_ID',
       shiftId
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'POLICY_ID',
       policyId
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'LOCATION_ID',
       locationId
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'SHIP_ID',
@@ -316,23 +328,68 @@ function checkIn(sessionToken, payload) {
     );
 
 
-    _setAttendanceValue(
+    /* GPS - tahap berikutnya */
+
+    _attendanceSetRowValue(
+      row,
+      columns,
+      'CHECKIN_LATITUDE',
+      ''
+    );
+
+    _attendanceSetRowValue(
+      row,
+      columns,
+      'CHECKIN_LONGITUDE',
+      ''
+    );
+
+    _attendanceSetRowValue(
+      row,
+      columns,
+      'CHECKIN_ACCURACY',
+      ''
+    );
+
+    _attendanceSetRowValue(
+      row,
+      columns,
+      'CHECKOUT_LATITUDE',
+      ''
+    );
+
+    _attendanceSetRowValue(
+      row,
+      columns,
+      'CHECKOUT_LONGITUDE',
+      ''
+    );
+
+    _attendanceSetRowValue(
+      row,
+      columns,
+      'CHECKOUT_ACCURACY',
+      ''
+    );
+
+
+    /* Working */
+
+    _attendanceSetRowValue(
       row,
       columns,
       'WORKING_MINUTES',
       0
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'OVERTIME_MINUTES',
       0
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'REMARK',
@@ -340,15 +397,16 @@ function checkIn(sessionToken, payload) {
     );
 
 
-    _setAttendanceValue(
+    /* Audit */
+
+    _attendanceSetRowValue(
       row,
       columns,
       'CREATED_AT',
       now
     );
 
-
-    _setAttendanceValue(
+    _attendanceSetRowValue(
       row,
       columns,
       'UPDATED_AT',
@@ -356,21 +414,28 @@ function checkIn(sessionToken, payload) {
     );
 
 
-    /*
-     * Simpan satu baris saja.
-     */
+    /* --------------------------------------------------------
+     * 11. SAVE
+     * ------------------------------------------------------ */
+
     sheet.appendRow(row);
 
 
-    /*
-     * Return data hasil insert.
-     */
+    /* --------------------------------------------------------
+     * 12. BUILD RESPONSE
+     * ------------------------------------------------------ */
+
+    const insertedRecord =
+      _attendanceRowToObject(
+        columns,
+        row
+      );
+
     const result =
-      _buildAttendanceResult(
-        _rowArrayToObject(
-          columns,
-          row
-        )
+      _attendanceBuildResult(
+        insertedRecord,
+        timezone,
+        zoneLabel
       );
 
 
@@ -378,7 +443,8 @@ function checkIn(sessionToken, payload) {
 
       success: true,
 
-      code: 'CHECK_IN_SUCCESS',
+      code:
+        'CHECK_IN_SUCCESS',
 
       message:
         'Absen masuk berhasil.',
@@ -396,12 +462,10 @@ function checkIn(sessionToken, payload) {
       error
     );
 
-
     throw new Error(
       error.message ||
       'Gagal melakukan absen masuk.'
     );
-
 
   } finally {
 
@@ -414,10 +478,12 @@ function checkIn(sessionToken, payload) {
 }
 
 
+/* ============================================================
+ * PUBLIC - CHECK OUT
+ * ============================================================ */
+
 /**
- * ------------------------------------------------------------
- * CHECK-OUT
- * ------------------------------------------------------------
+ * Check-out pegawai.
  */
 function checkOut(sessionToken, payload) {
 
@@ -426,24 +492,25 @@ function checkOut(sessionToken, payload) {
 
   try {
 
-    /*
-     * Cegah double checkout.
-     */
     lock.waitLock(15000);
 
 
-    /*
-     * Validasi session.
-     */
-    const context =
-      _getAttendanceContext(sessionToken);
+    /* --------------------------------------------------------
+     * 1. SESSION
+     * ------------------------------------------------------ */
 
+    const context =
+      _attendanceGetContext(
+        sessionToken
+      );
+
+    const employee =
+      context.employee;
 
     const employeeId =
       String(
-        context.employee.EMPLOYEE_ID || ''
+        employee.EMPLOYEE_ID || ''
       ).trim();
-
 
     if (!employeeId) {
       throw new Error(
@@ -452,30 +519,97 @@ function checkOut(sessionToken, payload) {
     }
 
 
-    /*
-     * Server time.
-     */
+    /* --------------------------------------------------------
+     * 2. TIMEZONE
+     * ------------------------------------------------------ */
+
+    const timezoneInfo =
+      _attendanceGetEmployeeTimezone(
+        employee
+      );
+
+    const timezone =
+      timezoneInfo.timezone;
+
+    const zoneLabel =
+      timezoneInfo.label;
+
+
+    /* --------------------------------------------------------
+     * 3. SERVER TIME
+     * ------------------------------------------------------ */
+
     const now =
       new Date();
 
 
-    /*
-     * Cari attendance hari ini.
-     */
+    /* --------------------------------------------------------
+     * 4. SHIFT
+     * ------------------------------------------------------ */
+
+    const shift =
+      _attendanceGetEmployeeShift(
+        employeeId,
+        now
+      );
+
+
+    /* --------------------------------------------------------
+     * 5. WORK DATE
+     *
+     * Penting untuk night shift.
+     * ------------------------------------------------------ */
+
     const workDate =
-      _getWorkDate(now);
+      _attendanceResolveWorkDate(
+        now,
+        timezone,
+        shift
+      );
 
 
-    const existing =
-      _findAttendanceByEmployeeAndDate(
+    /* --------------------------------------------------------
+     * 6. FIND OPEN / EXISTING
+     * ------------------------------------------------------ */
+
+    let existing =
+      _attendanceFindByEmployeeAndWorkDate(
         employeeId,
         workDate
       );
 
 
     /*
-     * Belum check-in.
+     * Jika tidak ditemukan berdasarkan tanggal sekarang,
+     * cek kemungkinan night shift dari hari sebelumnya.
+     *
+     * Contoh:
+     *
+     * 14 Sep 19:00 masuk
+     * 15 Sep 06:00 pulang
+     *
+     * WORK_DATE = 14 Sep
      */
+
+    if (!existing) {
+
+      const previousWorkDate =
+        _attendanceGetPreviousDate(
+          workDate
+        );
+
+      existing =
+        _attendanceFindByEmployeeAndWorkDate(
+          employeeId,
+          previousWorkDate
+        );
+    }
+
+
+    /* --------------------------------------------------------
+     * 7. BELUM CHECK-IN
+     * ------------------------------------------------------ */
+
     if (!existing) {
 
       return {
@@ -495,14 +629,18 @@ function checkOut(sessionToken, payload) {
     const record =
       existing.record;
 
+    const status =
+      _attendanceNormalizeStatus(
+        record.STATUS
+      );
 
-    /*
-     * Sudah checkout.
-     */
+
+    /* --------------------------------------------------------
+     * 8. SUDAH CHECKOUT
+     * ------------------------------------------------------ */
+
     if (
-      String(record.STATUS || '')
-        .trim()
-        .toUpperCase() ===
+      status ===
       ATTENDANCE_STATUS_CLOSED
     ) {
 
@@ -517,22 +655,24 @@ function checkOut(sessionToken, payload) {
           'Anda sudah melakukan absen pulang.',
 
         attendance:
-          _buildAttendanceResult(
-            record
+          _attendanceBuildResult(
+            record,
+            timezone,
+            zoneLabel
           )
 
       };
     }
 
 
-    /*
-     * CHECK_IN harus ada.
-     */
+    /* --------------------------------------------------------
+     * 9. CHECK-IN VALIDATION
+     * ------------------------------------------------------ */
+
     const checkIn =
-      _toDate(
+      _attendanceToDate(
         record.CHECK_IN_AT
       );
-
 
     if (!checkIn) {
 
@@ -542,43 +682,59 @@ function checkOut(sessionToken, payload) {
     }
 
 
-    /*
-     * Hitung durasi.
-     */
+    /* --------------------------------------------------------
+     * 10. PROTECT AGAINST INVALID TIME
+     * ------------------------------------------------------ */
+
+    if (
+      now.getTime() <
+      checkIn.getTime()
+    ) {
+
+      throw new Error(
+        'Waktu absen pulang tidak valid.'
+      );
+    }
+
+
+    /* --------------------------------------------------------
+     * 11. WORKING MINUTES
+     * ------------------------------------------------------ */
+
     const workingMinutes =
-      _calculateWorkingMinutes(
+      _attendanceCalculateWorkingMinutes(
         checkIn,
         now
       );
 
 
-    /*
-     * Overtime sementara 0.
+    /* --------------------------------------------------------
+     * 12. OVERTIME
      *
-     * Nanti dihitung berdasarkan:
-     * MS_Shift / MS_AttendancePolicy.
-     */
+     * Untuk tahap ini tetap 0.
+     * Akan dihitung melalui Attendance Policy.
+     * ------------------------------------------------------ */
+
     const overtimeMinutes = 0;
 
 
-    /*
-     * Update hanya row attendance terkait.
-     */
+    /* --------------------------------------------------------
+     * 13. UPDATE ROW
+     * ------------------------------------------------------ */
+
     const sheet =
       getDatabaseSheet(
         ATTENDANCE_SHEET_NAME
       );
 
-
     const columns =
-      _getAttendanceColumns(sheet);
-
+      _attendanceGetColumns(sheet);
 
     const rowNumber =
       existing.rowNumber;
 
 
-    _setSheetCell(
+    _attendanceSetSheetCell(
       sheet,
       rowNumber,
       columns,
@@ -586,8 +742,7 @@ function checkOut(sessionToken, payload) {
       now
     );
 
-
-    _setSheetCell(
+    _attendanceSetSheetCell(
       sheet,
       rowNumber,
       columns,
@@ -595,8 +750,7 @@ function checkOut(sessionToken, payload) {
       ATTENDANCE_STATUS_CLOSED
     );
 
-
-    _setSheetCell(
+    _attendanceSetSheetCell(
       sheet,
       rowNumber,
       columns,
@@ -604,8 +758,7 @@ function checkOut(sessionToken, payload) {
       workingMinutes
     );
 
-
-    _setSheetCell(
+    _attendanceSetSheetCell(
       sheet,
       rowNumber,
       columns,
@@ -613,8 +766,7 @@ function checkOut(sessionToken, payload) {
       overtimeMinutes
     );
 
-
-    _setSheetCell(
+    _attendanceSetSheetCell(
       sheet,
       rowNumber,
       columns,
@@ -623,10 +775,11 @@ function checkOut(sessionToken, payload) {
     );
 
 
-    /*
-     * Buat hasil terbaru.
-     */
-    const updated =
+    /* --------------------------------------------------------
+     * 14. RESPONSE
+     * ------------------------------------------------------ */
+
+    const updatedRecord =
       Object.assign(
         {},
         record,
@@ -654,8 +807,10 @@ function checkOut(sessionToken, payload) {
         'Absen pulang berhasil.',
 
       attendance:
-        _buildAttendanceResult(
-          updated
+        _attendanceBuildResult(
+          updatedRecord,
+          timezone,
+          zoneLabel
         )
 
     };
@@ -668,12 +823,10 @@ function checkOut(sessionToken, payload) {
       error
     );
 
-
     throw new Error(
       error.message ||
       'Gagal melakukan absen pulang.'
     );
-
 
   } finally {
 
@@ -686,42 +839,99 @@ function checkOut(sessionToken, payload) {
 }
 
 
+/* ============================================================
+ * PUBLIC - TODAY ATTENDANCE
+ * ============================================================ */
+
 /**
- * ------------------------------------------------------------
- * GET TODAY ATTENDANCE
- * ------------------------------------------------------------
+ * Mengambil attendance hari ini.
  *
- * Dipanggil hanya ketika UI benar-benar membutuhkan
- * status attendance.
+ * Fungsi ini DIPANGGIL SATU KALI setelah dashboard selesai
+ * loading.
  *
- * JANGAN dipanggil berulang setiap detik.
+ * Tidak membaca seluruh attendance.
  */
 function getTodayAttendance(sessionToken) {
 
   const context =
-    _getAttendanceContext(
+    _attendanceGetContext(
       sessionToken
     );
 
+  const employee =
+    context.employee;
 
   const employeeId =
     String(
-      context.employee.EMPLOYEE_ID || ''
+      employee.EMPLOYEE_ID || ''
     ).trim();
 
 
-  const workDate =
-    _getWorkDate(
-      new Date()
+  const timezoneInfo =
+    _attendanceGetEmployeeTimezone(
+      employee
     );
 
 
-  const existing =
-    _findAttendanceByEmployeeAndDate(
+  const now =
+    new Date();
+
+
+  const shift =
+    _attendanceGetEmployeeShift(
+      employeeId,
+      now
+    );
+
+
+  const workDate =
+    _attendanceResolveWorkDate(
+      now,
+      timezoneInfo.timezone,
+      shift
+    );
+
+
+  let existing =
+    _attendanceFindByEmployeeAndWorkDate(
       employeeId,
       workDate
     );
 
+
+  /*
+   * Night shift:
+   * jika pagi hari dan attendance kemarin masih OPEN,
+   * ambil record tersebut.
+   */
+
+  if (!existing) {
+
+    const previousWorkDate =
+      _attendanceGetPreviousDate(
+        workDate
+      );
+
+    const previous =
+      _attendanceFindByEmployeeAndWorkDate(
+        employeeId,
+        previousWorkDate
+      );
+
+    if (
+      previous &&
+      _attendanceNormalizeStatus(
+        previous.record.STATUS
+      ) === ATTENDANCE_STATUS_OPEN
+    ) {
+      existing = previous;
+    }
+  }
+
+
+  /* ----------------------------------------------------------
+   * BELUM ABSEN
+   * -------------------------------------------------------- */
 
   if (!existing) {
 
@@ -740,6 +950,10 @@ function getTodayAttendance(sessionToken) {
   }
 
 
+  /* ----------------------------------------------------------
+   * ADA ATTENDANCE
+   * -------------------------------------------------------- */
+
   return {
 
     success: true,
@@ -747,13 +961,15 @@ function getTodayAttendance(sessionToken) {
     exists: true,
 
     status:
-      _normalizeAttendanceStatus(
+      _attendanceNormalizeStatus(
         existing.record.STATUS
       ),
 
     attendance:
-      _buildAttendanceResult(
-        existing.record
+      _attendanceBuildResult(
+        existing.record,
+        timezoneInfo.timezone,
+        timezoneInfo.label
       )
 
   };
@@ -764,19 +980,15 @@ function getTodayAttendance(sessionToken) {
  * CONTEXT
  * ============================================================ */
 
-
 /**
- * Mendapatkan employee berdasarkan session.
- *
- * Session hanya menyimpan USER_ID.
+ * Session → SYS_User → HR_Employee
  */
-function _getAttendanceContext(sessionToken) {
+function _attendanceGetContext(sessionToken) {
 
   const sessionResult =
     validateSession(
       sessionToken
     );
-
 
   if (
     !sessionResult ||
@@ -793,7 +1005,7 @@ function _getAttendanceContext(sessionToken) {
     sessionResult.session;
 
 
-  if (!session.userId) {
+  if (!session || !session.userId) {
 
     throw new Error(
       'Session tidak memiliki USER_ID.'
@@ -801,11 +1013,12 @@ function _getAttendanceContext(sessionToken) {
   }
 
 
-  /*
-   * Ambil SYS_User.
-   */
+  /* ----------------------------------------------------------
+   * SYS USER
+   * -------------------------------------------------------- */
+
   const user =
-    _findRowByColumn(
+    _attendanceFindRowByColumn(
       'SYS_User',
       'USER_ID',
       session.userId
@@ -820,9 +1033,6 @@ function _getAttendanceContext(sessionToken) {
   }
 
 
-  /*
-   * User harus aktif.
-   */
   const userStatus =
     String(
       user.STATUS || ''
@@ -856,11 +1066,12 @@ function _getAttendanceContext(sessionToken) {
   }
 
 
-  /*
-   * Ambil HR_Employee.
-   */
+  /* ----------------------------------------------------------
+   * HR EMPLOYEE
+   * -------------------------------------------------------- */
+
   const employee =
-    _findRowByColumn(
+    _attendanceFindRowByColumn(
       'HR_Employee',
       'EMPLOYEE_ID',
       employeeId
@@ -870,7 +1081,7 @@ function _getAttendanceContext(sessionToken) {
   if (!employee) {
 
     throw new Error(
-      'Data HR_Employee tidak ditemukan.'
+      'Data employee tidak ditemukan.'
     );
   }
 
@@ -889,23 +1100,754 @@ function _getAttendanceContext(sessionToken) {
   ) {
 
     throw new Error(
-      'Data pegawai tidak aktif.'
+      'Employee tidak aktif.'
     );
   }
 
 
   return {
 
-    session:
-      session,
+    user: user,
 
-    user:
-      user,
-
-    employee:
-      employee
+    employee: employee
 
   };
+}
+
+
+/* ============================================================
+ * EMPLOYEE TIMEZONE
+ * ============================================================ */
+
+/**
+ * LAND
+ * ----
+ * HR_Employee.BRANCH_ID
+ *       ↓
+ * MS_Branch.TIME_ZONE
+ *
+ *
+ * CREW
+ * ----
+ * HR_Employee.SHIP_ID
+ *       ↓
+ * MS_Ship.LATITUDE / LONGITUDE
+ *       ↓
+ * timezone
+ */
+function _attendanceGetEmployeeTimezone(employee) {
+
+  const shipId =
+    String(
+      employee.SHIP_ID || ''
+    ).trim();
+
+
+  /* ----------------------------------------------------------
+   * CREW
+   * -------------------------------------------------------- */
+
+  if (shipId) {
+
+    const ship =
+      _attendanceFindRowByColumn(
+        ATTENDANCE_SHIP_SHEET,
+        'SHIP_ID',
+        shipId
+      );
+
+
+    if (ship) {
+
+      const latitude =
+        Number(
+          ship.LATITUDE
+        );
+
+      const longitude =
+        Number(
+          ship.LONGITUDE
+        );
+
+
+      if (
+        !isNaN(latitude) &&
+        !isNaN(longitude)
+      ) {
+
+        return _attendanceTimezoneFromLongitude(
+          longitude
+        );
+      }
+    }
+  }
+
+
+  /* ----------------------------------------------------------
+   * LAND
+   * -------------------------------------------------------- */
+
+  const branchId =
+    String(
+      employee.BRANCH_ID || ''
+    ).trim();
+
+
+  if (branchId) {
+
+    const branch =
+      _attendanceFindRowByColumn(
+        ATTENDANCE_BRANCH_SHEET,
+        'BRANCH_ID',
+        branchId
+      );
+
+
+    if (branch) {
+
+      const timezone =
+        String(
+          branch.TIME_ZONE ||
+          branch.TIMEZONE ||
+          ''
+        ).trim();
+
+
+      if (timezone) {
+
+        return _attendanceTimezoneInfo(
+          timezone
+        );
+      }
+    }
+  }
+
+
+  /* ----------------------------------------------------------
+   * FALLBACK
+   * -------------------------------------------------------- */
+
+  return {
+
+    timezone:
+      ATTENDANCE_DEFAULT_TIMEZONE,
+
+    label:
+      ATTENDANCE_DEFAULT_ZONE_LABEL
+
+  };
+}
+
+
+/**
+ * Indonesia timezone berdasarkan longitude.
+ *
+ * WIB  : UTC+7
+ * WITA : UTC+8
+ * WIT  : UTC+9
+ *
+ * Saat ini perusahaan menggunakan WIB/WITA.
+ */
+function _attendanceTimezoneFromLongitude(longitude) {
+
+  if (longitude < 114.5) {
+
+    return {
+
+      timezone:
+        'Asia/Jakarta',
+
+      label:
+        'WIB'
+
+    };
+  }
+
+
+  if (longitude < 120.5) {
+
+    return {
+
+      timezone:
+        'Asia/Makassar',
+
+      label:
+        'WITA'
+
+    };
+  }
+
+
+  return {
+
+    timezone:
+      'Asia/Jayapura',
+
+    label:
+      'WIT'
+
+  };
+}
+
+
+/**
+ * Normalisasi timezone.
+ */
+function _attendanceTimezoneInfo(timezone) {
+
+  const value =
+    String(
+      timezone || ''
+    ).trim();
+
+
+  if (
+    value === 'Asia/Jakarta' ||
+    value === 'WIB' ||
+    value === 'UTC+7'
+  ) {
+
+    return {
+
+      timezone:
+        'Asia/Jakarta',
+
+      label:
+        'WIB'
+
+    };
+  }
+
+
+  if (
+    value === 'Asia/Makassar' ||
+    value === 'Asia/Ujung_Pandang' ||
+    value === 'WITA' ||
+    value === 'UTC+8'
+  ) {
+
+    return {
+
+      timezone:
+        'Asia/Makassar',
+
+      label:
+        'WITA'
+
+    };
+  }
+
+
+  if (
+    value === 'Asia/Jayapura' ||
+    value === 'WIT' ||
+    value === 'UTC+9'
+  ) {
+
+    return {
+
+      timezone:
+        'Asia/Jayapura',
+
+      label:
+        'WIT'
+
+    };
+  }
+
+
+  return {
+
+    timezone:
+      value ||
+      ATTENDANCE_DEFAULT_TIMEZONE,
+
+    label:
+      _attendanceTimezoneLabel(
+        value
+      )
+
+  };
+}
+
+
+function _attendanceTimezoneLabel(timezone) {
+
+  if (
+    timezone === 'Asia/Makassar'
+  ) {
+    return 'WITA';
+  }
+
+  if (
+    timezone === 'Asia/Jayapura'
+  ) {
+    return 'WIT';
+  }
+
+  return 'WIB';
+}
+
+
+/* ============================================================
+ * SHIFT
+ * ============================================================ */
+
+/**
+ * Mencari shift employee.
+ *
+ * Karena struktur HR_EmployeeShift dapat berkembang,
+ * fungsi ini mendeteksi header secara fleksibel.
+ */
+function _attendanceGetEmployeeShift(
+  employeeId,
+  referenceDate
+) {
+
+  const sheet =
+    _attendanceGetSheetSafe(
+      ATTENDANCE_EMPLOYEE_SHIFT_SHEET
+    );
+
+
+  if (!sheet) {
+    return null;
+  }
+
+
+  const data =
+    sheet.getDataRange().getValues();
+
+
+  if (
+    !data ||
+    data.length < 2
+  ) {
+    return null;
+  }
+
+
+  const headers =
+    data[0].map(
+      function (value) {
+        return String(
+          value || ''
+        )
+          .trim()
+          .toUpperCase();
+      }
+    );
+
+
+  const employeeIndex =
+    _attendanceFindHeaderIndex(
+      headers,
+      [
+        'EMPLOYEE_ID',
+        'EMP_ID'
+      ]
+    );
+
+
+  const shiftIndex =
+    _attendanceFindHeaderIndex(
+      headers,
+      [
+        'SHIFT_ID',
+        'ATTENDANCE_SHIFT_ID'
+      ]
+    );
+
+
+  if (
+    employeeIndex < 0 ||
+    shiftIndex < 0
+  ) {
+    return null;
+  }
+
+
+  const startIndex =
+    _attendanceFindHeaderIndex(
+      headers,
+      [
+        'START_DATE',
+        'EFFECTIVE_FROM',
+        'VALID_FROM'
+      ]
+    );
+
+
+  const endIndex =
+    _attendanceFindHeaderIndex(
+      headers,
+      [
+        'END_DATE',
+        'EFFECTIVE_TO',
+        'VALID_TO'
+      ]
+    );
+
+
+  const statusIndex =
+    _attendanceFindHeaderIndex(
+      headers,
+      [
+        'STATUS',
+        'IS_ACTIVE'
+      ]
+    );
+
+
+  const refTime =
+    referenceDate.getTime();
+
+
+  let best =
+    null;
+
+  let bestStart =
+    -Infinity;
+
+
+  for (
+    let i = 1;
+    i < data.length;
+    i++
+  ) {
+
+    const row =
+      data[i];
+
+
+    const rowEmployeeId =
+      String(
+        row[employeeIndex] || ''
+      ).trim();
+
+
+    if (
+      rowEmployeeId !==
+      String(employeeId).trim()
+    ) {
+      continue;
+    }
+
+
+    /* Status */
+
+    if (statusIndex >= 0) {
+
+      const status =
+        String(
+          row[statusIndex] || ''
+        )
+          .trim()
+          .toUpperCase();
+
+
+      if (
+        status === 'INACTIVE' ||
+        status === '0' ||
+        status === 'FALSE'
+      ) {
+        continue;
+      }
+    }
+
+
+    /* Start date */
+
+    let startTime =
+      -Infinity;
+
+
+    if (startIndex >= 0) {
+
+      const startDate =
+        _attendanceToDate(
+          row[startIndex]
+        );
+
+
+      if (startDate) {
+
+        startTime =
+          startDate.getTime();
+
+
+        if (
+          startTime >
+          refTime
+        ) {
+          continue;
+        }
+      }
+    }
+
+
+    /* End date */
+
+    if (endIndex >= 0) {
+
+      const endDate =
+        _attendanceToDate(
+          row[endIndex]
+        );
+
+
+      if (
+        endDate &&
+        refTime >
+        endDate.getTime()
+      ) {
+        continue;
+      }
+    }
+
+
+    if (
+      startTime >= bestStart
+    ) {
+
+      bestStart =
+        startTime;
+
+      best =
+        _attendanceRowToObject(
+          headers,
+          row
+        );
+    }
+  }
+
+
+  if (!best) {
+    return null;
+  }
+
+
+  const shiftId =
+    String(
+      best.SHIFT_ID ||
+      best.ATTENDANCE_SHIFT_ID ||
+      ''
+    ).trim();
+
+
+  if (!shiftId) {
+    return null;
+  }
+
+
+  /* ----------------------------------------------------------
+   * Ambil master shift.
+   * -------------------------------------------------------- */
+
+  const shift =
+    _attendanceFindRowByColumn(
+      ATTENDANCE_SHIFT_SHEET,
+      'SHIFT_ID',
+      shiftId
+    );
+
+
+  if (!shift) {
+
+    return {
+
+      SHIFT_ID:
+        shiftId
+
+    };
+  }
+
+
+  return Object.assign(
+    {},
+    shift,
+    {
+      SHIFT_ID:
+        shiftId
+    }
+  );
+}
+
+
+/* ============================================================
+ * WORK DATE
+ * ============================================================ */
+
+/**
+ * Menentukan WORK_DATE.
+ *
+ * Night shift:
+ *
+ * 19:00 - 07:00
+ *
+ * Jika sekarang sebelum jam selesai shift,
+ * tanggal kerja dapat berasal dari hari sebelumnya.
+ */
+function _attendanceResolveWorkDate(
+  now,
+  timezone,
+  shift
+) {
+
+  const localDate =
+    Utilities.formatDate(
+      now,
+      timezone,
+      'yyyy-MM-dd'
+    );
+
+
+  if (!shift) {
+    return localDate;
+  }
+
+
+  const start =
+    _attendanceGetShiftTime(
+      shift,
+      [
+        'START_TIME',
+        'SHIFT_START',
+        'CHECKIN_START'
+      ]
+    );
+
+
+  const end =
+    _attendanceGetShiftTime(
+      shift,
+      [
+        'END_TIME',
+        'SHIFT_END',
+        'CHECKOUT_END'
+      ]
+    );
+
+
+  if (!start || !end) {
+    return localDate;
+  }
+
+
+  /*
+   * Shift melewati tengah malam.
+   *
+   * Contoh:
+   * 19:00 → 07:00
+   */
+  if (end < start) {
+
+    const currentTime =
+      Utilities.formatDate(
+        now,
+        timezone,
+        'HH:mm'
+      );
+
+
+    /*
+     * Setelah tengah malam dan sebelum end time,
+     * WORK_DATE adalah hari sebelumnya.
+     */
+    if (
+      currentTime <
+      end
+    ) {
+
+      return _attendanceGetPreviousDate(
+        localDate
+      );
+    }
+  }
+
+
+  return localDate;
+}
+
+
+/**
+ * Ambil jam shift secara fleksibel.
+ */
+function _attendanceGetShiftTime(
+  shift,
+  fields
+) {
+
+  for (
+    let i = 0;
+    i < fields.length;
+    i++
+  ) {
+
+    const value =
+      shift[
+        fields[i]
+      ];
+
+
+    if (
+      value === null ||
+      value === undefined ||
+      value === ''
+    ) {
+      continue;
+    }
+
+
+    /*
+     * Jika Date.
+     */
+    if (
+      Object.prototype.toString.call(
+        value
+      ) === '[object Date]'
+    ) {
+
+      return Utilities.formatDate(
+        value,
+        ATTENDANCE_DEFAULT_TIMEZONE,
+        'HH:mm'
+      );
+    }
+
+
+    const text =
+      String(
+        value
+      ).trim();
+
+
+    const match =
+      text.match(
+        /(\d{1,2}):(\d{2})/
+      );
+
+
+    if (match) {
+
+      const hour =
+        ('0' +
+          match[1]
+        ).slice(-2);
+
+      const minute =
+        match[2];
+
+      return (
+        hour +
+        ':' +
+        minute
+      );
+    }
+  }
+
+
+  return '';
 }
 
 
@@ -913,41 +1855,32 @@ function _getAttendanceContext(sessionToken) {
  * ATTENDANCE FIND
  * ============================================================ */
 
-
 /**
  * Mencari attendance berdasarkan:
  *
  * EMPLOYEE_ID + WORK_DATE
  *
- * Tidak menggunakan getDataRange().
+ * PENTING:
+ * Tidak menggunakan getDataRange() untuk seluruh
+ * HR_Attendance.
  *
- * TextFinder hanya mencari employee ID
- * pada kolom EMPLOYEE_ID.
+ * TextFinder digunakan untuk menemukan EMPLOYEE_ID,
+ * kemudian hanya row yang match yang dibaca.
  */
-function _findAttendanceByEmployeeAndDate(
+function _attendanceFindByEmployeeAndWorkDate(
   employeeId,
   workDate
 ) {
 
   const sheet =
-    getDatabaseSheet(
+    _attendanceGetSheetSafe(
       ATTENDANCE_SHEET_NAME
     );
 
 
-  const columns =
-    _getAttendanceColumns(
-      sheet
-    );
-
-
-  if (
-    !columns.EMPLOYEE_ID ||
-    !columns.WORK_DATE
-  ) {
-
+  if (!sheet) {
     throw new Error(
-      'Kolom EMPLOYEE_ID / WORK_DATE tidak ditemukan.'
+      'Sheet HR_Attendance tidak ditemukan.'
     );
   }
 
@@ -956,88 +1889,174 @@ function _findAttendanceByEmployeeAndDate(
     sheet.getLastRow();
 
 
-  if (lastRow < 2) {
+  const lastColumn =
+    sheet.getLastColumn();
+
+
+  if (
+    lastRow < 2 ||
+    lastColumn < 1
+  ) {
     return null;
   }
 
 
-  /*
-   * Cari EMPLOYEE_ID saja.
-   *
-   * Ini jauh lebih ringan dibanding membaca
-   * seluruh HR_Attendance ke memory.
-   */
-  const employeeRange =
-    sheet.getRange(
-      2,
-      columns.EMPLOYEE_ID,
-      lastRow - 1,
-      1
+  /* ----------------------------------------------------------
+   * Header
+   * -------------------------------------------------------- */
+
+  const headers =
+    sheet
+      .getRange(
+        1,
+        1,
+        1,
+        lastColumn
+      )
+      .getValues()[0]
+      .map(
+        function (value) {
+          return String(
+            value || ''
+          ).trim();
+        }
+      );
+
+
+  const employeeColumn =
+    _attendanceFindHeaderIndex(
+      headers.map(
+        function (value) {
+          return value.toUpperCase();
+        }
+      ),
+      ['EMPLOYEE_ID']
     );
 
 
-  const finder =
-    employeeRange
+  const workDateColumn =
+    _attendanceFindHeaderIndex(
+      headers.map(
+        function (value) {
+          return value.toUpperCase();
+        }
+      ),
+      ['WORK_DATE']
+    );
+
+
+  if (
+    employeeColumn < 0 ||
+    workDateColumn < 0
+  ) {
+
+    throw new Error(
+      'Kolom EMPLOYEE_ID atau WORK_DATE pada HR_Attendance tidak ditemukan.'
+    );
+  }
+
+
+  /* ----------------------------------------------------------
+   * TextFinder
+   * -------------------------------------------------------- */
+
+  const employeeColumnNumber =
+    employeeColumn + 1;
+
+
+  const matches =
+    sheet
+      .getRange(
+        2,
+        employeeColumnNumber,
+        lastRow - 1,
+        1
+      )
       .createTextFinder(
         String(employeeId)
       )
       .matchEntireCell(true)
-      .matchCase(false);
+      .matchCase(true)
+      .findAll();
 
 
-  const matches =
-    finder.findAll();
-
-
-  if (!matches || !matches.length) {
+  if (
+    !matches ||
+    matches.length === 0
+  ) {
     return null;
   }
 
 
-  /*
-   * Periksa hanya row milik employee tersebut.
-   */
+  /* ----------------------------------------------------------
+   * Check matched rows only.
+   * -------------------------------------------------------- */
+
+  const targetDate =
+    String(
+      workDate
+    ).trim();
+
+
+  let found =
+    null;
+
+
   for (
-    let i = matches.length - 1;
-    i >= 0;
-    i--
+    let i = 0;
+    i < matches.length;
+    i++
   ) {
 
-    const cell =
-      matches[i];
-
-
     const rowNumber =
-      cell.getRow();
+      matches[i].getRow();
 
 
-    const rowValues =
+    const values =
       sheet
         .getRange(
           rowNumber,
           1,
           1,
-          columns._count
+          lastColumn
         )
         .getValues()[0];
 
 
     const record =
-      _rowArrayToObject(
-        columns,
-        rowValues
+      _attendanceRowToObject(
+        headers,
+        values
       );
 
 
     const recordDate =
-      _normalizeWorkDate(
+      _attendanceNormalizeWorkDate(
         record.WORK_DATE
       );
 
 
     if (
-      recordDate ===
-      workDate
+      recordDate !==
+      targetDate
+    ) {
+      continue;
+    }
+
+
+    /*
+     * Jika ada lebih dari satu record,
+     * prioritaskan OPEN.
+     */
+    const status =
+      _attendanceNormalizeStatus(
+        record.STATUS
+      );
+
+
+    if (
+      status ===
+      ATTENDANCE_STATUS_OPEN
     ) {
 
       return {
@@ -1050,234 +2069,177 @@ function _findAttendanceByEmployeeAndDate(
 
       };
     }
+
+
+    if (!found) {
+
+      found = {
+
+        rowNumber:
+          rowNumber,
+
+        record:
+          record
+
+      };
+    }
   }
 
 
-  return null;
+  return found;
 }
 
 
 /* ============================================================
- * DATABASE HELPERS
+ * SHEET HELPERS
  * ============================================================ */
 
-
-/**
- * Cari row berdasarkan satu kolom.
- *
- * Dipakai untuk master yang kecil:
- * SYS_User
- * HR_Employee
- *
- * Bukan untuk HR_Attendance.
- */
-function _findRowByColumn(
-  sheetName,
-  columnName,
-  targetValue
+function _attendanceGetSheetSafe(
+  sheetName
 ) {
 
-  const sheet =
-    getDatabaseSheet(
+  try {
+
+    return getDatabaseSheet(
       sheetName
     );
 
+  } catch (error) {
 
-  const lastColumn =
-    sheet.getLastColumn();
-
-
-  const headers =
-    sheet
-      .getRange(
-        1,
-        1,
-        1,
-        lastColumn
-      )
-      .getValues()[0];
-
-
-  const index =
-    _findHeaderIndex(
-      headers,
-      columnName
+    console.error(
+      'Attendance sheet error:',
+      sheetName,
+      error
     );
 
-
-  if (index < 0) {
-
-    throw new Error(
-      'Kolom ' +
-      columnName +
-      ' tidak ditemukan pada ' +
-      sheetName
-    );
-  }
-
-
-  const lastRow =
-    sheet.getLastRow();
-
-
-  if (lastRow < 2) {
     return null;
   }
-
-
-  /*
-   * Untuk master kecil, baca hanya
-   * kolom pencarian.
-   */
-  const values =
-    sheet
-      .getRange(
-        2,
-        index + 1,
-        lastRow - 1,
-        1
-      )
-      .getValues();
-
-
-  const target =
-    String(
-      targetValue || ''
-    ).trim();
-
-
-  for (
-    let i = 0;
-    i < values.length;
-    i++
-  ) {
-
-    if (
-      String(
-        values[i][0] || ''
-      ).trim() === target
-    ) {
-
-      const rowNumber =
-        i + 2;
-
-
-      const rowValues =
-        sheet
-          .getRange(
-            rowNumber,
-            1,
-            1,
-            lastColumn
-          )
-          .getValues()[0];
-
-
-      return _rowArrayToObject(
-        _buildColumnMap(
-          headers
-        ),
-        rowValues
-      );
-    }
-  }
-
-
-  return null;
 }
 
 
-/**
- * Ambil mapping kolom attendance.
- */
-function _getAttendanceColumns(sheet) {
+function _attendanceGetColumns(
+  sheet
+) {
 
   const lastColumn =
     sheet.getLastColumn();
 
 
-  const headers =
-    sheet
-      .getRange(
-        1,
-        1,
-        1,
-        lastColumn
-      )
-      .getValues()[0];
+  if (
+    lastColumn < 1
+  ) {
+    throw new Error(
+      'Sheet attendance tidak memiliki header.'
+    );
+  }
 
 
-  const columns =
-    _buildColumnMap(
-      headers
+  return sheet
+    .getRange(
+      1,
+      1,
+      1,
+      lastColumn
+    )
+    .getValues()[0]
+    .map(
+      function (value) {
+        return String(
+          value || ''
+        ).trim();
+      }
+    );
+}
+
+
+function _attendanceCreateEmptyRow(
+  columns
+) {
+
+  return columns.map(
+    function () {
+      return '';
+    }
+  );
+}
+
+
+function _attendanceSetRowValue(
+  row,
+  columns,
+  columnName,
+  value
+) {
+
+  const index =
+    _attendanceFindHeaderIndex(
+      columns.map(
+        function (value) {
+          return String(
+            value || ''
+          ).toUpperCase();
+        }
+      ),
+      [
+        columnName.toUpperCase()
+      ]
     );
 
 
-  columns._count =
-    lastColumn;
-
-
-  return columns;
+  if (
+    index >= 0
+  ) {
+    row[index] =
+      value;
+  }
 }
 
 
-/**
- * Build map:
- *
- * {
- *   ATTENDANCE_ID: 1,
- *   EMPLOYEE_ID: 2,
- *   ...
- * }
- *
- * Index dibuat 1-based karena Google Sheets.
- */
-function _buildColumnMap(headers) {
-
-  const map = {};
-
-
-  headers.forEach(
-    function(header, index) {
-
-      const key =
-        String(
-          header || ''
-        )
-          .trim()
-          .toUpperCase();
-
-
-      if (key) {
-
-        map[key] =
-          index + 1;
-      }
-    }
-  );
-
-
-  return map;
-}
-
-
-/**
- * Cari index header.
- *
- * Return 0-based.
- */
-function _findHeaderIndex(
-  headers,
-  target
+function _attendanceSetSheetCell(
+  sheet,
+  rowNumber,
+  columns,
+  columnName,
+  value
 ) {
 
-  const wanted =
-    String(
-      target || ''
-    )
-      .trim()
-      .toUpperCase();
+  const index =
+    _attendanceFindHeaderIndex(
+      columns.map(
+        function (item) {
+          return String(
+            item || ''
+          ).toUpperCase();
+        }
+      ),
+      [
+        columnName.toUpperCase()
+      ]
+    );
 
+
+  if (
+    index < 0
+  ) {
+    return;
+  }
+
+
+  sheet
+    .getRange(
+      rowNumber,
+      index + 1
+    )
+    .setValue(
+      value
+    );
+}
+
+
+function _attendanceFindHeaderIndex(
+  headers,
+  candidates
+) {
 
   for (
     let i = 0;
@@ -1285,16 +2247,31 @@ function _findHeaderIndex(
     i++
   ) {
 
-    if (
+    const header =
       String(
         headers[i] || ''
       )
         .trim()
-        .toUpperCase() ===
-      wanted
+        .toUpperCase();
+
+
+    for (
+      let j = 0;
+      j < candidates.length;
+      j++
     ) {
 
-      return i;
+      if (
+        header ===
+        String(
+          candidates[j]
+        )
+          .trim()
+          .toUpperCase()
+      ) {
+
+        return i;
+      }
     }
   }
 
@@ -1304,297 +2281,177 @@ function _findHeaderIndex(
 
 
 /* ============================================================
- * ROW HELPERS
+ * GENERIC ROW FINDER
  * ============================================================ */
 
-
 /**
- * Membuat row kosong berdasarkan jumlah kolom.
- */
-function _createEmptyAttendanceRow(
-  columns
-) {
-
-  return new Array(
-    columns._count
-  ).fill('');
-}
-
-
-/**
- * Set nilai row berdasarkan nama kolom.
- */
-function _setAttendanceValue(
-  row,
-  columns,
-  columnName,
-  value
-) {
-
-  const column =
-    columns[
-      String(
-        columnName
-      ).toUpperCase()
-    ];
-
-
-  if (!column) {
-    return;
-  }
-
-
-  row[column - 1] =
-    value;
-}
-
-
-/**
- * Update satu cell berdasarkan nama kolom.
- */
-function _setSheetCell(
-  sheet,
-  rowNumber,
-  columns,
-  columnName,
-  value
-) {
-
-  const column =
-    columns[
-      String(
-        columnName
-      ).toUpperCase()
-    ];
-
-
-  if (!column) {
-    return;
-  }
-
-
-  sheet
-    .getRange(
-      rowNumber,
-      column
-    )
-    .setValue(
-      value
-    );
-}
-
-
-/**
- * Ubah array row menjadi object.
- */
-function _rowArrayToObject(
-  columns,
-  row
-) {
-
-  const result = {};
-
-
-  Object.keys(columns)
-    .forEach(
-      function(key) {
-
-        if (
-          key === '_count'
-        ) {
-          return;
-        }
-
-
-        const column =
-          columns[key];
-
-
-        result[key] =
-          row[column - 1];
-      }
-    );
-
-
-  return result;
-}
-
-
-/* ============================================================
- * DATE / TIME
- * ============================================================ */
-
-
-/**
- * WORK_DATE server.
+ * Digunakan untuk master kecil:
  *
- * Tahap pertama menggunakan tanggal server.
+ * SYS_User
+ * HR_Employee
+ * MS_Branch
+ * MS_Ship
+ * MS_Shift
+ *
+ * Bukan untuk HR_Attendance.
  */
-function _getWorkDate(date) {
+function _attendanceFindRowByColumn(
+  sheetName,
+  columnName,
+  value
+) {
 
-  const timezone =
-    getConfigValue(
-      'TIMEZONE'
-    ) ||
-    Session.getScriptTimeZone() ||
-    'Asia/Jakarta';
-
-
-  return Utilities.formatDate(
-    date,
-    timezone,
-    'yyyy-MM-dd'
-  );
-}
-
-
-/**
- * Normalize WORK_DATE dari Sheet.
- */
-function _normalizeWorkDate(value) {
-
-  if (!value) {
-    return '';
-  }
-
-
-  /*
-   * Date object.
-   */
-  if (
-    Object.prototype.toString
-      .call(value) ===
-    '[object Date]'
-  ) {
-
-    if (
-      isNaN(
-        value.getTime()
-      )
-    ) {
-      return '';
-    }
-
-
-    return _getWorkDate(
-      value
-    );
-  }
-
-
-  /*
-   * String yyyy-MM-dd.
-   */
-  const text =
-    String(
-      value
-    ).trim();
-
-
-  if (
-    /^\d{4}-\d{2}-\d{2}$/.test(
-      text
-    )
-  ) {
-
-    return text;
-  }
-
-
-  /*
-   * Coba parse.
-   */
-  const parsed =
-    new Date(
-      text
+  const sheet =
+    _attendanceGetSheetSafe(
+      sheetName
     );
 
 
-  if (
-    !isNaN(
-      parsed.getTime()
-    )
-  ) {
-
-    return _getWorkDate(
-      parsed
-    );
-  }
-
-
-  return '';
-}
-
-
-/**
- * Convert value menjadi Date.
- */
-function _toDate(value) {
-
-  if (!value) {
+  if (!sheet) {
     return null;
   }
 
 
-  if (
-    Object.prototype.toString
-      .call(value) ===
-    '[object Date]'
-  ) {
+  const lastRow =
+    sheet.getLastRow();
 
-    return isNaN(
-      value.getTime()
-    )
-      ? null
-      : value;
+  const lastColumn =
+    sheet.getLastColumn();
+
+
+  if (
+    lastRow < 2 ||
+    lastColumn < 1
+  ) {
+    return null;
   }
 
 
-  const date =
-    new Date(
-      value
+  const headers =
+    sheet
+      .getRange(
+        1,
+        1,
+        1,
+        lastColumn
+      )
+      .getValues()[0];
+
+
+  const normalizedHeaders =
+    headers.map(
+      function (header) {
+        return String(
+          header || ''
+        )
+          .trim()
+          .toUpperCase();
+      }
     );
 
 
-  return isNaN(
-    date.getTime()
-  )
-    ? null
-    : date;
-}
-
-
-/**
- * Hitung working minutes.
- */
-function _calculateWorkingMinutes(
-  start,
-  end
-) {
-
-  const startMs =
-    start.getTime();
-
-
-  const endMs =
-    end.getTime();
+  const columnIndex =
+    _attendanceFindHeaderIndex(
+      normalizedHeaders,
+      [
+        columnName
+      ]
+    );
 
 
   if (
-    endMs <= startMs
+    columnIndex < 0
   ) {
-
-    return 0;
+    return null;
   }
 
 
-  return Math.floor(
-    (
-      endMs -
-      startMs
-    ) /
-    60000
+  /*
+   * TextFinder agar tidak membaca seluruh
+   * kolom menjadi array besar.
+   */
+  const matches =
+    sheet
+      .getRange(
+        2,
+        columnIndex + 1,
+        lastRow - 1,
+        1
+      )
+      .createTextFinder(
+        String(value)
+      )
+      .matchEntireCell(true)
+      .matchCase(true)
+      .findAll();
+
+
+  if (
+    !matches ||
+    matches.length === 0
+  ) {
+    return null;
+  }
+
+
+  const rowNumber =
+    matches[0].getRow();
+
+
+  const row =
+    sheet
+      .getRange(
+        rowNumber,
+        1,
+        1,
+        lastColumn
+      )
+      .getValues()[0];
+
+
+  return _attendanceRowToObject(
+    headers,
+    row
   );
+}
+
+
+/* ============================================================
+ * OBJECT / ROW
+ * ============================================================ */
+
+function _attendanceRowToObject(
+  headers,
+  row
+) {
+
+  const object =
+    {};
+
+
+  for (
+    let i = 0;
+    i < headers.length;
+    i++
+  ) {
+
+    const key =
+      String(
+        headers[i] || ''
+      ).trim();
+
+
+    if (!key) {
+      continue;
+    }
+
+
+    object[key] =
+      row[i];
+  }
+
+
+  return object;
 }
 
 
@@ -1602,54 +2459,30 @@ function _calculateWorkingMinutes(
  * RESULT
  * ============================================================ */
 
-
 /**
- * Normalize status.
+ * Response yang dikonsumsi PAGE_Dashboard.html.
  */
-function _normalizeAttendanceStatus(
-  status
-) {
-
-  const value =
-    String(
-      status || ''
-    )
-      .trim()
-      .toUpperCase();
-
-
-  if (
-    value ===
-    ATTENDANCE_STATUS_CLOSED
-  ) {
-
-    return 'SELESAI';
-  }
-
-
-  if (
-    value ===
-    ATTENDANCE_STATUS_OPEN
-  ) {
-
-    return 'SEDANG_BEKERJA';
-  }
-
-
-  return 'BELUM_ABSEN';
-}
-
-
-/**
- * Build response untuk frontend.
- */
-function _buildAttendanceResult(
-  record
+function _attendanceBuildResult(
+  record,
+  timezone,
+  zoneLabel
 ) {
 
   if (!record) {
     return null;
   }
+
+
+  const checkIn =
+    _attendanceToDate(
+      record.CHECK_IN_AT
+    );
+
+
+  const checkOut =
+    _attendanceToDate(
+      record.CHECK_OUT_AT
+    );
 
 
   return {
@@ -1665,41 +2498,46 @@ function _buildAttendanceResult(
       ),
 
     workDate:
-      _normalizeWorkDate(
+      _attendanceNormalizeWorkDate(
         record.WORK_DATE
       ),
 
     status:
-      _normalizeAttendanceStatus(
+      _attendanceNormalizeStatus(
         record.STATUS
       ),
 
-    rawStatus:
-      String(
-        record.STATUS || ''
-      ),
+    checkInAt:
+      checkIn
+        ? checkIn.toISOString()
+        : null,
 
-    checkIn:
-      _formatAttendanceTime(
-        record.CHECK_IN_AT
-      ),
+    checkOutAt:
+      checkOut
+        ? checkOut.toISOString()
+        : null,
 
-    checkOut:
-      _formatAttendanceTime(
-        record.CHECK_OUT_AT
-      ),
+    checkInDisplay:
+      checkIn
+        ? _attendanceFormatDateTime(
+            checkIn,
+            timezone
+          )
+        : '',
 
-    workingMinutes:
-      Number(
-        record.WORKING_MINUTES ||
-        0
-      ),
+    checkOutDisplay:
+      checkOut
+        ? _attendanceFormatDateTime(
+            checkOut,
+            timezone
+          )
+        : '',
 
-    overtimeMinutes:
-      Number(
-        record.OVERTIME_MINUTES ||
-        0
-      ),
+    timezone:
+      timezone,
+
+    timezoneLabel:
+      zoneLabel,
 
     shiftId:
       String(
@@ -1719,42 +2557,254 @@ function _buildAttendanceResult(
     shipId:
       String(
         record.SHIP_ID || ''
+      ),
+
+    workingMinutes:
+      Number(
+        record.WORKING_MINUTES || 0
+      ),
+
+    overtimeMinutes:
+      Number(
+        record.OVERTIME_MINUTES || 0
+      ),
+
+    remark:
+      String(
+        record.REMARK || ''
       )
 
   };
 }
 
 
-/**
- * Format timestamp untuk frontend.
- */
-function _formatAttendanceTime(
+/* ============================================================
+ * DATE / TIME
+ * ============================================================ */
+
+function _attendanceFormatDateTime(
+  date,
+  timezone
+) {
+
+  return Utilities.formatDate(
+    date,
+    timezone ||
+      ATTENDANCE_DEFAULT_TIMEZONE,
+    'dd/MM/yyyy HH:mm:ss'
+  );
+}
+
+
+function _attendanceNormalizeWorkDate(
   value
 ) {
 
-  const date =
-    _toDate(
-      value
-    );
-
-
-  if (!date) {
-    return null;
+  if (
+    value === null ||
+    value === undefined ||
+    value === ''
+  ) {
+    return '';
   }
 
 
-  const timezone =
-    getConfigValue(
-      'TIMEZONE'
-    ) ||
-    'Asia/Jakarta';
+  if (
+    Object.prototype.toString.call(
+      value
+    ) === '[object Date]'
+  ) {
+
+    return Utilities.formatDate(
+      value,
+      ATTENDANCE_DEFAULT_TIMEZONE,
+      'yyyy-MM-dd'
+    );
+  }
+
+
+  const text =
+    String(
+      value
+    ).trim();
+
+
+  /*
+   * yyyy-MM-dd
+   */
+  if (
+    /^\d{4}-\d{2}-\d{2}$/.test(
+      text
+    )
+  ) {
+
+    return text;
+  }
+
+
+  /*
+   * Date object represented as string.
+   */
+  const parsed =
+    new Date(text);
+
+
+  if (
+    !isNaN(
+      parsed.getTime()
+    )
+  ) {
+
+    return Utilities.formatDate(
+      parsed,
+      ATTENDANCE_DEFAULT_TIMEZONE,
+      'yyyy-MM-dd'
+    );
+  }
+
+
+  return text;
+}
+
+
+function _attendanceGetPreviousDate(
+  workDate
+) {
+
+  const date =
+    new Date(
+      workDate +
+      'T00:00:00'
+    );
+
+
+  date.setDate(
+    date.getDate() - 1
+  );
 
 
   return Utilities.formatDate(
     date,
-    timezone,
-    'HH:mm:ss'
+    'UTC',
+    'yyyy-MM-dd'
   );
+}
+
+
+function _attendanceToDate(
+  value
+) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    value === ''
+  ) {
+    return null;
+  }
+
+
+  if (
+    Object.prototype.toString.call(
+      value
+    ) === '[object Date]'
+  ) {
+
+    if (
+      isNaN(
+        value.getTime()
+      )
+    ) {
+      return null;
+    }
+
+    return value;
+  }
+
+
+  const parsed =
+    new Date(value);
+
+
+  if (
+    isNaN(
+      parsed.getTime()
+    )
+  ) {
+    return null;
+  }
+
+
+  return parsed;
+}
+
+
+/* ============================================================
+ * CALCULATION
+ * ============================================================ */
+
+function _attendanceCalculateWorkingMinutes(
+  checkIn,
+  checkOut
+) {
+
+  const diff =
+    checkOut.getTime() -
+    checkIn.getTime();
+
+
+  if (
+    diff <= 0
+  ) {
+    return 0;
+  }
+
+
+  return Math.floor(
+    diff /
+    60000
+  );
+}
+
+
+/* ============================================================
+ * STATUS
+ * ============================================================ */
+
+function _attendanceNormalizeStatus(
+  status
+) {
+
+  const value =
+    String(
+      status || ''
+    )
+      .trim()
+      .toUpperCase();
+
+
+  if (
+    value ===
+    ATTENDANCE_STATUS_OPEN
+  ) {
+    return ATTENDANCE_STATUS_OPEN;
+  }
+
+
+  if (
+    value ===
+    ATTENDANCE_STATUS_CLOSED
+  ) {
+    return ATTENDANCE_STATUS_CLOSED;
+  }
+
+
+  if (!value) {
+    return '';
+  }
+
+
+  return value;
 }
 
 
@@ -1762,52 +2812,37 @@ function _formatAttendanceTime(
  * ID
  * ============================================================ */
 
-
-/**
- * Generate ATTENDANCE_ID.
- *
- * Contoh:
- *
- * ATT-20260914-12306001-abc123
- */
-function _generateAttendanceId(
+function _attendanceGenerateId(
   employeeId,
   date
 ) {
 
-  const timezone =
-    getConfigValue(
-      'TIMEZONE'
-    ) ||
-    'Asia/Jakarta';
-
-
-  const dateText =
+  const timestamp =
     Utilities.formatDate(
       date,
-      timezone,
-      'yyyyMMdd'
+      'UTC',
+      'yyyyMMddHHmmss'
     );
 
 
-  const suffix =
-    Utilities.getUuid()
-      .replace(
-        /-/g,
-        ''
-      )
-      .substring(
-        0,
-        8
+  const random =
+    Math.floor(
+      Math.random() *
+      1000
+    )
+      .toString()
+      .padStart(
+        3,
+        '0'
       );
 
 
   return (
     'ATT-' +
-    dateText +
-    '-' +
     employeeId +
     '-' +
-    suffix
+    timestamp +
+    '-' +
+    random
   );
 }
