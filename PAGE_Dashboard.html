@@ -234,11 +234,6 @@
       const role =
         data.role || {};
 
-
-      const attendance =
-        data.attendance || {};
-
-
       const management =
         data.management || {};
 
@@ -453,20 +448,31 @@
       );
 
 
+      /* =====================================================
+        ATTENDANCE
+        ===================================================== */
+
       /*
-       * =====================================================
-       * ATTENDANCE
-       * =====================================================
-       */
+      * Attendance sengaja tidak diambil dari
+      * getDashboardData() agar dashboard ringan.
+      *
+      * Data attendance dimuat terpisah setelah
+      * informasi pegawai selesai ditampilkan.
+      */
 
-      renderTodayAttendance(
-        attendance
-      );
+      renderTodayAttendance({
+        today: null
+      });
 
+      renderRecentAttendance({
+        recent: []
+      });
 
-      renderRecentAttendance(
-        attendance
-      );
+      /*
+      * Load attendance setelah dashboard utama
+      * selesai dirender.
+      */
+      loadTodayAttendance();
 
 
       /*
@@ -488,6 +494,125 @@
        */
 
       hideDashboardLoading();
+
+    }
+
+    /* =======================================================
+      LOAD TODAY ATTENDANCE
+      ======================================================= */
+
+    function loadTodayAttendance() {
+
+      if (!SESSION_TOKEN) {
+        console.warn(
+          'JNDA: Session token tidak tersedia.'
+        );
+
+        return;
+      }
+
+
+      google.script.run
+
+        .withSuccessHandler(
+          function (result) {
+
+            console.log(
+              'JNDA Today Attendance:',
+              result
+            );
+
+
+            /*
+            * Backend SVC_Attendance.gs:
+            *
+            * {
+            *   success: true,
+            *   exists: true,
+            *   status: 'OPEN',
+            *   attendance: {...}
+            * }
+            *
+            * atau:
+            *
+            * {
+            *   success: true,
+            *   exists: false,
+            *   status: 'BELUM_ABSEN',
+            *   attendance: null
+            * }
+            */
+
+
+            if (
+              !result ||
+              result.success === false
+            ) {
+
+              renderTodayAttendance({
+                today: null
+              });
+
+              return;
+
+            }
+
+
+            /*
+            * Response backend langsung menggunakan
+            * property "attendance".
+            */
+            const attendance =
+              result.attendance || null;
+
+
+            renderTodayAttendance({
+
+              today:
+                attendance || null
+
+            });
+
+
+            /*
+            * Saat ini getTodayAttendance()
+            * hanya mengembalikan attendance hari ini.
+            *
+            * Recent attendance belum diambil di sini.
+            */
+            renderRecentAttendance({
+
+              recent: []
+
+            });
+
+          }
+        )
+
+        .withFailureHandler(
+          function (error) {
+
+            console.error(
+              'JNDA Today Attendance Error:',
+              error
+            );
+
+
+            /*
+            * Jangan membuat seluruh dashboard
+            * gagal hanya karena attendance gagal.
+            */
+
+            renderTodayAttendance({
+              today: null
+            });
+
+          }
+        )
+
+        .getTodayAttendance(
+          SESSION_TOKEN
+        );
 
     }
 
@@ -643,11 +768,24 @@
       attendance
     ) {
 
+      attendance =
+        attendance || {};
+
+
       const today =
         attendance.today ||
         attendance.todayAttendance ||
         attendance.current ||
         {};
+
+
+      /*
+      * Data belum tersedia.
+      * Gunakan placeholder agar UI tidak kosong.
+      */
+
+      const hasAttendance =
+        Object.keys(today).length > 0;
 
 
       const checkIn =
