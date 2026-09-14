@@ -1311,66 +1311,102 @@
 
 
     /* =======================================================
-       CLOCK
-       ======================================================= */
+   DIGITAL CLOCK
+   ======================================================= */
 
-    function startClock() {
-
-      updateClock();
-
-
-      setInterval(
-        updateClock,
-        1000
-      );
-
-    }
+      let EMPLOYEE_TIMEZONE = 'Asia/Jakarta';
+      let EMPLOYEE_TIMEZONE_LABEL = 'WIB';
 
 
-    function updateClock() {
+      function startClock() {
 
-      const now =
-        new Date();
+        updateClock();
 
+        setInterval(
+          updateClock,
+          1000
+        );
 
-      const time =
-        new Intl.DateTimeFormat(
-          'id-ID',
-          {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false,
-            timeZone: 'Asia/Jakarta'
-          }
-        ).format(now);
+      }
 
 
-      const date =
-        new Intl.DateTimeFormat(
-          'id-ID',
-          {
-            weekday: 'long',
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric',
-            timeZone: 'Asia/Jakarta'
-          }
-        ).format(now);
+      function updateClock() {
+
+        const now = new Date();
+
+        const timeText =
+          new Intl.DateTimeFormat(
+            'id-ID',
+            {
+              timeZone: EMPLOYEE_TIMEZONE,
+
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+
+              hour12: false
+            }
+          ).format(now);
 
 
-      setText(
-        'liveClock',
-        time + ' WIB'
-      );
+        const clock =
+          document.getElementById(
+            'digitalClock'
+          );
 
 
-      setText(
-        'pageDate',
-        date
-      );
+        if (clock) {
 
-    }
+          clock.textContent =
+            timeText;
+
+        }
+
+
+        const zone =
+          document.getElementById(
+            'digitalClockZone'
+          );
+
+
+        if (zone) {
+
+          zone.textContent =
+            EMPLOYEE_TIMEZONE_LABEL;
+
+        }
+
+
+        /* tanggal dashboard */
+
+        const dateText =
+          new Intl.DateTimeFormat(
+            'id-ID',
+            {
+              timeZone: EMPLOYEE_TIMEZONE,
+
+              weekday: 'long',
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric'
+            }
+          ).format(now);
+
+
+        const pageDate =
+          document.getElementById(
+            'pageDate'
+          );
+
+
+        if (pageDate) {
+
+          pageDate.textContent =
+            dateText;
+
+        }
+
+      }
 
 
     /* =======================================================
