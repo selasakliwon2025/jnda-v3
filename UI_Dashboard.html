@@ -1141,14 +1141,11 @@ body {
 @media (max-width: 900px) {
 
   .jnda-sidebar {
-
     transform:
       translateX(-100%);
   }
 
-
   .jnda-sidebar.mobile-open {
-
     transform:
       translateX(0);
 
@@ -1157,108 +1154,90 @@ body {
       rgba(15,23,42,.18);
   }
 
-
   .sidebar-overlay.mobile-open {
-
     display: block;
   }
 
-
   .jnda-main {
-
     margin-left: 0;
   }
 
-
   .mobile-menu-button {
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
   }
 
-
   .jnda-topbar {
-
     height: 66px;
-
-    padding:
-      0 14px;
+    padding: 0 14px;
   }
 
-
   .navbar-logo.jn {
-
     width: 90px;
-
     height: 42px;
   }
 
-
   .navbar-logo.partner {
-
     width: 50px;
-
     height: 36px;
   }
 
-
   .navbar-logos {
-
     gap: 7px;
   }
 
-
   .logo-divider {
-
     height: 22px;
   }
 
-
   .top-user-text {
-
     display: none;
   }
 
-
   .jnda-content {
-
-    padding:
-      14px;
+    padding: 14px;
   }
 
-
+  /* BANNER MOBILE */
   .welcome-card {
-
-    min-height: 320px;
-
+    min-height: 260px;
     border-radius: 19px;
-
-    background-position:
-      62% center;
+    background-position: 62% center;
   }
-
 
   .welcome-content {
-
-    padding:
-      24px 20px;
+    padding: 24px 20px;
   }
-
 
   .dashboard-grid {
-
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
-
   .management-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 
-    grid-template-columns:
-      1fr 1fr;
+}
+
+
+@media (max-width: 700px) {
+
+  .welcome-clock {
+    top: 18px;
+    right: 18px;
+
+    min-width: 135px;
+    padding: 9px 12px;
+    border-radius: 12px;
+  }
+
+  .welcome-clock-time {
+    font-size: 18px;
+  }
+
+  .welcome-clock-zone {
+    font-size: 8px;
   }
 
 }
@@ -1267,52 +1246,36 @@ body {
 @media (max-width: 560px) {
 
   .navbar-logo.partner {
-
     display: none;
   }
-
 
   .logo-divider {
-
     display: none;
   }
 
-
   .navbar-logo.jn {
-
     width: 105px;
   }
 
-
   .attendance-actions {
-
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
-
+  /* BANNER LEBIH PENDEK */
   .welcome-card {
-
-    min-height: 335px;
+    min-height: 250px;
   }
-
 
   .welcome-title {
-
-    font-size: 27px;
+    font-size: 24px;
   }
-
 
   .welcome-name {
-
-    font-size: 17px;
+    font-size: 16px;
   }
 
-
   .today-status {
-
-    grid-template-columns:
-      1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
 }
