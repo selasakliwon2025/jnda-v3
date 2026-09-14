@@ -91,3 +91,7 @@ function getConfig(key) {
 function getAllConfig() {
   return Object.assign({}, JNDA_CONFIG);
 }
+
+function getConfigValue(key) {
+  return getConfig(key);
+}
