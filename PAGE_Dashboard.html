@@ -76,6 +76,37 @@
 
       }
 
+      const checkInMode =
+        document.getElementById(
+          'checkInMode'
+        );
+
+
+      const checkInEmployeeType =
+        document.getElementById(
+          'checkInEmployeeType'
+        );
+
+
+      if (checkInMode) {
+
+        checkInMode.addEventListener(
+          'change',
+          updateCheckInShiftUI
+        );
+
+      }
+
+
+      if (checkInEmployeeType) {
+
+        checkInEmployeeType.addEventListener(
+          'change',
+          updateCheckInShiftUI
+        );
+
+      }
+
 
       /*
       * ESC untuk menutup modal
@@ -2229,6 +2260,8 @@
 
       resetCheckInForm();
 
+      updateCheckInShiftUI();
+
 
       /*
       * Tampilkan modal
@@ -2373,6 +2406,201 @@
             Konfirmasi Absen
           </span>
         `;
+      }
+
+    }
+
+    /* =======================================================
+      CHECK-IN - UPDATE SHIFT UI
+      ======================================================= */
+
+    function updateCheckInShiftUI() {
+
+      const mode =
+        String(
+          document.getElementById('checkInMode')?.value || ''
+        )
+        .trim()
+        .toUpperCase();
+
+
+      const employeeType =
+        String(
+          document.getElementById('checkInEmployeeType')?.value || ''
+        )
+        .trim()
+        .toUpperCase();
+
+
+      const shiftField =
+        document.getElementById(
+          'checkInShiftField'
+        );
+
+
+      const shiftSelect =
+        document.getElementById(
+          'checkInShift'
+        );
+
+
+      const officeSchedule =
+        document.getElementById(
+          'checkInOfficeSchedule'
+        );
+
+
+      const officeDay =
+        document.getElementById(
+          'checkInOfficeDay'
+        );
+
+
+      const officeHours =
+        document.getElementById(
+          'checkInOfficeHours'
+        );
+
+
+      const officeTolerance =
+        document.getElementById(
+          'checkInOfficeTolerance'
+        );
+
+
+      if (!shiftField || !shiftSelect) {
+        return;
+      }
+
+
+      /*
+      * Office Hour hanya berlaku untuk:
+      *
+      * WFO + OFFICE_HOUR
+      */
+
+      const isOfficeHour =
+        mode === 'WFO' &&
+        employeeType === 'OFFICE_HOUR';
+
+
+      if (isOfficeHour) {
+
+        /*
+        * Jangan biarkan user memilih shift.
+        */
+
+        shiftSelect.value = '';
+
+        shiftSelect.disabled = true;
+
+        shiftSelect.style.display = 'none';
+
+
+        if (officeSchedule) {
+
+          officeSchedule.hidden = false;
+
+        }
+
+
+        /*
+        * Gunakan tanggal browser hanya
+        * untuk menampilkan informasi UI.
+        *
+        * Backend tetap menjadi sumber
+        * kebenaran jadwal sebenarnya.
+        */
+
+        const now = new Date();
+
+        const day =
+          now.getDay();
+
+
+        if (day >= 1 && day <= 4) {
+
+          if (officeDay) {
+
+            officeDay.textContent =
+              'Office Hour · Senin – Kamis';
+
+          }
+
+          if (officeHours) {
+
+            officeHours.textContent =
+              '08:00 – 16:30';
+
+          }
+
+        }
+
+        else if (day === 5) {
+
+          if (officeDay) {
+
+            officeDay.textContent =
+              'Office Hour · Jumat';
+
+          }
+
+          if (officeHours) {
+
+            officeHours.textContent =
+              '08:00 – 17:00';
+
+          }
+
+        }
+
+        else {
+
+          if (officeDay) {
+
+            officeDay.textContent =
+              'Office Hour · Weekend';
+
+          }
+
+          if (officeHours) {
+
+            officeHours.textContent =
+              'Tidak ada jadwal';
+
+          }
+
+        }
+
+
+        if (officeTolerance) {
+
+          officeTolerance.textContent =
+            'Toleransi keterlambatan 18 menit';
+
+        }
+
+
+        return;
+
+      }
+
+
+      /*
+      * Bukan Office Hour
+      *
+      * Kembalikan dropdown shift.
+      */
+
+      shiftSelect.disabled = false;
+
+      shiftSelect.style.display = '';
+
+
+      if (officeSchedule) {
+
+        officeSchedule.hidden = true;
+
       }
 
     }
