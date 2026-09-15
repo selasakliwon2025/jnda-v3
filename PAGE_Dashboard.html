@@ -56,6 +56,8 @@
 
         initAttendanceModal();
 
+        initDinasAttachment();
+
       }
     );
 
@@ -2364,7 +2366,6 @@
           'checkInRemark'
         );
 
-
       if (mode) {
         mode.value = '';
       }
@@ -2374,6 +2375,40 @@
         employeeType.value = '';
       }
 
+      /* =====================================================
+        DEFAULT UNTUK PEGAWAI YANG MEMILIKI SHIP_ID
+        ===================================================== */
+
+      const employee =
+        DASHBOARD_DATA?.employee || {};
+
+
+      const shipId =
+        String(
+          employee.shipId ||
+          employee.SHIP_ID ||
+          ''
+        ).trim();
+
+
+      if (shipId) {
+
+        if (mode) {
+
+          mode.value =
+            'SHIP';
+
+        }
+
+
+        if (employeeType) {
+
+          employeeType.value =
+            'CREW';
+
+        }
+
+      } 
 
       if (shift) {
         shift.value = '';
@@ -2408,7 +2443,38 @@
         `;
       }
 
+      const dinasAttachment =
+        document.getElementById(
+          'checkInDinasAttachment'
+        );
+
+
+      const dinasAttachmentName =
+        document.getElementById(
+          'checkInDinasAttachmentName'
+        );
+
+
+      if (dinasAttachment) {
+
+        dinasAttachment.value = '';
+
+      }
+
+
+      if (dinasAttachmentName) {
+
+        dinasAttachmentName.textContent = '';
+
+        dinasAttachmentName.classList.remove(
+          'error'
+        );
+
+      }
+
     }
+
+   
 
     /* =======================================================
       CHECK-IN - UPDATE SHIFT UI
@@ -2418,7 +2484,9 @@
 
       const mode =
         String(
-          document.getElementById('checkInMode')?.value || ''
+          document.getElementById(
+            'checkInMode'
+          )?.value || ''
         )
         .trim()
         .toUpperCase();
@@ -2426,16 +2494,12 @@
 
       const employeeType =
         String(
-          document.getElementById('checkInEmployeeType')?.value || ''
+          document.getElementById(
+            'checkInEmployeeType'
+          )?.value || ''
         )
         .trim()
         .toUpperCase();
-
-
-      const shiftField =
-        document.getElementById(
-          'checkInShiftField'
-        );
 
 
       const shiftSelect =
@@ -2444,9 +2508,27 @@
         );
 
 
+      const manualShift =
+        document.getElementById(
+          'checkInManualShift'
+        );
+
+
       const officeSchedule =
         document.getElementById(
           'checkInOfficeSchedule'
+        );
+
+
+      const crewSchedule =
+        document.getElementById(
+          'checkInCrewSchedule'
+        );
+
+
+      const attachmentField =
+        document.getElementById(
+          'checkInDinasAttachmentField'
         );
 
 
@@ -2468,70 +2550,140 @@
         );
 
 
-      if (!shiftField || !shiftSelect) {
+      const crewDay =
+        document.getElementById(
+          'checkInCrewDay'
+        );
+
+
+      if (!shiftSelect) {
         return;
       }
 
 
-      /*
-      * Office Hour hanya berlaku untuk:
-      *
-      * WFO + OFFICE_HOUR
-      */
+      /* =====================================================
+        RESET TAMPILAN
+        ===================================================== */
 
-      const isOfficeHour =
-        mode === 'WFO' &&
-        employeeType === 'OFFICE_HOUR';
+      if (manualShift) {
+        manualShift.style.display = '';
+      }
+
+      shiftSelect.disabled = false;
+      shiftSelect.style.display = '';
 
 
-      if (isOfficeHour) {
+      if (officeSchedule) {
+        officeSchedule.hidden = true;
+      }
 
-        /*
-        * Jangan biarkan user memilih shift.
-        */
+
+      if (crewSchedule) {
+        crewSchedule.hidden = true;
+      }
+
+
+      /* =====================================================
+        DINAS LUAR
+        ===================================================== */
+
+      if (attachmentField) {
+
+        attachmentField.hidden =
+          mode !== 'DINAS_LUAR';
+
+      }
+
+
+      /* =====================================================
+        CREW DI ATAS KAPAL
+        ===================================================== */
+
+      if (
+        mode === 'SHIP' &&
+        employeeType === 'CREW'
+      ) {
 
         shiftSelect.value = '';
-
         shiftSelect.disabled = true;
-
         shiftSelect.style.display = 'none';
 
 
-        if (officeSchedule) {
-
-          officeSchedule.hidden = false;
-
+        if (manualShift) {
+          manualShift.style.display = 'none';
         }
 
 
-        /*
-        * Gunakan tanggal browser hanya
-        * untuk menampilkan informasi UI.
-        *
-        * Backend tetap menjadi sumber
-        * kebenaran jadwal sebenarnya.
-        */
+        if (crewSchedule) {
+          crewSchedule.hidden = false;
+        }
 
-        const now = new Date();
+
+        if (crewDay) {
+          crewDay.textContent =
+            'Crew Kapal';
+        }
+
+
+        return;
+      }
+
+
+      /* =====================================================
+        OFFICE HOUR
+
+        Berlaku untuk:
+        - OFFICE_HOUR + WFO
+        - WFH
+        - DINAS_LUAR
+        ===================================================== */
+
+      const useOfficeHour =
+        (
+          mode === 'WFO' &&
+          employeeType === 'OFFICE_HOUR'
+        ) ||
+        mode === 'WFH' ||
+        mode === 'DINAS_LUAR';
+
+
+      if (useOfficeHour) {
+
+        shiftSelect.value = '';
+        shiftSelect.disabled = true;
+        shiftSelect.style.display = 'none';
+
+
+        if (manualShift) {
+          manualShift.style.display = 'none';
+        }
+
+
+        if (officeSchedule) {
+          officeSchedule.hidden = false;
+        }
+
+
+        const now =
+          new Date();
 
         const day =
           now.getDay();
 
 
-        if (day >= 1 && day <= 4) {
+        if (
+          day >= 1 &&
+          day <= 4
+        ) {
 
           if (officeDay) {
-
             officeDay.textContent =
               'Office Hour · Senin – Kamis';
-
           }
 
           if (officeHours) {
-
             officeHours.textContent =
               '08:00 – 16:30';
-
           }
 
         }
@@ -2539,17 +2691,13 @@
         else if (day === 5) {
 
           if (officeDay) {
-
             officeDay.textContent =
               'Office Hour · Jumat';
-
           }
 
           if (officeHours) {
-
             officeHours.textContent =
               '08:00 – 17:00';
-
           }
 
         }
@@ -2557,17 +2705,13 @@
         else {
 
           if (officeDay) {
-
             officeDay.textContent =
               'Office Hour · Weekend';
-
           }
 
           if (officeHours) {
-
             officeHours.textContent =
               'Tidak ada jadwal';
-
           }
 
         }
@@ -2582,25 +2726,41 @@
 
 
         return;
-
       }
 
+    }
 
-      /*
-      * Bukan Office Hour
-      *
-      * Kembalikan dropdown shift.
-      */
+    /* =====================================================
+      VALIDASI LAMPIRAN DINAS LUAR
+      ===================================================== */
 
-      shiftSelect.disabled = false;
+    if (
+      String(mode)
+        .trim()
+        .toUpperCase() === 'DINAS_LUAR'
+    ) {
 
-      shiftSelect.style.display = '';
+      const attachment =
+        document.getElementById(
+          'checkInDinasAttachment'
+        );
 
 
-      if (officeSchedule) {
+      if (
+        !attachment ||
+        !attachment.files ||
+        !attachment.files.length
+      ) {
 
-        officeSchedule.hidden = true;
+        showAttendanceMessage(
+          'Surat Dinas wajib dilampirkan untuk Mode Dinas Luar.',
+          'warning'
+        );
 
+
+        attachment?.focus();
+
+        return;
       }
 
     }
@@ -2674,16 +2834,57 @@
       }
 
 
-      if (!shiftId) {
+      /* =====================================================
+        VALIDASI SHIFT
+        ===================================================== */
+
+      const modeUpper =
+        String(mode)
+          .trim()
+          .toUpperCase();
+
+
+      const employeeTypeUpper =
+        String(employeeType)
+          .trim()
+          .toUpperCase();
+
+
+      const autoShift =
+        (
+          modeUpper === 'SHIP' &&
+          employeeTypeUpper === 'CREW'
+        ) ||
+        (
+          modeUpper === 'WFO' &&
+          employeeTypeUpper === 'OFFICE_HOUR'
+        ) ||
+        modeUpper === 'WFH' ||
+        modeUpper === 'DINAS_LUAR';
+
+
+      /*
+      * Hanya minta shift jika memang
+      * menggunakan pilihan manual.
+      */
+
+      if (
+        !autoShift &&
+        !shiftId
+      ) {
 
         showAttendanceMessage(
           'Silakan pilih Shift & Jam Kerja.',
           'warning'
         );
 
+
         document
-          .getElementById('checkInShift')
+          .getElementById(
+            'checkInShift'
+          )
           ?.focus();
+
 
         return;
       }
@@ -2785,6 +2986,8 @@
         );
 
     }
+
+
 
 
     /* =========================================================
@@ -2988,6 +3191,115 @@
       */
 
       alert(message);
+
+    }
+
+    function initDinasAttachment() {
+
+      const input =
+        document.getElementById(
+          'checkInDinasAttachment'
+        );
+
+      const name =
+        document.getElementById(
+          'checkInDinasAttachmentName'
+        );
+
+
+      if (!input) {
+        return;
+      }
+
+
+      input.addEventListener(
+        'change',
+        function () {
+
+          const file =
+            input.files &&
+            input.files[0];
+
+
+          if (!file) {
+
+            if (name) {
+              name.textContent = '';
+              name.classList.remove('error');
+            }
+
+            return;
+          }
+
+
+          const maxSize =
+            5 * 1024 * 1024;
+
+
+          const allowedTypes = [
+            'application/pdf',
+            'image/jpeg',
+            'image/png'
+          ];
+
+
+          if (
+            !allowedTypes.includes(
+              file.type
+            )
+          ) {
+
+            input.value = '';
+
+            if (name) {
+
+              name.textContent =
+                'Format file tidak didukung. Gunakan PDF, JPG, JPEG atau PNG.';
+
+              name.classList.add(
+                'error'
+              );
+
+            }
+
+            return;
+          }
+
+
+          if (
+            file.size > maxSize
+          ) {
+
+            input.value = '';
+
+            if (name) {
+
+              name.textContent =
+                'Ukuran file maksimal 5 MB.';
+
+              name.classList.add(
+                'error'
+              );
+
+            }
+
+            return;
+          }
+
+
+          if (name) {
+
+            name.textContent =
+              '📄 ' + file.name;
+
+            name.classList.remove(
+              'error'
+            );
+
+          }
+
+        }
+      );
 
     }
 
