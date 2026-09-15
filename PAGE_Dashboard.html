@@ -3082,9 +3082,11 @@
 
     function handleCheckInError(error) {
 
-      console.error(
-        'JNDA Check-In Error:',
-        error
+      console.warn(
+        'JNDA Check-In ditolak:',
+        error && error.message
+          ? error.message
+          : error
       );
 
       const button =
