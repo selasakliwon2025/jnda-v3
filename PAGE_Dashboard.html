@@ -2730,40 +2730,7 @@
 
     }
 
-    /* =====================================================
-      VALIDASI LAMPIRAN DINAS LUAR
-      ===================================================== */
-
-    if (
-      String(mode)
-        .trim()
-        .toUpperCase() === 'DINAS_LUAR'
-    ) {
-
-      const attachment =
-        document.getElementById(
-          'checkInDinasAttachment'
-        );
-
-
-      if (
-        !attachment ||
-        !attachment.files ||
-        !attachment.files.length
-      ) {
-
-        showAttendanceMessage(
-          'Surat Dinas wajib dilampirkan untuk Mode Dinas Luar.',
-          'warning'
-        );
-
-
-        attachment?.focus();
-
-        return;
-      }
-
-    }
+    
 
 
     /* =========================================================
@@ -2831,6 +2798,41 @@
           ?.focus();
 
         return;
+      }
+
+      /* =====================================================
+        VALIDASI LAMPIRAN DINAS LUAR
+        ===================================================== */
+
+      if (
+        String(mode)
+          .trim()
+          .toUpperCase() === 'DINAS_LUAR'
+      ) {
+
+        const attachment =
+          document.getElementById(
+            'checkInDinasAttachment'
+          );
+
+
+        if (
+          !attachment ||
+          !attachment.files ||
+          !attachment.files.length
+        ) {
+
+          showAttendanceMessage(
+            'Surat Dinas wajib dilampirkan untuk Mode Dinas Luar.',
+            'warning'
+          );
+
+
+          attachment?.focus();
+
+          return;
+        }
+
       }
 
 
