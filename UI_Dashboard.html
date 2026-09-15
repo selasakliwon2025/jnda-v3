@@ -1947,35 +1947,6 @@ body.attendance-modal-open {
       <div id="employeeMenuGroup">
 
         <button
-          type="button"
-          class="attendance-button check-in"
-          onclick="openCheckInModal()"
-        >
-          <div class="attendance-button-icon">
-            ✓
-          </div>
-
-          <div>
-            <div>Absen Masuk</div>
-            <small>Mulai aktivitas kerja</small>
-          </div>
-        </button>
-
-
-        <button
-          class="nav-item"
-          onclick="openAttendance('out')">
-
-          <span class="nav-icon">
-            🔴
-          </span>
-
-          Absen Pulang
-
-        </button>
-
-
-        <button
           class="nav-item"
           onclick="navigateTo('attendance-history')">
 
@@ -2316,7 +2287,7 @@ body.attendance-modal-open {
 
           <button
             class="attendance-button check-in"
-            onclick="openAttendance('in')">
+            onclick="openCheckInModal()">
 
             <div class="attendance-button-icon">
               🟢
