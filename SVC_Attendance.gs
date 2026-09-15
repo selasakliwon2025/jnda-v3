@@ -149,6 +149,42 @@ function checkIn(sessionToken, payload) {
         .trim()
         .toUpperCase();
 
+    /* --------------------------------------------------------
+      * VALIDASI HAK ABSEN DI ATAS KAPAL
+      * ------------------------------------------------------ */
+
+      const employeeShipId =
+        String(employee.SHIP_ID || '').trim();
+
+      /*
+      * Mode SHIP hanya boleh digunakan oleh pegawai
+      * yang mempunyai SHIP_ID.
+      *
+      * Pegawai darat:
+      *   SHIP_ID kosong
+      *   -> tidak boleh memilih Hadir di Atas Kapal.
+      */
+      if (attendanceMode === 'SHIP') {
+
+        if (!employeeShipId) {
+
+          throw new Error(
+            'Anda tidak terdaftar sebagai pegawai yang ditugaskan pada kapal. ' +
+            'Mode "Hadir di Atas Kapal" tidak dapat digunakan.'
+          );
+        }
+
+        /*
+        * Mode kapal harus menggunakan tipe Crew.
+        */
+        if (employeeType !== 'CREW') {
+
+          throw new Error(
+            'Mode "Hadir di Atas Kapal" hanya dapat digunakan oleh Crew Kapal.'
+          );
+        }
+      }
+
     let attendanceRule = null;
 
     if (
