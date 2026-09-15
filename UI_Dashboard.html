@@ -1908,6 +1908,145 @@ body.attendance-modal-open {
 
 }
 
+/* =========================================================
+   OFFICE HOUR - AUTO SCHEDULE
+   ========================================================= */
+
+.attendance-office-schedule {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  min-height: 76px;
+
+  padding: 14px 15px;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eef6ff,
+      #f8fbff
+    );
+
+  border: 1px solid #d9e8f8;
+
+  overflow: hidden;
+}
+
+
+.office-schedule-icon {
+
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 5px 15px
+    rgba(22,69,143,.08);
+
+  font-size: 19px;
+}
+
+
+.office-schedule-content {
+  min-width: 0;
+}
+
+
+.office-schedule-day {
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  color: #64748b;
+
+  margin-bottom: 3px;
+}
+
+
+.office-schedule-hours {
+
+  font-size: 17px;
+
+  line-height: 1.2;
+
+  font-weight: 800;
+
+  color: #16458f;
+}
+
+
+.office-schedule-tolerance {
+
+  margin-top: 4px;
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  color: #64748b;
+}
+
+
+.office-schedule-auto {
+
+  position: absolute;
+
+  top: 10px;
+  right: 10px;
+
+  padding: 4px 7px;
+
+  border-radius: 6px;
+
+  background: #dff5e8;
+
+  color: #16803b;
+
+  font-size: 7px;
+
+  font-weight: 800;
+
+  letter-spacing: .5px;
+}
+
+
+.attendance-office-schedule[hidden] {
+  display: none !important;
+}
+
+
+@media (max-width: 700px) {
+
+  .attendance-office-schedule {
+    min-height: 70px;
+    padding: 12px;
+  }
+
+  .office-schedule-hours {
+    font-size: 15px;
+  }
+
+  .office-schedule-auto {
+    font-size: 6px;
+  }
+
+}
+
 </style>
 
 
@@ -2951,34 +3090,99 @@ f
               <span>*</span>
             </label>
 
-            <div class="attendance-select-wrap">
+            <!-- =====================================================
+                JAM KERJA
+                ===================================================== -->
+            <div class="attendance-field" id="checkInShiftField">
 
+              <label
+                for="checkInShift"
+                class="attendance-label"
+              >
+                🕐 Jam Kerja
+              </label>
+
+              <!-- Untuk non Office Hour -->
               <select
                 id="checkInShift"
-                class="attendance-select"
+                class="attendance-input"
               >
-
                 <option value="">
-                  Pilih Shift & Jam Kerja
+                  Pilih Jam Kerja
                 </option>
 
-                <option value="SHIFT_1">
-                  🕐 Shift 1 Operasional Cabang (07:00 s.d 19:00)
+                <option value="S003">
+                  Shift Operasional 07:00 – 19:00
                 </option>
 
-                <option value="SHIFT_2">
-                  🕐 Shift 2 Operasional Cabang (19:00 s.d 07:00)
+                <option value="S004">
+                  Shift Operasional 19:00 – 07:00
                 </option>
 
-                <option value="SHIFT_3">
-                  🕐 Shift 3 Office Hour (08:00 s.d 17:00)
+                <option value="S005">
+                  Shift Operasional 08:00 – 20:00
                 </option>
 
-                <option value="SHIFT_4">
-                  🕐 Shift 4 Khusus
+                <option value="S006">
+                  Shift Operasional 20:00 – 08:00
+                </option>
+
+                <option value="S007">
+                  Security 07:00 – 19:00
+                </option>
+
+                <option value="S008">
+                  Security 19:00 – 07:00
+                </option>
+
+                <option value="S009">
+                  Crew Kapal — Flexible
                 </option>
 
               </select>
+
+
+              <!-- Untuk Office Hour -->
+              <div
+                id="checkInOfficeSchedule"
+                class="attendance-office-schedule"
+                hidden
+              >
+
+                <div class="office-schedule-icon">
+                  🕐
+                </div>
+
+                <div class="office-schedule-content">
+
+                  <div
+                    id="checkInOfficeDay"
+                    class="office-schedule-day"
+                  >
+                    Jadwal Hari Ini
+                  </div>
+
+                  <div
+                    id="checkInOfficeHours"
+                    class="office-schedule-hours"
+                  >
+                    -
+                  </div>
+
+                  <div
+                    id="checkInOfficeTolerance"
+                    class="office-schedule-tolerance"
+                  >
+                    Toleransi keterlambatan 18 menit
+                  </div>
+
+                </div>
+
+                <div class="office-schedule-auto">
+                  OTOMATIS
+                </div>
+
+              </div>
 
             </div>
 
