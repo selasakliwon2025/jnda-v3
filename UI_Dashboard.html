@@ -1280,6 +1280,634 @@ body {
 
 }
 
+/* =========================================================
+   ATTENDANCE MODAL
+   ========================================================= */
+
+body.attendance-modal-open {
+  overflow: hidden;
+}
+
+.attendance-modal {
+  position: fixed;
+  inset: 0;
+
+  z-index: 5000;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+}
+
+
+.attendance-modal.show {
+  display: flex;
+}
+
+
+/* OVERLAY */
+
+.attendance-modal-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    rgba(15, 23, 42, .58);
+
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+
+/* DIALOG */
+
+.attendance-modal-dialog {
+  position: relative;
+
+  width: min(680px, 100%);
+
+  max-height: calc(100vh - 40px);
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 30px 80px
+    rgba(15, 23, 42, .30);
+
+  animation:
+    attendanceModalIn
+    .22s ease;
+}
+
+
+@keyframes attendanceModalIn {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(18px)
+      scale(.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+/* HEADER */
+
+.attendance-modal-header {
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding:
+    20px 25px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #1769e0,
+      #2476ed
+    );
+
+  color: #ffffff;
+}
+
+
+.attendance-modal-title-wrap {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  min-width: 0;
+}
+
+
+.attendance-modal-icon {
+
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    rgba(255,255,255,.16);
+
+  border:
+    1px solid
+    rgba(255,255,255,.20);
+
+  font-size: 22px;
+
+  font-weight: 800;
+}
+
+
+.attendance-modal-title {
+
+  font-size: 20px;
+
+  line-height: 1.25;
+
+  font-weight: 800;
+}
+
+
+.attendance-modal-subtitle {
+
+  margin-top: 4px;
+
+  font-size: 11px;
+
+  color:
+    rgba(255,255,255,.78);
+}
+
+
+.attendance-modal-close {
+
+  flex-shrink: 0;
+
+  width: 40px;
+  height: 40px;
+
+  border: 0;
+
+  border-radius: 10px;
+
+  background: transparent;
+
+  color: rgba(255,255,255,.75);
+
+  font-size: 34px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+
+.attendance-modal-close:hover {
+
+  background:
+    rgba(255,255,255,.12);
+
+  color: #ffffff;
+
+}
+
+
+/* BODY */
+
+.attendance-modal-body {
+
+  overflow-y: auto;
+
+  padding:
+    24px 25px 10px;
+}
+
+
+/* FIELD */
+
+.attendance-field {
+
+  margin-bottom: 20px;
+}
+
+
+.attendance-label {
+
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  color: #68727e;
+}
+
+
+.attendance-label span {
+
+  color: #dc2626;
+
+}
+
+
+/* SELECT */
+
+.attendance-select-wrap {
+
+  position: relative;
+}
+
+
+.attendance-select {
+
+  width: 100%;
+
+  min-height: 56px;
+
+  padding:
+    0 46px 0 18px;
+
+  border:
+    2px solid #dfe4ea;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  color: #2f343b;
+
+  font-family: inherit;
+
+  font-size: 15px;
+
+  appearance: none;
+
+  -webkit-appearance: none;
+
+  cursor: pointer;
+
+  outline: none;
+
+  transition:
+    border-color .2s,
+    box-shadow .2s;
+}
+
+
+.attendance-select-wrap::after {
+
+  content: "⌄";
+
+  position: absolute;
+
+  top: 50%;
+  right: 17px;
+
+  transform:
+    translateY(-55%);
+
+  pointer-events: none;
+
+  color: #39414a;
+
+  font-size: 24px;
+
+  font-weight: 600;
+}
+
+
+.attendance-select:focus {
+
+  border-color: #2476ed;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(36,118,237,.10);
+}
+
+
+/* TEXTAREA */
+
+.attendance-textarea {
+
+  width: 100%;
+
+  min-height: 105px;
+
+  padding:
+    14px 16px;
+
+  resize: vertical;
+
+  border:
+    1px solid #dfe4ea;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  color: #30353b;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+
+  outline: none;
+
+  transition:
+    border-color .2s,
+    box-shadow .2s;
+}
+
+
+.attendance-textarea:focus {
+
+  border-color: #2476ed;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(36,118,237,.10);
+}
+
+
+.attendance-textarea::placeholder {
+
+  color: #8b929b;
+}
+
+
+/* COUNTER */
+
+.attendance-counter {
+
+  margin-top: 5px;
+
+  text-align: right;
+
+  color: #9aa2ad;
+
+  font-size: 10px;
+}
+
+
+/* FOOTER */
+
+.attendance-modal-footer {
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 12px;
+
+  padding:
+    14px 25px;
+
+  border-top:
+    1px solid #e7ebef;
+
+  background:
+    #fbfcfd;
+}
+
+
+/* BUTTON */
+
+.attendance-btn {
+
+  min-height: 48px;
+
+  padding:
+    0 22px;
+
+  border-radius: 11px;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform .15s,
+    box-shadow .15s,
+    opacity .15s;
+}
+
+
+.attendance-btn:active {
+
+  transform:
+    translateY(1px);
+}
+
+
+/* CANCEL */
+
+.attendance-btn-cancel {
+
+  border:
+    1px solid #dce2e8;
+
+  background: #ffffff;
+
+  color: #20252b;
+}
+
+
+.attendance-btn-cancel:hover {
+
+  background: #f5f7f9;
+}
+
+
+/* CONFIRM */
+
+.attendance-btn-confirm {
+
+  min-width: 210px;
+
+  border: 0;
+
+  background:
+    linear-gradient(
+      135deg,
+      #1769e0,
+      #2476ed
+    );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 7px 18px
+    rgba(36,118,237,.25);
+}
+
+
+.attendance-btn-confirm:hover {
+
+  box-shadow:
+    0 10px 24px
+    rgba(36,118,237,.32);
+
+  transform:
+    translateY(-1px);
+}
+
+
+.attendance-btn-confirm:disabled {
+
+  opacity: .65;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+
+.confirm-check-icon {
+
+  margin-right: 6px;
+
+  font-size: 17px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .attendance-modal {
+
+    padding: 8px;
+  }
+
+
+  .attendance-modal-dialog {
+
+    max-height:
+      calc(100vh - 16px);
+
+    border-radius: 16px;
+  }
+
+
+  .attendance-modal-header {
+
+    padding:
+      16px 17px;
+  }
+
+
+  .attendance-modal-title {
+
+    font-size: 17px;
+  }
+
+
+  .attendance-modal-subtitle {
+
+    display: none;
+  }
+
+
+  .attendance-modal-icon {
+
+    width: 38px;
+    height: 38px;
+
+    font-size: 19px;
+  }
+
+
+  .attendance-modal-body {
+
+    padding:
+      20px 17px 5px;
+  }
+
+
+  .attendance-field {
+
+    margin-bottom: 16px;
+  }
+
+
+  .attendance-label {
+
+    font-size: 13px;
+  }
+
+
+  .attendance-select {
+
+    min-height: 52px;
+
+    font-size: 14px;
+  }
+
+
+  .attendance-modal-footer {
+
+    padding:
+      12px 17px;
+
+    gap: 8px;
+  }
+
+
+  .attendance-btn {
+
+    flex: 1;
+
+    padding:
+      0 13px;
+
+    font-size: 13px;
+  }
+
+
+  .attendance-btn-confirm {
+
+    min-width: 0;
+  }
+
+}
+
 </style>
 
 
@@ -1319,15 +1947,18 @@ body {
       <div id="employeeMenuGroup">
 
         <button
-          class="nav-item"
-          onclick="openAttendance('in')">
+          type="button"
+          class="attendance-button check-in"
+          onclick="openCheckInModal()"
+        >
+          <div class="attendance-button-icon">
+            ✓
+          </div>
 
-          <span class="nav-icon">
-            🟢
-          </span>
-
-          Absen Masuk
-
+          <div>
+            <div>Absen Masuk</div>
+            <small>Mulai aktivitas kerja</small>
+          </div>
         </button>
 
 
@@ -2182,5 +2813,267 @@ f
     </section>
 
   </main>
+
+  <!-- =========================================================
+        MODAL ABSEN MASUK
+        ========================================================= -->
+
+    <div
+      id="checkInModal"
+      class="attendance-modal"
+      aria-hidden="true"
+    >
+
+      <div
+        class="attendance-modal-overlay"
+        onclick="closeCheckInModal()"
+      ></div>
+
+
+      <div
+        class="attendance-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="checkInModalTitle"
+      >
+
+        <!-- HEADER -->
+        <div class="attendance-modal-header">
+
+          <div class="attendance-modal-title-wrap">
+
+            <div class="attendance-modal-icon">
+              ✓
+            </div>
+
+            <div>
+
+              <div
+                id="checkInModalTitle"
+                class="attendance-modal-title"
+              >
+                Pilih Status Kehadiran - Masuk
+              </div>
+
+              <div class="attendance-modal-subtitle">
+                Lengkapi informasi kehadiran sebelum melakukan absen
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="attendance-modal-close"
+            onclick="closeCheckInModal()"
+            aria-label="Tutup"
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <!-- BODY -->
+        <div class="attendance-modal-body">
+
+          <!-- MODE ABSEN -->
+          <div class="attendance-field">
+
+            <label
+              for="checkInMode"
+              class="attendance-label"
+            >
+              Mode Absen
+              <span>*</span>
+            </label>
+
+            <div class="attendance-select-wrap">
+
+              <select
+                id="checkInMode"
+                class="attendance-select"
+              >
+
+                <option value="">
+                  Pilih Mode Absen
+                </option>
+
+                <option value="WFO">
+                  📍 WFO (Kantor)
+                </option>
+
+                <option value="SHIP">
+                  🚢 Hadir di Atas Kapal (Crew / ABK)
+                </option>
+
+                <option value="DINAS_LUAR">
+                  ✈️ Dinas Luar
+                </option>
+
+                <option value="WFH">
+                  🏠 WFH (Work From Home)
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <!-- TYPE PEGAWAI -->
+          <div class="attendance-field">
+
+            <label
+              for="checkInEmployeeType"
+              class="attendance-label"
+            >
+              Type Pegawai
+              <span>*</span>
+            </label>
+
+            <div class="attendance-select-wrap">
+
+              <select
+                id="checkInEmployeeType"
+                class="attendance-select"
+              >
+
+                <option value="">
+                  Pilih Type Pegawai
+                </option>
+
+                <option value="OFFICE_HOUR">
+                  👤 Office Hour
+                </option>
+
+                <option value="OPERATIONAL">
+                  ⚙️ Petugas Operasional
+                </option>
+
+                <option value="CREW">
+                  🚢 Crew Kapal
+                </option>
+
+                <option value="SECURITY">
+                  🛡️ Security
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <!-- SHIFT -->
+          <div class="attendance-field">
+
+            <label
+              for="checkInShift"
+              class="attendance-label"
+            >
+              Pilihan Shift & Jam Kerja
+              <span>*</span>
+            </label>
+
+            <div class="attendance-select-wrap">
+
+              <select
+                id="checkInShift"
+                class="attendance-select"
+              >
+
+                <option value="">
+                  Pilih Shift & Jam Kerja
+                </option>
+
+                <option value="SHIFT_1">
+                  🕐 Shift 1 Operasional Cabang (07:00 s.d 19:00)
+                </option>
+
+                <option value="SHIFT_2">
+                  🕐 Shift 2 Operasional Cabang (19:00 s.d 07:00)
+                </option>
+
+                <option value="SHIFT_3">
+                  🕐 Shift 3 Office Hour (08:00 s.d 17:00)
+                </option>
+
+                <option value="SHIFT_4">
+                  🕐 Shift 4 Khusus
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <!-- KETERANGAN -->
+          <div class="attendance-field">
+
+            <label
+              for="checkInRemark"
+              class="attendance-label"
+            >
+              Keterangan Tambahan
+            </label>
+
+            <textarea
+              id="checkInRemark"
+              class="attendance-textarea"
+              rows="4"
+              maxlength="500"
+              placeholder="Keterangan tambahan (opsional)"
+            ></textarea>
+
+            <div class="attendance-counter">
+              <span id="checkInRemarkCounter">0</span>/500
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+        <div class="attendance-modal-footer">
+
+          <button
+            type="button"
+            class="attendance-btn attendance-btn-cancel"
+            onclick="closeCheckInModal()"
+          >
+            Batal
+          </button>
+
+
+          <button
+            type="button"
+            id="confirmCheckInButton"
+            class="attendance-btn attendance-btn-confirm"
+            onclick="confirmCheckIn()"
+          >
+
+            <span class="confirm-check-icon">
+              ✓
+            </span>
+
+            <span>
+              Konfirmasi Absen
+            </span>
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
 
 </div>
