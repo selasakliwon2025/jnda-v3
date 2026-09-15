@@ -54,8 +54,61 @@
 
         startClock();
 
+        initAttendanceModal();
+
       }
     );
+
+    function initAttendanceModal() {
+
+      const remark =
+        document.getElementById(
+          'checkInRemark'
+        );
+
+
+      if (remark) {
+
+        remark.addEventListener(
+          'input',
+          updateRemarkCounter
+        );
+
+      }
+
+
+      /*
+      * ESC untuk menutup modal
+      */
+
+      document.addEventListener(
+        'keydown',
+        function (event) {
+
+          if (
+            event.key === 'Escape'
+          ) {
+
+            const modal =
+              document.getElementById(
+                'checkInModal'
+              );
+
+            if (
+              modal &&
+              modal.classList.contains('show')
+            ) {
+
+              closeCheckInModal();
+
+            }
+
+          }
+
+        }
+      );
+
+    }
 
 
     /* =======================================================
@@ -2119,6 +2172,596 @@
 
       }
     );
+
+    /* =========================================================
+      ABSEN MASUK - MODAL
+      ========================================================= */
+
+    function openCheckInModal() {
+
+      console.log(
+        'JNDA: Membuka modal Absen Masuk'
+      );
+
+
+      const modal =
+        document.getElementById(
+          'checkInModal'
+        );
+
+
+      if (!modal) {
+
+        console.error(
+          'JNDA: #checkInModal tidak ditemukan.'
+        );
+
+        return;
+      }
+
+
+      /*
+      * Pastikan token masih tersedia.
+      *
+      * Tidak redirect ke login.
+      */
+
+      SESSION_TOKEN =
+        localStorage.getItem(
+          'JNDA_SESSION_TOKEN'
+        ) || SESSION_TOKEN;
+
+
+      if (!SESSION_TOKEN) {
+
+        showAttendanceMessage(
+          'Session tidak tersedia. Silakan refresh halaman.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      /*
+      * Reset form
+      */
+
+      resetCheckInForm();
+
+
+      /*
+      * Tampilkan modal
+      */
+
+      modal.classList.add('show');
+
+      modal.setAttribute(
+        'aria-hidden',
+        'false'
+      );
+
+
+      document.body.classList.add(
+        'attendance-modal-open'
+      );
+
+
+      /*
+      * Fokus ke dropdown pertama
+      */
+
+      setTimeout(
+        function () {
+
+          const mode =
+            document.getElementById(
+              'checkInMode'
+            );
+
+          if (mode) {
+            mode.focus();
+          }
+
+        },
+        100
+      );
+
+    }
+
+
+    /* =========================================================
+      CLOSE MODAL
+      ========================================================= */
+
+    function closeCheckInModal() {
+
+      const modal =
+        document.getElementById(
+          'checkInModal'
+        );
+
+
+      if (!modal) {
+        return;
+      }
+
+
+      modal.classList.remove(
+        'show'
+      );
+
+
+      modal.setAttribute(
+        'aria-hidden',
+        'true'
+      );
+
+
+      document.body.classList.remove(
+        'attendance-modal-open'
+      );
+
+    }
+
+
+    /* =========================================================
+      RESET FORM
+      ========================================================= */
+
+    function resetCheckInForm() {
+
+      const mode =
+        document.getElementById(
+          'checkInMode'
+        );
+
+      const employeeType =
+        document.getElementById(
+          'checkInEmployeeType'
+        );
+
+      const shift =
+        document.getElementById(
+          'checkInShift'
+        );
+
+      const remark =
+        document.getElementById(
+          'checkInRemark'
+        );
+
+
+      if (mode) {
+        mode.value = '';
+      }
+
+
+      if (employeeType) {
+        employeeType.value = '';
+      }
+
+
+      if (shift) {
+        shift.value = '';
+      }
+
+
+      if (remark) {
+
+        remark.value = '';
+
+        updateRemarkCounter();
+      }
+
+
+      const button =
+        document.getElementById(
+          'confirmCheckInButton'
+        );
+
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.innerHTML = `
+          <span class="confirm-check-icon">
+            ✓
+          </span>
+          <span>
+            Konfirmasi Absen
+          </span>
+        `;
+      }
+
+    }
+
+
+    /* =========================================================
+      CONFIRM ABSEN
+      ========================================================= */
+
+    function confirmCheckIn() {
+
+      /*
+      * Ambil value form
+      */
+
+      const mode =
+        document.getElementById(
+          'checkInMode'
+        )?.value || '';
+
+
+      const employeeType =
+        document.getElementById(
+          'checkInEmployeeType'
+        )?.value || '';
+
+
+      const shiftId =
+        document.getElementById(
+          'checkInShift'
+        )?.value || '';
+
+
+      const remark =
+        document.getElementById(
+          'checkInRemark'
+        )?.value.trim() || '';
+
+
+      /*
+      * Validasi
+      */
+
+      if (!mode) {
+
+        showAttendanceMessage(
+          'Silakan pilih Mode Absen.',
+          'warning'
+        );
+
+        document
+          .getElementById('checkInMode')
+          ?.focus();
+
+        return;
+      }
+
+
+      if (!employeeType) {
+
+        showAttendanceMessage(
+          'Silakan pilih Type Pegawai.',
+          'warning'
+        );
+
+        document
+          .getElementById('checkInEmployeeType')
+          ?.focus();
+
+        return;
+      }
+
+
+      if (!shiftId) {
+
+        showAttendanceMessage(
+          'Silakan pilih Shift & Jam Kerja.',
+          'warning'
+        );
+
+        document
+          .getElementById('checkInShift')
+          ?.focus();
+
+        return;
+      }
+
+
+      /*
+      * Token
+      */
+
+      SESSION_TOKEN =
+        localStorage.getItem(
+          'JNDA_SESSION_TOKEN'
+        ) || SESSION_TOKEN;
+
+
+      if (!SESSION_TOKEN) {
+
+        showAttendanceMessage(
+          'Session tidak tersedia.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      /*
+      * Disable button
+      */
+
+      const button =
+        document.getElementById(
+          'confirmCheckInButton'
+        );
+
+
+      if (button) {
+
+        button.disabled = true;
+
+        button.innerHTML = `
+          <span>
+            ⏳
+          </span>
+          <span>
+            Memproses...
+          </span>
+        `;
+
+      }
+
+
+      /*
+      * Payload
+      */
+
+      const payload = {
+
+        attendanceMode:
+          mode,
+
+        employeeType:
+          employeeType,
+
+        shiftId:
+          shiftId,
+
+        remark:
+          remark
+
+      };
+
+
+      console.log(
+        'JNDA Check In Payload:',
+        payload
+      );
+
+
+      /*
+      * Panggil backend
+      *
+      * TIDAK REDIRECT
+      */
+
+      google.script.run
+
+        .withSuccessHandler(
+          handleCheckInSuccess
+        )
+
+        .withFailureHandler(
+          handleCheckInError
+        )
+
+        .checkIn(
+          SESSION_TOKEN,
+          payload
+        );
+
+    }
+
+
+    /* =========================================================
+      CHECK IN SUCCESS
+      ========================================================= */
+
+    function handleCheckInSuccess(result) {
+
+      console.log(
+        'JNDA Check In Result:',
+        result
+      );
+
+
+      const button =
+        document.getElementById(
+          'confirmCheckInButton'
+        );
+
+
+      if (result && result.success) {
+
+        /*
+        * Tutup modal
+        */
+
+        closeCheckInModal();
+
+
+        /*
+        * Update UI langsung
+        */
+
+        if (result.attendance) {
+
+          renderTodayAttendance({
+            today:
+              result.attendance
+          });
+
+        }
+
+
+        /*
+        * Notifikasi
+        */
+
+        showAttendanceMessage(
+          result.message ||
+          'Absen masuk berhasil.',
+          'success'
+        );
+
+
+        /*
+        * Ambil ulang status attendance
+        * tanpa reload halaman.
+        */
+
+        setTimeout(
+          function () {
+
+            loadTodayAttendance();
+
+          },
+          300
+        );
+
+
+        return;
+      }
+
+
+      /*
+      * Backend menolak
+      */
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.innerHTML = `
+          <span class="confirm-check-icon">
+            ✓
+          </span>
+          <span>
+            Konfirmasi Absen
+          </span>
+        `;
+      }
+
+
+      showAttendanceMessage(
+        result?.message ||
+        'Absen masuk tidak dapat diproses.',
+        'error'
+      );
+
+    }
+
+
+    /* =========================================================
+      CHECK IN ERROR
+      ========================================================= */
+
+    function handleCheckInError(error) {
+
+      console.error(
+        'JNDA Check In Error:',
+        error
+      );
+
+
+      const button =
+        document.getElementById(
+          'confirmCheckInButton'
+        );
+
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.innerHTML = `
+          <span class="confirm-check-icon">
+            ✓
+          </span>
+          <span>
+            Konfirmasi Absen
+          </span>
+        `;
+
+      }
+
+
+      showAttendanceMessage(
+        'Terjadi kesalahan saat menyimpan absen.',
+        'error'
+      );
+
+    }
+
+
+    /* =========================================================
+      REMARK COUNTER
+      ========================================================= */
+
+    function updateRemarkCounter() {
+
+      const input =
+        document.getElementById(
+          'checkInRemark'
+        );
+
+      const counter =
+        document.getElementById(
+          'checkInRemarkCounter'
+        );
+
+
+      if (!input || !counter) {
+        return;
+      }
+
+
+      counter.textContent =
+        input.value.length;
+
+    }
+
+
+    /* =========================================================
+      ATTENDANCE MESSAGE
+      ========================================================= */
+
+    function showAttendanceMessage(
+      message,
+      type
+    ) {
+
+      /*
+      * Kalau project sudah punya toast,
+      * gunakan fungsi tersebut.
+      */
+
+      if (
+        typeof showToast === 'function'
+      ) {
+
+        showToast(
+          message,
+          type
+        );
+
+        return;
+      }
+
+
+      /*
+      * Fallback sederhana
+      */
+
+      alert(message);
+
+    }
 
   </script>
 
