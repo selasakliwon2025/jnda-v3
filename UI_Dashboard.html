@@ -2047,6 +2047,165 @@ body.attendance-modal-open {
 
 }
 
+/* =========================================================
+   LAMPIRAN SURAT DINAS
+   ========================================================= */
+
+#checkInDinasAttachmentField[hidden] {
+  display: none !important;
+}
+
+
+.attendance-file-box {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  min-height: 72px;
+
+  padding: 12px 14px;
+
+  border:
+    1px dashed
+    #cbd5e1;
+
+  border-radius: 12px;
+
+  background:
+    #f8fbff;
+
+  transition:
+    border-color .2s,
+    background .2s;
+}
+
+
+.attendance-file-box:hover {
+
+  border-color:
+    #2476ed;
+
+  background:
+    #f5f9ff;
+}
+
+
+.attendance-file-icon {
+
+  width: 42px;
+
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background:
+    #eaf3ff;
+
+  font-size: 19px;
+}
+
+
+.attendance-file-content {
+
+  flex: 1;
+
+  min-width: 0;
+}
+
+
+.attendance-file-title {
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  color: #26364d;
+}
+
+
+.attendance-file-desc {
+
+  margin-top: 2px;
+
+  font-size: 11px;
+
+  color: #64748b;
+}
+
+
+.attendance-file-format {
+
+  margin-top: 3px;
+
+  font-size: 9px;
+
+  color: #94a3b8;
+}
+
+
+.attendance-file-button {
+
+  flex-shrink: 0;
+
+  padding:
+    9px 14px;
+
+  border-radius: 9px;
+
+  background:
+    #eaf3ff;
+
+  color:
+    #1769e0;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+
+.attendance-file-button:hover {
+
+  background:
+    #dcecff;
+}
+
+
+.attendance-file-name {
+
+  margin-top: 7px;
+
+  padding-left: 4px;
+
+  font-size: 10px;
+
+  color: #475569;
+
+}
+
+
+.attendance-file-name.error {
+
+  color: #dc2626;
+
+  font-weight: 700;
+}
+
 </style>
 
 
@@ -3079,111 +3238,239 @@ f
           </div>
 
 
-          <!-- SHIFT -->
-          <div class="attendance-field">
+          <!-- =====================================================
+              SHIFT & JAM KERJA
+              ===================================================== -->
+
+          <div
+            class="attendance-field"
+            id="checkInShiftField"
+          >
 
             <label
-              for="checkInShift"
               class="attendance-label"
             >
               Pilihan Shift & Jam Kerja
               <span>*</span>
             </label>
 
-            <!-- =====================================================
-                JAM KERJA
-                ===================================================== -->
-            <div class="attendance-field" id="checkInShiftField">
 
-              <label
-                for="checkInShift"
-                class="attendance-label"
-              >
-                🕐 Jam Kerja
-              </label>
+            <!-- ===================================================
+                MANUAL SHIFT
+                Operational / Security
+                =================================================== -->
 
-              <!-- Untuk non Office Hour -->
+            <div
+              id="checkInManualShift"
+              class="attendance-select-wrap"
+            >
+
               <select
                 id="checkInShift"
-                class="attendance-input"
+                class="attendance-select"
               >
+
                 <option value="">
                   Pilih Jam Kerja
                 </option>
 
                 <option value="S003">
-                  Shift Operasional 07:00 – 19:00
+                  ⚙️ Operasional · 07:00 – 19:00
                 </option>
 
                 <option value="S004">
-                  Shift Operasional 19:00 – 07:00
+                  ⚙️ Operasional · 19:00 – 07:00
                 </option>
 
                 <option value="S005">
-                  Shift Operasional 08:00 – 20:00
+                  ⚙️ Operasional · 08:00 – 20:00
                 </option>
 
                 <option value="S006">
-                  Shift Operasional 20:00 – 08:00
+                  ⚙️ Operasional · 20:00 – 08:00
                 </option>
 
                 <option value="S007">
-                  Security 07:00 – 19:00
+                  🛡️ Security · 07:00 – 19:00
                 </option>
 
                 <option value="S008">
-                  Security 19:00 – 07:00
-                </option>
-
-                <option value="S009">
-                  Crew Kapal — Flexible
+                  🛡️ Security · 19:00 – 07:00
                 </option>
 
               </select>
 
+            </div>
 
-              <!-- Untuk Office Hour -->
-              <div
-                id="checkInOfficeSchedule"
-                class="attendance-office-schedule"
-                hidden
-              >
 
-                <div class="office-schedule-icon">
-                  🕐
+            <!-- ===================================================
+                OFFICE HOUR
+                WFO / WFH / DINAS LUAR
+                =================================================== -->
+
+            <div
+              id="checkInOfficeSchedule"
+              class="attendance-office-schedule"
+              hidden
+            >
+
+              <div class="office-schedule-icon">
+                🕐
+              </div>
+
+
+              <div class="office-schedule-content">
+
+                <div
+                  id="checkInOfficeDay"
+                  class="office-schedule-day"
+                >
+                  Jadwal Hari Ini
                 </div>
 
-                <div class="office-schedule-content">
 
-                  <div
-                    id="checkInOfficeDay"
-                    class="office-schedule-day"
-                  >
-                    Jadwal Hari Ini
-                  </div>
-
-                  <div
-                    id="checkInOfficeHours"
-                    class="office-schedule-hours"
-                  >
-                    -
-                  </div>
-
-                  <div
-                    id="checkInOfficeTolerance"
-                    class="office-schedule-tolerance"
-                  >
-                    Toleransi keterlambatan 18 menit
-                  </div>
-
+                <div
+                  id="checkInOfficeHours"
+                  class="office-schedule-hours"
+                >
+                  -
                 </div>
 
-                <div class="office-schedule-auto">
-                  OTOMATIS
+
+                <div
+                  id="checkInOfficeTolerance"
+                  class="office-schedule-tolerance"
+                >
+                  Toleransi keterlambatan 18 menit
                 </div>
 
               </div>
 
+
+              <div class="office-schedule-auto">
+                OTOMATIS
+              </div>
+
+            </div>
+
+
+            <!-- ===================================================
+                CREW KAPAL
+                =================================================== -->
+
+            <div
+              id="checkInCrewSchedule"
+              class="attendance-office-schedule attendance-crew-schedule"
+              hidden
+            >
+
+              <div class="office-schedule-icon">
+                🚢
+              </div>
+
+
+              <div class="office-schedule-content">
+
+                <div
+                  id="checkInCrewDay"
+                  class="office-schedule-day"
+                >
+                  Crew Kapal
+                </div>
+
+
+                <div
+                  id="checkInCrewHours"
+                  class="office-schedule-hours"
+                >
+                  Jam kerja fleksibel
+                </div>
+
+
+                <div
+                  id="checkInCrewInfo"
+                  class="office-schedule-tolerance"
+                >
+                  Mengikuti operasional kapal
+                </div>
+
+              </div>
+
+
+              <div class="office-schedule-auto">
+                OTOMATIS
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- =====================================================
+              LAMPIRAN SURAT DINAS
+              HANYA UNTUK DINAS LUAR
+              ===================================================== -->
+
+          <div
+            class="attendance-field"
+            id="checkInDinasAttachmentField"
+            hidden
+          >
+
+            <label
+              for="checkInDinasAttachment"
+              class="attendance-label"
+            >
+              Lampiran Surat Dinas
+              <span>*</span>
+            </label>
+
+
+            <div class="attendance-file-box">
+
+              <div class="attendance-file-icon">
+                📎
+              </div>
+
+
+              <div class="attendance-file-content">
+
+                <div class="attendance-file-title">
+                  Upload Surat Dinas
+                </div>
+
+                <div class="attendance-file-desc">
+                  Wajib dilampirkan untuk Dinas Luar
+                </div>
+
+                <div class="attendance-file-format">
+                  PDF, JPG, JPEG atau PNG · Maks. 5 MB
+                </div>
+
+              </div>
+
+
+              <label
+                for="checkInDinasAttachment"
+                class="attendance-file-button"
+              >
+                Pilih File
+              </label>
+
+
+              <input
+                type="file"
+                id="checkInDinasAttachment"
+                accept=".pdf,.jpg,.jpeg,.png"
+                hidden
+              >
+
+            </div>
+
+
+            <div
+              id="checkInDinasAttachmentName"
+              class="attendance-file-name"
+            >
             </div>
 
           </div>
