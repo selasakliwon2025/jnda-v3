@@ -43,6 +43,25 @@ const ATTENDANCE_STATUS_CLOSED = 'CLOSED';
 const ATTENDANCE_DEFAULT_TIMEZONE = 'Asia/Jakarta';
 const ATTENDANCE_DEFAULT_ZONE_LABEL = 'WIB';
 
+/* ============================================================
+ * OFFICE HOUR RULE
+ * ============================================================ */
+
+const ATTENDANCE_OFFICE_HOUR_START = '08:00';
+
+const ATTENDANCE_OFFICE_HOUR_END_WEEKDAY = '16:30';
+
+const ATTENDANCE_OFFICE_HOUR_END_FRIDAY = '17:00';
+
+/*
+ * Toleransi keterlambatan.
+ *
+ * 18 menit berarti:
+ * 08:00 - 08:18 = TEPAT WAKTU
+ * 08:19          = TERLAMBAT
+ */
+const ATTENDANCE_GRACE_MINUTES = 18;
+
 
 /* ============================================================
  * PUBLIC - CHECK IN
@@ -113,6 +132,385 @@ function checkIn(sessionToken, payload) {
 
     const shift =
       _attendanceGetEmployeeShift(employeeId, now);
+
+    const attendanceMode =
+      String(
+        payload &&
+        payload.attendanceMode || ''
+      )
+        .trim()
+        .toUpperCase();
+
+    const employeeType =
+      String(
+        payload &&
+        payload.employeeType || ''
+      )
+        .trim()
+        .toUpperCase();
+
+    let attendanceRule = null;
+
+    if (
+      attendanceMode === 'WFO' &&
+      employeeType === 'OFFICE_HOUR'
+    ) {
+
+      attendanceRule =
+        _attendanceGetOfficeHourRule(
+          now,
+          timezone
+        );
+    }
+
+
+    /* ============================================================
+    * OFFICE HOUR RULE
+    * ============================================================ */
+
+    /**
+     * Mengambil aturan Office Hour berdasarkan tanggal lokal employee.
+     *
+     * Senin - Kamis
+     *   08:00 - 16:30
+     *
+     * Jumat
+     *   08:00 - 17:00
+     *
+     * Sabtu/Minggu
+     *   Tidak memiliki jadwal Office Hour.
+     */
+    function _attendanceGetOfficeHourRule(
+      now,
+      timezone
+    ) {
+
+      const localDate =
+        Utilities.formatDate(
+          now,
+          timezone,
+          'yyyy-MM-dd'
+        );
+
+      /*
+      * JavaScript:
+      * 0 = Minggu
+      * 1 = Senin
+      * 2 = Selasa
+      * 3 = Rabu
+      * 4 = Kamis
+      * 5 = Jumat
+      * 6 = Sabtu
+      */
+      const dayOfWeek =
+        Number(
+          Utilities.formatDate(
+            now,
+            timezone,
+            'u'
+          )
+        );
+
+      /*
+      * ISO:
+      * 1 = Senin
+      * 2 = Selasa
+      * 3 = Rabu
+      * 4 = Kamis
+      * 5 = Jumat
+      * 6 = Sabtu
+      * 7 = Minggu
+      */
+
+      if (
+        dayOfWeek >= 1 &&
+        dayOfWeek <= 4
+      ) {
+
+        return {
+          employeeType: 'OFFICE_HOUR',
+          scheduleCode: 'OFFICE_MON_THU',
+          workDate: localDate,
+          dayOfWeek: dayOfWeek,
+          dayName: _attendanceOfficeDayName(dayOfWeek),
+
+          startTime:
+            ATTENDANCE_OFFICE_HOUR_START,
+
+          endTime:
+            ATTENDANCE_OFFICE_HOUR_END_WEEKDAY,
+
+          graceMinutes:
+            ATTENDANCE_GRACE_MINUTES
+        };
+      }
+
+
+      if (dayOfWeek === 5) {
+
+        return {
+          employeeType: 'OFFICE_HOUR',
+          scheduleCode: 'OFFICE_FRIDAY',
+          workDate: localDate,
+          dayOfWeek: dayOfWeek,
+          dayName: 'Jumat',
+
+          startTime:
+            ATTENDANCE_OFFICE_HOUR_START,
+
+          endTime:
+            ATTENDANCE_OFFICE_HOUR_END_FRIDAY,
+
+          graceMinutes:
+            ATTENDANCE_GRACE_MINUTES
+        };
+      }
+
+
+      /*
+      * Weekend.
+      */
+      return {
+        employeeType: 'OFFICE_HOUR',
+        scheduleCode: 'OFFICE_WEEKEND',
+        workDate: localDate,
+        dayOfWeek: dayOfWeek,
+        dayName: _attendanceOfficeDayName(dayOfWeek),
+
+        startTime: '',
+        endTime: '',
+
+        graceMinutes:
+          ATTENDANCE_GRACE_MINUTES,
+
+        isWorkingDay: false
+      };
+    }
+
+
+    /**
+     * Nama hari lokal.
+     */
+    function _attendanceOfficeDayName(
+      isoDay
+    ) {
+
+      const names = {
+        1: 'Senin',
+        2: 'Selasa',
+        3: 'Rabu',
+        4: 'Kamis',
+        5: 'Jumat',
+        6: 'Sabtu',
+        7: 'Minggu'
+      };
+
+      return names[isoDay] || '';
+    }
+
+    /**
+     * Evaluasi waktu check-in Office Hour.
+     *
+     * Contoh:
+     *
+     * Jadwal       : 08:00
+     * Toleransi    : 18 menit
+     *
+     * 08:00        → ON_TIME
+     * 08:18        → ON_TIME
+     * 08:19        → LATE, 1 menit
+     */
+    function _attendanceEvaluateOfficeHourCheckIn(
+      checkInAt,
+      rule,
+      timezone
+    ) {
+
+      if (
+        !checkInAt ||
+        !rule ||
+        !rule.startTime
+      ) {
+
+        return {
+          status: 'UNKNOWN',
+          lateMinutes: 0,
+          isLate: false
+        };
+      }
+
+
+      /*
+      * Ambil tanggal lokal dari check-in.
+      */
+      const localDate =
+        Utilities.formatDate(
+          checkInAt,
+          timezone,
+          'yyyy-MM-dd'
+        );
+
+
+      /*
+      * Buat waktu mulai kerja berdasarkan
+      * tanggal lokal employee.
+      */
+      const scheduledStart =
+        _attendanceBuildLocalDateTime(
+          localDate,
+          rule.startTime,
+          timezone
+        );
+
+
+      if (!scheduledStart) {
+
+        return {
+          status: 'UNKNOWN',
+          lateMinutes: 0,
+          isLate: false
+        };
+      }
+
+
+      const graceEnd =
+        new Date(
+          scheduledStart.getTime() +
+          (
+            rule.graceMinutes *
+            60 *
+            1000
+          )
+        );
+
+
+      const actual =
+        checkInAt.getTime();
+
+
+      /*
+      * Masih dalam toleransi.
+      */
+      if (
+        actual <=
+        graceEnd.getTime()
+      ) {
+
+        return {
+          status: 'ON_TIME',
+          lateMinutes: 0,
+          isLate: false,
+
+          scheduledStart:
+            scheduledStart,
+
+          graceEnd:
+            graceEnd
+        };
+      }
+
+
+      /*
+      * Sudah melewati toleransi.
+      */
+      const lateMinutes =
+        Math.ceil(
+          (
+            actual -
+            graceEnd.getTime()
+          ) /
+          60000
+        );
+
+
+      return {
+        status: 'LATE',
+        lateMinutes: lateMinutes,
+        isLate: true,
+
+        scheduledStart:
+          scheduledStart,
+
+        graceEnd:
+          graceEnd
+      };
+    }
+
+    /**
+     * Membuat Date dari tanggal + jam lokal.
+     *
+     * Karena Apps Script menggunakan Date object,
+     * kita buat string ISO lokal lalu konversi
+     * menggunakan timezone employee.
+     */
+    function _attendanceBuildLocalDateTime(
+      localDate,
+      time,
+      timezone
+    ) {
+
+      if (
+        !localDate ||
+        !time
+      ) {
+        return null;
+      }
+
+
+      const match =
+        String(time)
+          .trim()
+          .match(
+            /^(\d{1,2}):(\d{2})$/
+          );
+
+
+      if (!match) {
+        return null;
+      }
+
+
+      const hour =
+        Number(match[1]);
+
+      const minute =
+        Number(match[2]);
+
+
+      if (
+        hour < 0 ||
+        hour > 23 ||
+        minute < 0 ||
+        minute > 59
+      ) {
+        return null;
+      }
+
+
+      /*
+      * Apps Script timezone-safe approach:
+      *
+      * Gunakan Utilities.parseDate jika tersedia
+      * pada runtime Apps Script.
+      */
+      const date =
+        Utilities.parseDate(
+          localDate +
+          ' ' +
+          (
+            ('0' + hour).slice(-2)
+          ) +
+          ':' +
+          (
+            ('0' + minute).slice(-2)
+          ),
+          timezone,
+          'yyyy-MM-dd HH:mm'
+        );
+
+
+      return date;
+    }
 
 
     /* --------------------------------------------------------
@@ -541,6 +939,27 @@ function checkOut(sessionToken, payload) {
 
     const now =
       new Date();
+
+
+    let attendanceEvaluation = {
+      status: 'UNKNOWN',
+      lateMinutes: 0,
+      isLate: false
+    };
+
+
+    if (
+      attendanceRule &&
+      attendanceRule.isWorkingDay !== false
+    ) {
+
+      attendanceEvaluation =
+        _attendanceEvaluateOfficeHourCheckIn(
+          now,
+          attendanceRule,
+          timezone
+        );
+    }
 
 
     /* --------------------------------------------------------
