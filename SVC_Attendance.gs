@@ -550,15 +550,44 @@ function checkIn(sessionToken, payload) {
 
 
     /* --------------------------------------------------------
-     * 5. WORK DATE
-     *
-     * Untuk night shift:
-     *
-     * 19:00 - 07:00
-     *
-     * checkout besok pagi tetap menggunakan WORK_DATE
-     * tanggal mulai shift.
-     * ------------------------------------------------------ */
+    * 5. CEK OPEN ATTENDANCE
+    *
+    * Jangan hanya melihat WORK_DATE.
+    *
+    * Satu employee hanya boleh mempunyai
+    * satu sesi OPEN pada satu waktu.
+    * ------------------------------------------------------ */
+
+    const openAttendance =
+      _attendanceFindOpenAttendanceByEmployee(
+        employeeId
+      );
+
+    if (openAttendance) {
+
+      return {
+
+        success: false,
+
+        code:
+          'ALREADY_CHECKED_IN',
+
+        message:
+          'Anda masih memiliki sesi absensi yang belum diselesaikan.',
+
+        attendance:
+          _attendanceBuildResult(
+            openAttendance.record,
+            timezone,
+            zoneLabel
+          )
+
+      };
+    }
+
+    /* --------------------------------------------------------
+    * 6. WORK DATE
+    * ------------------------------------------------------ */
 
     const workDate =
       _attendanceResolveWorkDate(
@@ -568,9 +597,10 @@ function checkIn(sessionToken, payload) {
       );
 
 
+
     /* --------------------------------------------------------
-     * 6. CEK ATTENDANCE EXISTING
-     * ------------------------------------------------------ */
+    * 7. CEK ATTENDANCE EXISTING
+    * ------------------------------------------------------ */
 
     const existing =
       _attendanceFindByEmployeeAndWorkDate(
@@ -2304,6 +2334,185 @@ function _attendanceGetShiftTime(
 
   return '';
 }
+
+
+      /* ============================================================
+      * ATTENDANCE FIND - OPEN SESSION
+      * ============================================================ */
+
+      /**
+       * Mencari apakah employee masih mempunyai
+       * attendance dengan STATUS = OPEN.
+       *
+       * Aturan:
+       * 1 employee hanya boleh memiliki 1 sesi OPEN.
+       *
+       * Ini penting untuk:
+       * - shift malam
+       * - shift 24 jam
+       * - attendance yang melewati pergantian tanggal
+       */
+      function _attendanceFindOpenAttendanceByEmployee(
+        employeeId
+      ) {
+
+        const sheet =
+          _attendanceGetSheetSafe(
+            ATTENDANCE_SHEET_NAME
+          );
+
+        if (!sheet) {
+          throw new Error(
+            'Sheet HR_Attendance tidak ditemukan.'
+          );
+        }
+
+        const lastRow =
+          sheet.getLastRow();
+
+        const lastColumn =
+          sheet.getLastColumn();
+
+        if (
+          lastRow < 2 ||
+          lastColumn < 1
+        ) {
+          return null;
+        }
+
+        /* ----------------------------------------------------------
+        * HEADER
+        * -------------------------------------------------------- */
+
+        const headers =
+          sheet
+            .getRange(
+              1,
+              1,
+              1,
+              lastColumn
+            )
+            .getValues()[0]
+            .map(function (value) {
+
+              return String(
+                value || ''
+              ).trim();
+
+            });
+
+        const normalizedHeaders =
+          headers.map(function (value) {
+
+            return String(
+              value || ''
+            )
+              .trim()
+              .toUpperCase();
+
+          });
+
+        const employeeColumn =
+          _attendanceFindHeaderIndex(
+            normalizedHeaders,
+            ['EMPLOYEE_ID']
+          );
+
+        const statusColumn =
+          _attendanceFindHeaderIndex(
+            normalizedHeaders,
+            ['STATUS']
+          );
+
+        if (
+          employeeColumn < 0 ||
+          statusColumn < 0
+        ) {
+
+          throw new Error(
+            'Kolom EMPLOYEE_ID atau STATUS pada HR_Attendance tidak ditemukan.'
+          );
+        }
+
+        /* ----------------------------------------------------------
+        * CARI EMPLOYEE
+        * -------------------------------------------------------- */
+
+        const matches =
+          sheet
+            .getRange(
+              2,
+              employeeColumn + 1,
+              lastRow - 1,
+              1
+            )
+            .createTextFinder(
+              String(employeeId)
+            )
+            .matchEntireCell(true)
+            .matchCase(true)
+            .findAll();
+
+        if (
+          !matches ||
+          matches.length === 0
+        ) {
+          return null;
+        }
+
+        /* ----------------------------------------------------------
+        * PERIKSA STATUS OPEN
+        * -------------------------------------------------------- */
+
+        for (
+          let i = 0;
+          i < matches.length;
+          i++
+        ) {
+
+          const rowNumber =
+            matches[i].getRow();
+
+          const values =
+            sheet
+              .getRange(
+                rowNumber,
+                1,
+                1,
+                lastColumn
+              )
+              .getValues()[0];
+
+          const record =
+            _attendanceRowToObject(
+              headers,
+              values
+            );
+
+          const status =
+            _attendanceNormalizeStatus(
+              record.STATUS
+            );
+
+          if (
+            status ===
+            ATTENDANCE_STATUS_OPEN
+          ) {
+
+            return {
+
+              rowNumber:
+                rowNumber,
+
+              record:
+                record
+
+            };
+          }
+        }
+
+        return null;
+      }
 
 
 /* ============================================================
