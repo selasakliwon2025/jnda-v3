@@ -1735,108 +1735,268 @@ function _scheduleGetHeaders(
 }
 
 
-function _scheduleBuildRow(
-  headers,
-  data
-) {
+    function _scheduleBuildRow(
+      headers,
+      data
+    ) {
 
-  const normalizedHeaders =
-    headers.map(function(header) {
+      const normalizedHeaders =
+        headers.map(function(header) {
 
-      return String(
-        header
-      )
-        .trim()
-        .toUpperCase();
+          return String(header || '')
+            .trim()
+            .toUpperCase();
 
-    });
+        });
 
-  return normalizedHeaders.map(
-    function(header) {
 
-      if (
-        header ===
-        'EMPLOYEE_ID'
+      const row =
+        new Array(
+          normalizedHeaders.length
+        ).fill('');
+
+
+      function setValue(
+        columnNames,
+        value
       ) {
-        return data.employeeId;
+
+        for (
+          let i = 0;
+          i < columnNames.length;
+          i++
+        ) {
+
+          const index =
+            normalizedHeaders.indexOf(
+              columnNames[i]
+            );
+
+          if (index !== -1) {
+
+            row[index] =
+              value;
+
+            return;
+
+          }
+
+        }
+
       }
 
-      if (
-        header ===
-        'SHIFT_ID'
-      ) {
-        return data.shiftId;
-      }
 
-      if (
+      /*
+      * ======================================================
+      * EMPLOYEE SHIFT ID
+      * ======================================================
+      */
+
+      const employeeShiftId =
+        'ES-' +
+        Utilities.getUuid()
+          .replace(/-/g, '')
+          .substring(0, 12)
+          .toUpperCase();
+
+
+      setValue(
+        [
+          'EMPLOYEE_SHIFT_ID'
+        ],
+        employeeShiftId
+      );
+
+
+      /*
+      * ======================================================
+      * EMPLOYEE
+      * ======================================================
+      */
+
+      setValue(
+        [
+          'EMPLOYEE_ID'
+        ],
+        String(
+          data.employeeId || ''
+        ).trim()
+      );
+
+
+      /*
+      * ======================================================
+      * SHIFT
+      * ======================================================
+      */
+
+      setValue(
+        [
+          'SHIFT_ID'
+        ],
+        String(
+          data.shiftId || ''
+        ).trim()
+      );
+
+
+      /*
+      * ======================================================
+      * DATE
+      *
+      * Gunakan tanggal saja.
+      * Tidak menggunakan jam 12:00.
+      * ======================================================
+      */
+
+      const scheduleDate =
+        _scheduleDateToSheetValue(
+          data.date
+        );
+
+
+      setValue(
         [
           'START_DATE',
           'SCHEDULE_DATE',
           'WORK_DATE',
           'DATE'
-        ].indexOf(header) >= 0
-      ) {
+        ],
+        scheduleDate
+      );
 
-        return _scheduleDateToSheetValue(
-          data.date
-        );
-      }
+
+      /*
+      * END_DATE
+      *
+      * Untuk roster harian:
+      *
+      * START_DATE = END_DATE
+      *
+      * Artinya assignment berlaku
+      * hanya pada tanggal tersebut.
+      */
+
+      setValue(
+        [
+          'END_DATE'
+        ],
+        scheduleDate
+      );
+
+
+      /*
+      * ======================================================
+      * DAY OF WEEK
+      * ======================================================
+      */
 
       if (
-        header ===
-        'END_DATE'
+        scheduleDate instanceof Date &&
+        !isNaN(
+          scheduleDate.getTime()
+        )
       ) {
 
-        return _scheduleDateToSheetValue(
-          data.date
+        const days = [
+
+          'SUNDAY',
+          'MONDAY',
+          'TUESDAY',
+          'WEDNESDAY',
+          'THURSDAY',
+          'FRIDAY',
+          'SATURDAY'
+
+        ];
+
+        setValue(
+          [
+            'DAY_OF_WEEK'
+          ],
+          days[
+            scheduleDate.getDay()
+          ]
         );
+
       }
 
-      if (
+
+      /*
+      * ======================================================
+      * ACTIVE
+      *
+      * Sheet menggunakan ACTIVE,
+      * bukan STATUS.
+      * ======================================================
+      */
+
+      setValue(
+        [
+          'ACTIVE'
+        ],
+        true
+      );
+
+
+      /*
+      * Jika suatu saat sheet menggunakan
+      * STATUS, tetap kompatibel.
+      */
+
+      setValue(
+        [
+          'STATUS'
+        ],
+        'ACTIVE'
+      );
+
+
+      /*
+      * ======================================================
+      * NOTE
+      * ======================================================
+      */
+
+      setValue(
         [
           'NOTE',
           'REMARK',
           'NOTES'
-        ].indexOf(header) >= 0
-      ) {
+        ],
+        String(
+          data.note || ''
+        ).trim()
+      );
 
-        return data.note || '';
-      }
-
-      if (
-        header ===
-        'STATUS'
-      ) {
-
-        return data.status ||
-          'ACTIVE';
-      }
-
-      if (
-        header ===
-        'CREATED_AT'
-      ) {
-
-        return data.now;
-      }
-
-      if (
-        header ===
-        'UPDATED_AT'
-      ) {
-
-        return data.now;
-      }
 
       /*
-       * Kolom lain tidak disentuh.
-       */
+      * ======================================================
+      * AUDIT
+      * ======================================================
+      */
 
-      return '';
+      setValue(
+        [
+          'CREATED_AT'
+        ],
+        data.now ||
+        new Date()
+      );
+
+
+      setValue(
+        [
+          'UPDATED_AT'
+        ],
+        data.now ||
+        new Date()
+      );
+
+
+      return row;
 
     }
-  );
-}
 
 
 function _scheduleSetColumnValue(
@@ -2005,28 +2165,29 @@ function _scheduleGetRowDate(
 
 
 function _scheduleDateToSheetValue(
-  dateString
+  value
 ) {
 
-  const parts =
-    String(
-      dateString
-    ).split('-');
+  const date =
+    _scheduleParseDate(
+      value
+    );
 
-  if (
-    parts.length !== 3
-  ) {
-    return dateString;
+  if (!date) {
+    return '';
   }
 
+
   return new Date(
-    Number(parts[0]),
-    Number(parts[1]) - 1,
-    Number(parts[2]),
-    12,
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    0,
+    0,
     0,
     0
   );
+
 }
 
 
