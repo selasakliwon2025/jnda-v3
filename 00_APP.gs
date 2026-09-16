@@ -87,6 +87,22 @@ function getDatabaseSheet(sheetName) {
       spreadsheetId
     );
 
+  /*
+  * Pastikan database menggunakan timezone
+  * yang sama dengan aplikasi.
+  */
+  const appTimezone =
+    getConfig('TIMEZONE');
+
+  if (
+    appTimezone &&
+    spreadsheet.getSpreadsheetTimeZone() !== appTimezone
+  ) {
+    spreadsheet.setSpreadsheetTimeZone(
+      appTimezone
+    );
+  }
+
   const sheet =
     spreadsheet.getSheetByName(
       String(sheetName).trim()
