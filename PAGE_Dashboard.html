@@ -3016,64 +3016,149 @@
 
     function handleCheckInSuccess(result) {
 
-      console.log(
-        'JNDA Check-In Success:',
-        result
+    console.log(
+      'JNDA Check-In Response:',
+      result
+    );
+
+    const button =
+      document.getElementById(
+        'confirmCheckInButton'
       );
 
-      const button =
-        document.getElementById(
-          'confirmCheckInButton'
-        );
+    if (button) {
 
-      if (button) {
+      button.disabled = false;
 
-        button.disabled = false;
+      button.classList.remove(
+        'loading'
+      );
 
-        button.classList.remove(
-          'loading'
-        );
+      button.innerHTML =
+        '✓ Konfirmasi Absen';
 
-        button.innerHTML =
-          '✓ Konfirmasi Absen';
+    }
 
-      }
+
+    /*
+    * =====================================================
+    * SERVER MENOLAK ABSEN
+    * =====================================================
+    *
+    * Backend checkIn() dapat mengembalikan:
+    *
+    * {
+    *   success: false,
+    *   code: 'ALREADY_CHECKED_IN',
+    *   message: '...'
+    * }
+    *
+    * Jangan dianggap sebagai success.
+    */
+
+    if (
+      result &&
+      result.success === false
+    ) {
 
       /*
-      * Tutup modal setelah server
-      * benar-benar menyatakan berhasil.
+      * Tutup modal attendance.
       */
+
       closeCheckInModal();
 
-      /*
-      * Refresh data attendance.
-      */
-      loadTodayAttendance();
 
       /*
-      * Notifikasi otomatis.
+      * Tampilkan pesan asli dari backend.
       */
+
       Swal.fire({
 
-        icon: 'success',
+        icon: 'warning',
 
-        title: 'Absen Berhasil',
+        title:
+          'Absen Masuk Ditolak',
 
-        text: 'Absensi masuk berhasil dicatat.',
+        text:
+          result.message ||
+          'Absensi masuk tidak dapat diproses.',
 
-        showConfirmButton: false,
+        confirmButtonText:
+          'Mengerti',
 
-        timer: 2000,
-
-        timerProgressBar: true,
+        confirmButtonColor:
+          '#16458f',
 
         customClass: {
-          popup: 'jnda-swal-popup'
+          popup:
+            'jnda-swal-popup'
         }
 
       });
 
+
+      /*
+      * STOP.
+      *
+      * Jangan jalankan:
+      * loadTodayAttendance()
+      * success alert
+      */
+
+      return;
     }
+
+
+    /*
+    * =====================================================
+    * SUCCESS
+    * =====================================================
+    */
+
+    closeCheckInModal();
+
+
+    /*
+    * Refresh attendance.
+    */
+
+    loadTodayAttendance();
+
+
+    /*
+    * Notifikasi berhasil.
+    */
+
+    Swal.fire({
+
+      icon: 'success',
+
+      title:
+        'Absen Berhasil',
+
+      text:
+        result &&
+        result.message
+          ? result.message
+          : 'Absensi masuk berhasil dicatat.',
+
+      showConfirmButton:
+        false,
+
+      timer:
+        2000,
+
+      timerProgressBar:
+        true,
+
+      customClass: {
+        popup:
+          'jnda-swal-popup'
+      }
+
+    });
+
+  }
 
 
     /* =========================================================
