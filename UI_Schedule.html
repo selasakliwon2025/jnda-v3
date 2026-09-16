@@ -1,510 +1,1887 @@
 <style>
 
-  .schedule-page {
-    min-height: 100vh;
-    background:
-      linear-gradient(
-        135deg,
-        #f5f8fc 0%,
-        #eef3f9 100%
-      );
-    padding: 28px;
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
-    color: #172033;
+/* =========================================================
+   JNDA SCHEDULE PAGE
+   DASHBOARD SHELL
+   ========================================================= */
+
+:root {
+
+  --primary: #16458f;
+  --primary-2: #2476c9;
+  --primary-soft: #eaf3ff;
+
+  --green: #16a34a;
+  --red: #dc2626;
+
+  --text: #172033;
+  --muted: #728096;
+
+  --bg: #eef4fa;
+
+  --border:
+    rgba(148,163,184,.18);
+
+  --sidebar: 260px;
+
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+
+body {
+
+  margin: 0;
+
+  font-family:
+    Inter,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+
+  color:
+    var(--text);
+
+  background:
+
+    radial-gradient(
+      circle at 0% 0%,
+      rgba(36,118,201,.14),
+      transparent 30%
+    ),
+
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(14,165,233,.10),
+      transparent 28%
+    ),
+
+    linear-gradient(
+      135deg,
+      #eef4fa,
+      #f7faff
+    );
+
+  min-height: 100vh;
+
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.jnda-sidebar {
+
+  position: fixed;
+
+  left: 0;
+  top: 0;
+
+  width:
+    var(--sidebar);
+
+  height: 100vh;
+
+  background:
+
+    linear-gradient(
+      180deg,
+      #123b7c,
+      #0d2d61
+    );
+
+  color: white;
+
+  z-index: 1000;
+
+  display: flex;
+
+  flex-direction: column;
+
+  transition:
+    transform .25s ease;
+
+}
+
+
+.sidebar-nav {
+
+  flex: 1;
+
+  padding:
+    25px 13px;
+
+  overflow-y: auto;
+
+}
+
+
+.nav-section-title {
+
+  padding:
+    12px 13px 7px;
+
+  font-size: 9px;
+
+  color:
+    rgba(255,255,255,.45);
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+
+}
+
+
+.nav-item {
+
+  width: 100%;
+
+  border: 0;
+
+  background:
+    transparent;
+
+  color:
+    rgba(255,255,255,.72);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding:
+    12px 13px;
+
+  margin-bottom: 4px;
+
+  border-radius: 11px;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: .2s;
+
+}
+
+
+.nav-item:hover {
+
+  background:
+    rgba(255,255,255,.09);
+
+  color: white;
+
+}
+
+
+.nav-item.active {
+
+  background:
+    rgba(255,255,255,.16);
+
+  color: white;
+
+  box-shadow:
+    inset 3px 0 0 #53b4ff;
+
+}
+
+
+.nav-icon {
+
+  width: 22px;
+
+  min-width: 22px;
+
+  text-align: center;
+
+  font-size: 16px;
+
+}
+
+
+/* =========================================================
+   SIDEBAR FOOTER
+   ========================================================= */
+
+.sidebar-footer {
+
+  padding: 14px;
+
+  border-top:
+    1px solid
+    rgba(255,255,255,.08);
+
+}
+
+
+.logout-button {
+
+  width: 100%;
+
+  border: 0;
+
+  border-radius: 10px;
+
+  background:
+    rgba(255,255,255,.08);
+
+  color:
+    rgba(255,255,255,.78);
+
+  padding: 11px;
+
+  cursor: pointer;
+
+  font-weight: 700;
+
+  font-size: 12px;
+
+}
+
+
+.logout-button:hover {
+
+  background:
+    rgba(255,255,255,.14);
+
+}
+
+
+/* =========================================================
+   MOBILE OVERLAY
+   ========================================================= */
+
+.sidebar-overlay {
+
+  display: none;
+
+  position: fixed;
+
+  inset: 0;
+
+  background:
+    rgba(15,23,42,.48);
+
+  z-index: 900;
+
+}
+
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+
+.jnda-main {
+
+  margin-left:
+    var(--sidebar);
+
+  min-height:
+    100vh;
+
+}
+
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.jnda-topbar {
+
+  height: 76px;
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 800;
+
+  background:
+    rgba(255,255,255,.88);
+
+  backdrop-filter:
+    blur(15px);
+
+  -webkit-backdrop-filter:
+    blur(15px);
+
+  border-bottom:
+    1px solid
+    var(--border);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content:
+    space-between;
+
+  padding:
+    0 28px;
+
+}
+
+
+.topbar-left {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+}
+
+
+.mobile-menu-button {
+
+  display: none;
+
+  width: 40px;
+  height: 40px;
+
+  border:
+    1px solid
+    #dce4ef;
+
+  border-radius: 11px;
+
+  background: white;
+
+  color:
+    var(--primary);
+
+  font-size: 20px;
+
+  cursor: pointer;
+
+}
+
+
+/* =========================================================
+   3 LOGOS
+   ========================================================= */
+
+.navbar-logos {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+}
+
+
+.navbar-logo {
+
+  object-fit: contain;
+
+  object-position: center;
+
+  background:
+    transparent;
+
+}
+
+
+.navbar-logo.jn {
+
+  width: 120px;
+
+  height: 50px;
+
+}
+
+
+.navbar-logo.partner {
+
+  width: 70px;
+
+  height: 44px;
+
+}
+
+
+.logo-divider {
+
+  width: 1px;
+
+  height: 30px;
+
+  background:
+    #dce3ed;
+
+}
+
+
+/* =========================================================
+   TOP USER
+   ========================================================= */
+
+.top-user {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+}
+
+
+.top-avatar {
+
+  width: 38px;
+
+  height: 38px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+
+    linear-gradient(
+      135deg,
+      #16458f,
+      #2476c9
+    );
+
+  color: white;
+
+  font-weight: 800;
+
+  font-size: 13px;
+
+}
+
+
+.top-user-name {
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+}
+
+
+.top-user-role {
+
+  margin-top: 2px;
+
+  font-size: 9px;
+
+  color:
+    var(--muted);
+
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.jnda-content {
+
+  max-width: 1500px;
+
+  margin:
+    auto;
+
+  padding:
+    0 28px 40px;
+
+}
+
+
+/* =========================================================
+   SCHEDULE PAGE
+   ========================================================= */
+
+.schedule-page {
+
+  min-height:
+    calc(100vh - 76px);
+
+  padding:
+    25px 0 40px;
+
+}
+
+
+.schedule-container {
+
+  max-width:
+    1400px;
+
+  margin:
+    0 auto;
+
+}
+
+
+.schedule-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content:
+    space-between;
+
+  gap: 20px;
+
+  margin-bottom:
+    24px;
+
+}
+
+
+.schedule-title {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+}
+
+
+.schedule-icon {
+
+  width: 48px;
+  height: 48px;
+
+  border-radius: 14px;
+
+  background:
+    #16458f;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 23px;
+
+}
+
+
+.schedule-title h1 {
+
+  margin: 0;
+
+  font-size: 25px;
+
+  font-weight: 800;
+
+}
+
+
+.schedule-title p {
+
+  margin:
+    5px 0 0;
+
+  color:
+    #718096;
+
+  font-size: 13px;
+
+}
+
+
+.branch-badge {
+
+  background: white;
+
+  border:
+    1px solid
+    #e1e8f0;
+
+  border-radius: 12px;
+
+  padding:
+    11px 16px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color:
+    #16458f;
+
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.schedule-card {
+
+  background:
+    rgba(255,255,255,.94);
+
+  border:
+    1px solid
+    #e4eaf2;
+
+  border-radius:
+    18px;
+
+  box-shadow:
+    0 10px 30px
+    rgba(15,23,42,.06);
+
+  margin-bottom:
+    20px;
+
+  overflow:
+    hidden;
+
+}
+
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.schedule-toolbar {
+
+  padding: 18px;
+
+  display: flex;
+
+  align-items: end;
+
+  gap: 14px;
+
+  flex-wrap: wrap;
+
+}
+
+
+.schedule-field {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+
+}
+
+
+.schedule-field label {
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  color:
+    #536174;
+
+}
+
+
+.schedule-field input,
+.schedule-field select,
+.schedule-field textarea {
+
+  border:
+    1px solid
+    #d9e1eb;
+
+  border-radius:
+    10px;
+
+  padding:
+    10px 12px;
+
+  font-size:
+    13px;
+
+  outline:
+    none;
+
+  background:
+    white;
+
+  min-width:
+    180px;
+
+  box-sizing:
+    border-box;
+
+}
+
+
+.schedule-field input:focus,
+.schedule-field select:focus,
+.schedule-field textarea:focus {
+
+  border-color:
+    #16458f;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(22,69,143,.08);
+
+}
+
+
+/* =========================================================
+   BUTTON
+   ========================================================= */
+
+.schedule-btn {
+
+  border: 0;
+
+  border-radius:
+    10px;
+
+  padding:
+    10px 16px;
+
+  font-size:
+    13px;
+
+  font-weight:
+    700;
+
+  cursor:
+    pointer;
+
+  transition:
+    .2s;
+
+}
+
+
+.schedule-btn:hover {
+
+  transform:
+    translateY(-1px);
+
+}
+
+
+.schedule-btn:disabled {
+
+  opacity:
+    .65;
+
+  cursor:
+    not-allowed;
+
+  transform:
+    none;
+
+}
+
+
+.schedule-btn-primary {
+
+  background:
+    #16458f;
+
+  color:
+    white;
+
+}
+
+
+.schedule-btn-secondary {
+
+  background:
+    #edf2f7;
+
+  color:
+    #344054;
+
+}
+
+
+.schedule-btn-danger {
+
+  background:
+    #fff1f2;
+
+  color:
+    #be123c;
+
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.schedule-table-wrapper {
+
+  overflow-x:
+    auto;
+
+}
+
+
+.schedule-table {
+
+  width:
+    100%;
+
+  border-collapse:
+    collapse;
+
+}
+
+
+.schedule-table th {
+
+  background:
+    #f7f9fc;
+
+  color:
+    #667085;
+
+  font-size:
+    11px;
+
+  text-transform:
+    uppercase;
+
+  letter-spacing:
+    .04em;
+
+  text-align:
+    left;
+
+  padding:
+    13px 16px;
+
+  border-bottom:
+    1px solid
+    #e8edf3;
+
+}
+
+
+.schedule-table td {
+
+  padding:
+    14px 16px;
+
+  border-bottom:
+    1px solid
+    #edf1f5;
+
+  font-size:
+    13px;
+
+  vertical-align:
+    middle;
+
+}
+
+
+.schedule-table tr:hover td {
+
+  background:
+    #fafcff;
+
+}
+
+
+.employee-name {
+
+  font-weight:
+    750;
+
+  color:
+    #172033;
+
+}
+
+
+.employee-no {
+
+  margin-top:
+    3px;
+
+  color:
+    #8a96a8;
+
+  font-size:
+    11px;
+
+}
+
+
+.shift-badge {
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  gap:
+    5px;
+
+  background:
+    #edf4ff;
+
+  color:
+    #16458f;
+
+  border-radius:
+    8px;
+
+  padding:
+    6px 9px;
+
+  font-size:
+    11px;
+
+  font-weight:
+    750;
+
+}
+
+
+.shift-24 {
+
+  background:
+    #f3efff;
+
+  color:
+    #6d4bc2;
+
+}
+
+
+.status-badge {
+
+  display:
+    inline-flex;
+
+  background:
+    #ecfdf3;
+
+  color:
+    #087443;
+
+  border-radius:
+    999px;
+
+  padding:
+    5px 9px;
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+
+}
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.schedule-empty {
+
+  text-align:
+    center;
+
+  padding:
+    55px 20px;
+
+  color:
+    #8a96a8;
+
+}
+
+
+.schedule-empty-icon {
+
+  font-size:
+    38px;
+
+  margin-bottom:
+    10px;
+
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.schedule-loading {
+
+  text-align:
+    center;
+
+  padding:
+    40px;
+
+  color:
+    #718096;
+
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.schedule-modal-backdrop {
+
+  position:
+    fixed;
+
+  inset:
+    0;
+
+  background:
+    rgba(15,23,42,.42);
+
+  display:
+    none;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  padding:
+    20px;
+
+  z-index:
+    9999;
+
+}
+
+
+.schedule-modal-backdrop.show {
+
+  display:
+    flex;
+
+}
+
+
+.schedule-modal {
+
+  width:
+    100%;
+
+  max-width:
+    520px;
+
+  background:
+    white;
+
+  border-radius:
+    20px;
+
+  box-shadow:
+    0 30px 80px
+    rgba(15,23,42,.25);
+
+  overflow:
+    hidden;
+
+}
+
+
+.schedule-modal-header {
+
+  padding:
+    20px 22px;
+
+  border-bottom:
+    1px solid
+    #edf1f5;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+}
+
+
+.schedule-modal-header h2 {
+
+  margin:
+    0;
+
+  font-size:
+    18px;
+
+  font-weight:
+    800;
+
+}
+
+
+.schedule-modal-close {
+
+  border:
+    0;
+
+  background:
+    transparent;
+
+  font-size:
+    24px;
+
+  cursor:
+    pointer;
+
+  color:
+    #7b8798;
+
+}
+
+
+.schedule-modal-body {
+
+  padding:
+    22px;
+
+  display:
+    grid;
+
+  gap:
+    16px;
+
+}
+
+
+.schedule-modal-body
+.schedule-field input,
+.schedule-modal-body
+.schedule-field select,
+.schedule-modal-body
+.schedule-field textarea {
+
+  width:
+    100%;
+
+  min-width:
+    0;
+
+}
+
+
+.schedule-modal-footer {
+
+  padding:
+    16px 22px;
+
+  background:
+    #fafbfc;
+
+  border-top:
+    1px solid
+    #edf1f5;
+
+  display:
+    flex;
+
+  justify-content:
+    flex-end;
+
+  gap:
+    10px;
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .jnda-sidebar {
+
+    transform:
+      translateX(-100%);
+
   }
 
-  .schedule-container {
-    max-width: 1400px;
-    margin: 0 auto;
+
+  .jnda-sidebar.mobile-open {
+
+    transform:
+      translateX(0);
+
+    box-shadow:
+      12px 0 40px
+      rgba(15,23,42,.20);
+
   }
+
+
+  .sidebar-overlay.mobile-show {
+
+    display:
+      block;
+
+  }
+
+
+  .jnda-main {
+
+    margin-left:
+      0;
+
+  }
+
+
+  .mobile-menu-button {
+
+    display:
+      flex;
+
+    align-items:
+      center;
+
+    justify-content:
+      center;
+
+  }
+
+
+  .jnda-topbar {
+
+    height:
+      66px;
+
+    padding:
+      0 14px;
+
+  }
+
+
+  .navbar-logo.jn {
+
+    width:
+      90px;
+
+    height:
+      42px;
+
+  }
+
+
+  .navbar-logo.partner {
+
+    width:
+      50px;
+
+    height:
+      36px;
+
+  }
+
+
+  .navbar-logos {
+
+    gap:
+      7px;
+
+  }
+
+
+  .logo-divider {
+
+    height:
+      22px;
+
+  }
+
+
+  .top-user-text {
+
+    display:
+      none;
+
+  }
+
+
+  .jnda-content {
+
+    padding:
+      0 14px 30px;
+
+  }
+
+
+  .schedule-page {
+
+    padding:
+      18px 0 30px;
+
+  }
+
 
   .schedule-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 24px;
+
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+
   }
 
-  .schedule-title {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .schedule-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: #16458f;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 23px;
-  }
-
-  .schedule-title h1 {
-    margin: 0;
-    font-size: 25px;
-    font-weight: 800;
-  }
-
-  .schedule-title p {
-    margin: 5px 0 0;
-    color: #718096;
-    font-size: 13px;
-  }
-
-  .branch-badge {
-    background: white;
-    border: 1px solid #e1e8f0;
-    border-radius: 12px;
-    padding: 11px 16px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #16458f;
-  }
-
-  .schedule-card {
-    background: white;
-    border: 1px solid #e4eaf2;
-    border-radius: 18px;
-    box-shadow:
-      0 10px 30px rgba(15, 23, 42, .06);
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
 
   .schedule-toolbar {
-    padding: 18px;
-    display: flex;
-    align-items: end;
-    gap: 14px;
-    flex-wrap: wrap;
+
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+
   }
 
-  .schedule-field {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-  }
-
-  .schedule-field label {
-    font-size: 12px;
-    font-weight: 700;
-    color: #536174;
-  }
 
   .schedule-field input,
-  .schedule-field select,
-  .schedule-field textarea {
-    border: 1px solid #d9e1eb;
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 13px;
-    outline: none;
-    background: white;
-    min-width: 180px;
-    box-sizing: border-box;
+  .schedule-field select {
+
+    width:
+      100%;
+
   }
 
-  .schedule-field input:focus,
-  .schedule-field select:focus,
-  .schedule-field textarea:focus {
-    border-color: #16458f;
-    box-shadow:
-      0 0 0 3px rgba(22, 69, 143, .08);
+}
+
+
+@media (max-width: 600px) {
+
+  .schedule-title h1 {
+
+    font-size:
+      21px;
+
   }
 
-  .schedule-btn {
-    border: 0;
-    border-radius: 10px;
-    padding: 10px 16px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
+
+  .schedule-title p {
+
+    font-size:
+      11px;
+
   }
 
-  .schedule-btn-primary {
-    background: #16458f;
-    color: white;
+
+  .branch-badge {
+
+    width:
+      100%;
+
+    text-align:
+      center;
+
   }
 
-  .schedule-btn-secondary {
-    background: #edf2f7;
-    color: #344054;
-  }
 
-  .schedule-btn-danger {
-    background: #fff1f2;
-    color: #be123c;
-  }
-
-  .schedule-table-wrapper {
-    overflow-x: auto;
-  }
-
-  .schedule-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .schedule-table th {
-    background: #f7f9fc;
-    color: #667085;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    text-align: left;
-    padding: 13px 16px;
-    border-bottom: 1px solid #e8edf3;
-  }
-
+  .schedule-table th,
   .schedule-table td {
-    padding: 14px 16px;
-    border-bottom: 1px solid #edf1f5;
-    font-size: 13px;
-    vertical-align: middle;
-  }
 
-  .schedule-table tr:hover td {
-    background: #fafcff;
-  }
-
-  .employee-name {
-    font-weight: 750;
-    color: #172033;
-  }
-
-  .employee-no {
-    margin-top: 3px;
-    color: #8a96a8;
-    font-size: 11px;
-  }
-
-  .shift-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: #edf4ff;
-    color: #16458f;
-    border-radius: 8px;
-    padding: 6px 9px;
-    font-size: 11px;
-    font-weight: 750;
-  }
-
-  .shift-24 {
-    background: #f3efff;
-    color: #6d4bc2;
-  }
-
-  .status-badge {
-    display: inline-flex;
-    background: #ecfdf3;
-    color: #087443;
-    border-radius: 999px;
-    padding: 5px 9px;
-    font-size: 10px;
-    font-weight: 800;
-  }
-
-  .schedule-empty {
-    text-align: center;
-    padding: 55px 20px;
-    color: #8a96a8;
-  }
-
-  .schedule-empty-icon {
-    font-size: 38px;
-    margin-bottom: 10px;
-  }
-
-  .schedule-modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, .42);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 9999;
-  }
-
-  .schedule-modal-backdrop.show {
-    display: flex;
-  }
-
-  .schedule-modal {
-    width: 100%;
-    max-width: 520px;
-    background: white;
-    border-radius: 20px;
-    box-shadow:
-      0 30px 80px rgba(15, 23, 42, .25);
-    overflow: hidden;
-  }
-
-  .schedule-modal-header {
-    padding: 20px 22px;
-    border-bottom: 1px solid #edf1f5;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .schedule-modal-header h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 800;
-  }
-
-  .schedule-modal-close {
-    border: 0;
-    background: transparent;
-    font-size: 24px;
-    cursor: pointer;
-    color: #7b8798;
-  }
-
-  .schedule-modal-body {
-    padding: 22px;
-    display: grid;
-    gap: 16px;
-  }
-
-  .schedule-modal-body .schedule-field input,
-  .schedule-modal-body .schedule-field select,
-  .schedule-modal-body .schedule-field textarea {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .schedule-modal-footer {
-    padding: 16px 22px;
-    background: #fafbfc;
-    border-top: 1px solid #edf1f5;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-
-  .schedule-loading {
-    text-align: center;
-    padding: 40px;
-    color: #718096;
-  }
-
-  @media (max-width: 700px) {
-
-    .schedule-page {
-      padding: 16px;
-    }
-
-    .schedule-header {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-
-    .schedule-toolbar {
-      align-items: stretch;
-      flex-direction: column;
-    }
-
-    .schedule-field input,
-    .schedule-field select {
-      width: 100%;
-    }
+    padding:
+      11px 10px;
 
   }
+
+}
 
 </style>
 
 
-<div class="schedule-page">
+<!-- =======================================================
+     SIDEBAR
+     ======================================================= -->
 
-  <div class="schedule-container">
+<aside
+  id="jndaSidebar"
+  class="jnda-sidebar">
 
-    <div class="schedule-header">
+  <nav class="sidebar-nav">
 
-      <div class="schedule-title">
+    <div class="nav-section-title">
+      Utama
+    </div>
 
-        <div class="schedule-icon">
-          📅
-        </div>
 
-        <div>
+    <button
+      type="button"
+      class="nav-item"
+      onclick="navigateTo('dashboard')">
 
-          <h1>
-            Manajemen Jadwal
-          </h1>
+      <span class="nav-icon">
+        🏠
+      </span>
 
-          <p>
-            Kelola jadwal kerja pegawai berdasarkan cabang.
-          </p>
+      <span>
+        Dashboard
+      </span>
 
-        </div>
+    </button>
 
-      </div>
 
-      <div
-        id="scheduleBranchBadge"
-        class="branch-badge"
-      >
-        📍 Memuat cabang...
-      </div>
+    <button
+      type="button"
+      class="nav-item"
+      onclick="navigateTo('history')">
+
+      <span class="nav-icon">
+        📋
+      </span>
+
+      <span>
+        Riwayat Kehadiran
+      </span>
+
+    </button>
+
+
+    <button
+      type="button"
+      class="nav-item"
+      onclick="navigateTo('leave')">
+
+      <span class="nav-icon">
+        📅
+      </span>
+
+      <span>
+        Cuti / Izin
+      </span>
+
+    </button>
+
+
+    <div
+      class="nav-section-title"
+      style="margin-top:12px;">
+
+      Manajemen
 
     </div>
 
 
-    <!-- FILTER -->
+    <button
+      type="button"
+      class="nav-item active"
+      onclick="navigateTo('schedule')">
 
-    <div class="schedule-card">
+      <span class="nav-icon">
+        📅
+      </span>
 
-      <div class="schedule-toolbar">
+      <span>
+        Manajemen Jadwal
+      </span>
 
-        <div class="schedule-field">
+    </button>
 
-          <label>
-            Dari Tanggal
-          </label>
-
-          <input
-            type="date"
-            id="scheduleStartDate"
-          >
-
-        </div>
+  </nav>
 
 
-        <div class="schedule-field">
+  <div class="sidebar-footer">
 
-          <label>
-            Sampai Tanggal
-          </label>
+    <button
+      type="button"
+      class="logout-button"
+      onclick="logoutUser()">
 
-          <input
-            type="date"
-            id="scheduleEndDate"
-          >
+      🚪 Keluar
 
-        </div>
-
-
-        <button
-          type="button"
-          class="schedule-btn schedule-btn-primary"
-          onclick="loadScheduleData()"
-        >
-          🔄 Tampilkan
-        </button>
-
-
-        <button
-          type="button"
-          class="schedule-btn schedule-btn-secondary"
-          onclick="openScheduleModal()"
-        >
-          ＋ Tambah Jadwal
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <!-- TABLE -->
-
-    <div class="schedule-card">
-
-      <div
-        id="scheduleLoading"
-        class="schedule-loading"
-      >
-        Memuat jadwal...
-      </div>
-
-      <div
-        id="scheduleTableWrapper"
-        class="schedule-table-wrapper"
-        style="display:none;"
-      >
-
-        <table class="schedule-table">
-
-          <thead>
-
-            <tr>
-
-              <th>
-                Tanggal
-              </th>
-
-              <th>
-                Pegawai
-              </th>
-
-              <th>
-                Shift
-              </th>
-
-              <th>
-                Status
-              </th>
-
-              <th>
-                Catatan
-              </th>
-
-              <th>
-                Aksi
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody
-            id="scheduleTableBody"
-          ></tbody>
-
-        </table>
-
-      </div>
-
-      <div
-        id="scheduleEmpty"
-        class="schedule-empty"
-        style="display:none;"
-      >
-
-        <div class="schedule-empty-icon">
-          📅
-        </div>
-
-        Belum ada jadwal pada periode ini.
-
-      </div>
-
-    </div>
+    </button>
 
   </div>
+
+</aside>
+
+
+<!-- =======================================================
+     MOBILE OVERLAY
+     ======================================================= -->
+
+<div
+  id="sidebarOverlay"
+  class="sidebar-overlay"
+  onclick="closeMobileSidebar()">
+</div>
+
+
+<!-- =======================================================
+     MAIN
+     ======================================================= -->
+
+<div class="jnda-main">
+
+
+  <!-- =====================================================
+       NAVBAR
+       ===================================================== -->
+
+  <header class="jnda-topbar">
+
+
+    <div class="topbar-left">
+
+
+      <button
+        type="button"
+        class="mobile-menu-button"
+        onclick="toggleMobileSidebar()">
+
+        ☰
+
+      </button>
+
+
+      <!-- 3 LOGO -->
+
+      <div class="navbar-logos">
+
+
+        <!-- DANANTARA -->
+
+        <img
+          class="navbar-logo partner"
+          src="https://drive.google.com/thumbnail?id=1HCOqgfla9hUzaW3bF3beymYn8q64zAdA&sz=w250"
+          alt="Danantara">
+
+
+        <span class="logo-divider"></span>
+
+
+        <!-- ASDP -->
+
+        <img
+          class="navbar-logo partner"
+          src="https://drive.google.com/thumbnail?id=1J5YLMEAbsoVkqFbWxeT2FTRcCYpooHzZ&sz=w250"
+          alt="ASDP">
+
+
+        <span class="logo-divider"></span>
+
+
+        <!-- PT JEMBATAN NUSANTARA -->
+
+        <img
+          class="navbar-logo jn"
+          src="https://drive.google.com/thumbnail?id=1UiZRAwhuxTzgYAEKdDMF1-qTF8D9K_bH&sz=w400"
+          alt="PT Jembatan Nusantara">
+
+
+      </div>
+
+    </div>
+
+
+    <!-- USER LOGIN -->
+
+    <div class="top-user">
+
+
+      <div
+        id="topAvatar"
+        class="top-avatar">
+
+        P
+
+      </div>
+
+
+      <div class="top-user-text">
+
+        <div
+          id="topUserName"
+          class="top-user-name">
+
+          Pegawai
+
+        </div>
+
+
+        <div
+          id="topUserRole"
+          class="top-user-role">
+
+          PEGAWAI
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+  </header>
+
+
+  <!-- =====================================================
+       CONTENT
+       ===================================================== -->
+
+  <main class="jnda-content">
+
+
+    <div class="schedule-page">
+
+
+      <div class="schedule-container">
+
+
+        <!-- HEADER -->
+
+        <div class="schedule-header">
+
+
+          <div class="schedule-title">
+
+
+            <div class="schedule-icon">
+              📅
+            </div>
+
+
+            <div>
+
+              <h1>
+                Manajemen Jadwal
+              </h1>
+
+              <p>
+                Kelola jadwal kerja pegawai berdasarkan cabang.
+              </p>
+
+            </div>
+
+
+          </div>
+
+
+          <div
+            id="scheduleBranchBadge"
+            class="branch-badge">
+
+            📍 Memuat cabang...
+
+          </div>
+
+
+        </div>
+
+
+        <!-- FILTER -->
+
+        <div class="schedule-card">
+
+
+          <div class="schedule-toolbar">
+
+
+            <div class="schedule-field">
+
+              <label>
+                Dari Tanggal
+              </label>
+
+              <input
+                type="date"
+                id="scheduleStartDate">
+
+            </div>
+
+
+            <div class="schedule-field">
+
+              <label>
+                Sampai Tanggal
+              </label>
+
+              <input
+                type="date"
+                id="scheduleEndDate">
+
+            </div>
+
+
+            <button
+              type="button"
+              class="schedule-btn schedule-btn-primary"
+              onclick="loadScheduleData()">
+
+              🔄 Tampilkan
+
+            </button>
+
+
+            <button
+              type="button"
+              class="schedule-btn schedule-btn-secondary"
+              onclick="openScheduleModal()">
+
+              ＋ Tambah Jadwal
+
+            </button>
+
+
+          </div>
+
+        </div>
+
+
+        <!-- TABLE -->
+
+        <div class="schedule-card">
+
+
+          <div
+            id="scheduleLoading"
+            class="schedule-loading">
+
+            Memuat jadwal...
+
+          </div>
+
+
+          <div
+            id="scheduleTableWrapper"
+            class="schedule-table-wrapper"
+            style="display:none;">
+
+            <table
+              class="schedule-table">
+
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Tanggal
+                  </th>
+
+                  <th>
+                    Pegawai
+                  </th>
+
+                  <th>
+                    Shift
+                  </th>
+
+                  <th>
+                    Status
+                  </th>
+
+                  <th>
+                    Catatan
+                  </th>
+
+                  <th>
+                    Aksi
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody
+                id="scheduleTableBody">
+              </tbody>
+
+
+            </table>
+
+          </div>
+
+
+          <div
+            id="scheduleEmpty"
+            class="schedule-empty"
+            style="display:none;">
+
+            <div class="schedule-empty-icon">
+              📅
+            </div>
+
+            Belum ada jadwal pada periode ini.
+
+          </div>
+
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+
+  </main>
 
 </div>
 
 
-<!-- MODAL -->
+<!-- =======================================================
+     MODAL
+     ======================================================= -->
 
 <div
   id="scheduleModalBackdrop"
-  class="schedule-modal-backdrop"
->
+  class="schedule-modal-backdrop">
+
 
   <div class="schedule-modal">
+
 
     <div class="schedule-modal-header">
 
@@ -512,18 +1889,21 @@
         Tambah Jadwal
       </h2>
 
+
       <button
         type="button"
         class="schedule-modal-close"
-        onclick="closeScheduleModal()"
-      >
+        onclick="closeScheduleModal()">
+
         ×
+
       </button>
 
     </div>
 
 
     <div class="schedule-modal-body">
+
 
       <div class="schedule-field">
 
@@ -532,11 +1912,12 @@
         </label>
 
         <select
-          id="scheduleEmployee"
-        >
+          id="scheduleEmployee">
+
           <option value="">
             Pilih Pegawai
           </option>
+
         </select>
 
       </div>
@@ -550,8 +1931,7 @@
 
         <input
           type="date"
-          id="scheduleDate"
-        >
+          id="scheduleDate">
 
       </div>
 
@@ -563,11 +1943,12 @@
         </label>
 
         <select
-          id="scheduleShift"
-        >
+          id="scheduleShift">
+
           <option value="">
             Pilih Shift
           </option>
+
         </select>
 
       </div>
@@ -582,34 +1963,40 @@
         <textarea
           id="scheduleNote"
           rows="3"
-          placeholder="Opsional"
-        ></textarea>
+          placeholder="Opsional"></textarea>
 
       </div>
+
 
     </div>
 
 
     <div class="schedule-modal-footer">
 
+
       <button
         type="button"
         class="schedule-btn schedule-btn-secondary"
-        onclick="closeScheduleModal()"
-      >
+        onclick="closeScheduleModal()">
+
         Batal
+
       </button>
+
 
       <button
         type="button"
         id="scheduleSaveButton"
         class="schedule-btn schedule-btn-primary"
-        onclick="saveSchedule()"
-      >
+        onclick="saveSchedule()">
+
         ✓ Simpan Jadwal
+
       </button>
 
+
     </div>
+
 
   </div>
 
