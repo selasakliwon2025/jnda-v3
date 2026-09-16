@@ -1007,25 +1007,11 @@ function checkOut(sessionToken, payload) {
       new Date();
 
 
-    let attendanceEvaluation = {
+    const attendanceEvaluation = {
       status: 'UNKNOWN',
       lateMinutes: 0,
       isLate: false
     };
-
-
-    if (
-      attendanceRule &&
-      attendanceRule.isWorkingDay !== false
-    ) {
-
-      attendanceEvaluation =
-        _attendanceEvaluateOfficeHourCheckIn(
-          now,
-          attendanceRule,
-          timezone
-        );
-    }
 
 
     /* --------------------------------------------------------
@@ -2119,6 +2105,72 @@ function _attendanceGetEmployeeShift(
       ''
     ).trim();
 
+    /*
+   * ==========================================================
+   * SPECIAL HANDLING - 24 HOUR SHIFT
+   * ==========================================================
+   *
+   * S010 hanya berlaku pada tanggal START_DATE
+   * yang tercatat di HR_EmployeeShift.
+   *
+   * Contoh:
+   *
+   * 16 Sep -> S010
+   * 17 Sep -> LIBUR
+   * 18 Sep -> S010
+   */
+
+  if (
+    shift &&
+    String(
+      shift.SHIFT_ID || ''
+    ).trim().toUpperCase() === 'S010'
+  ) {
+
+    const localReferenceDate =
+      Utilities.formatDate(
+        referenceDate,
+        ATTENDANCE_DEFAULT_TIMEZONE,
+        'yyyy-MM-dd'
+      );
+
+
+    /*
+     * Ambil START_DATE dari assignment.
+     */
+
+    const assignmentStartDate =
+      _attendanceToDate(
+        best.START_DATE
+      );
+
+
+    if (assignmentStartDate) {
+
+      const assignmentDate =
+        Utilities.formatDate(
+          assignmentStartDate,
+          ATTENDANCE_DEFAULT_TIMEZONE,
+          'yyyy-MM-dd'
+        );
+
+
+      /*
+       * Jika tanggal sekarang bukan tanggal
+       * roster S010, jangan kembalikan S010.
+       */
+
+      if (
+        assignmentDate !==
+        localReferenceDate
+      ) {
+
+        return null;
+
+      }
+    }
+  }
+
 
   if (!shiftId) {
     return null;
@@ -2202,7 +2254,6 @@ function _attendanceResolveWorkDate(
       ]
     );
 
-
   const end =
     _attendanceGetShiftTime(
       shift,
@@ -2220,11 +2271,71 @@ function _attendanceResolveWorkDate(
 
 
   /*
-   * Shift melewati tengah malam.
+   * ==========================================================
+   * SHIFT 24 JAM
+   * ==========================================================
    *
    * Contoh:
+   *
+   * 08:00 → 08:00
+   *
+   * Artinya:
+   *
+   * Hari kerja dimulai pukul 08:00
+   * dan berakhir pukul 08:00 hari berikutnya.
+   *
+   * WORK_DATE tetap tanggal saat shift dimulai.
+   */
+
+  if (start === end) {
+
+    const currentTime =
+      Utilities.formatDate(
+        now,
+        timezone,
+        'HH:mm'
+      );
+
+
+    /*
+     * Sebelum jam mulai:
+     *
+     * 17 Sep 07:59
+     *
+     * masih merupakan bagian
+     * dari shift 16 Sep.
+     */
+
+    if (currentTime < start) {
+
+      return _attendanceGetPreviousDate(
+        localDate
+      );
+
+    }
+
+
+    /*
+     * Mulai jam 08:00 sampai sebelum
+     * 08:00 hari berikutnya:
+     *
+     * WORK_DATE = tanggal sekarang.
+     */
+
+    return localDate;
+  }
+
+
+  /*
+   * ==========================================================
+   * SHIFT OVERNIGHT NORMAL
+   * ==========================================================
+   *
+   * Contoh:
+   *
    * 19:00 → 07:00
    */
+
   if (end < start) {
 
     const currentTime =
@@ -2236,17 +2347,16 @@ function _attendanceResolveWorkDate(
 
 
     /*
-     * Setelah tengah malam dan sebelum end time,
-     * WORK_DATE adalah hari sebelumnya.
+     * Setelah tengah malam dan sebelum
+     * jam selesai, gunakan tanggal sebelumnya.
      */
-    if (
-      currentTime <
-      end
-    ) {
+
+    if (currentTime < end) {
 
       return _attendanceGetPreviousDate(
         localDate
       );
+
     }
   }
 
