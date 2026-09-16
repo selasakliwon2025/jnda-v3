@@ -54,7 +54,9 @@ function getRequestedPage(e) {
 
     report: 'PAGE_Report',
 
-    admin: 'PAGE_Admin'
+    admin: 'PAGE_Admin',
+
+    schedule: 'PAGE_Schedule'
   };
 
 

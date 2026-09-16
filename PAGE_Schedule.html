@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+  <base target="_top">
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="
+      width=device-width,
+      initial-scale=1.0
+    "
+  >
+
+  <title>
+    JNDA - Manajemen Jadwal
+  </title>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+
+
+<body>
+
+  <?!= include('UI_Schedule'); ?>
+
+
+  <script>
+
+    /* ========================================================
+       STATE
+       ======================================================== */
+
+    let SESSION_TOKEN = '';
+
+    let SCHEDULE_DATA = {
+
+      employees: [],
+
+      shifts: [],
+
+      schedules: []
+
+    };
+
+    let EDITING_SCHEDULE = null;
+
+
+    /* ========================================================
+       INIT
+       ======================================================== */
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      function() {
+
+        SESSION_TOKEN =
+          localStorage.getItem(
+            'JNDA_SESSION_TOKEN'
+          );
+
+        if (!SESSION_TOKEN) {
+
+          window.location.href =
+            '<?!= WEB_APP_URL ?>?page=login';
+
+          return;
+        }
+
+        initializeSchedulePage();
+
+      }
+    );
+
+
+    function initializeSchedulePage() {
+
+      setDefaultPeriod();
+
+      google.script.run
+
+        .withSuccessHandler(
+          handleSchedulePageSuccess
+        )
+
+        .withFailureHandler(
+          handleScheduleError
+        )
+
+        .getSchedulePageData(
+          SESSION_TOKEN
+        );
+
+    }
+
+
+    /* ========================================================
+       INITIAL DATA
+       ======================================================== */
+
+    function handleSchedulePageSuccess(
+      result
+    ) {
+
+      if (
+        !result ||
+        result.success === false
+      ) {
+
+        showError(
+          result &&
+          result.message
+            ? result.message
+            : 'Data jadwal gagal dimuat.'
+        );
+
+        return;
+      }
+
+      SCHEDULE_DATA.employees =
+        result.employees || [];
+
+      SCHEDULE_DATA.shifts =
+        result.shifts || [];
+
+      const access =
+        result.access || {};
+
+      document.getElementById(
+        'scheduleBranchBadge'
+      ).textContent =
+        access.scope === 'ALL'
+          ? '🌐 Semua Cabang'
+          : '📍 ' +
+            (
+              access.branchName ||
+              access.branchId ||
+              'Cabang'
+            );
+
+      populateEmployeeSelect();
+
+      populateShiftSelect();
+
+      loadScheduleData();
+
+    }
+
+
+    /* ========================================================
+       PERIOD
+       ======================================================== */
+
+    function setDefaultPeriod() {
+
+      const now =
+        new Date();
+
+      const year =
+        now.getFullYear();
+
+      const month =
+        now.getMonth();
+
+      const first =
+        new Date(
+          year,
+          month,
+          1
+        );
+
+      const last =
+        new Date(
+          year,
+          month + 1,
+          0
+        );
+
+      document.getElementById(
+        'scheduleStartDate'
+      ).value =
+        toDateInputValue(
+          first
+        );
+
+      document.getElementById(
+        'scheduleEndDate'
+      ).value =
+        toDateInputValue(
+          last
+        );
+
+    }
+
+
+    function loadScheduleData() {
+
+      const startDate =
+        document.getElementById(
+          'scheduleStartDate'
+        ).value;
+
+      const endDate =
+        document.getElementById(
+          'scheduleEndDate'
+        ).value;
+
+      if (!startDate || !endDate) {
+
+        showWarning(
+          'Periode tanggal wajib diisi.'
+        );
+
+        return;
+      }
+
+      showScheduleLoading();
+
+      google.script.run
+
+        .withSuccessHandler(
+          handleSchedulesSuccess
+        )
+
+        .withFailureHandler(
+          handleScheduleError
+        )
+
+        .getSchedules(
+          SESSION_TOKEN,
+          startDate,
+          endDate
+        );
+
+    }
+
+
+    function handleSchedulesSuccess(
+      result
+    ) {
+
+      hideScheduleLoading();
+
+      if (
+        !result ||
+        result.success === false
+      ) {
+
+        showError(
+          result &&
+          result.message
+            ? result.message
+            : 'Jadwal gagal dimuat.'
+        );
+
+        return;
+      }
+
+      SCHEDULE_DATA.schedules =
+        result.schedules || [];
+
+      renderScheduleTable();
+
+    }
+
+
+    /* ========================================================
+       SELECT
+       ======================================================== */
+
+    function populateEmployeeSelect() {
+
+      const select =
+        document.getElementById(
+          'scheduleEmployee'
+        );
+
+      select.innerHTML =
+        '<option value="">Pilih Pegawai</option>';
+
+      SCHEDULE_DATA.employees
+        .forEach(function(employee) {
+
+          const option =
+            document.createElement(
+              'option'
+            );
+
+          option.value =
+            employee.employeeId;
+
+          option.textContent =
+            employee.fullName +
+            (
+              employee.employeeNo
+                ? ' · ' +
+                  employee.employeeNo
+                : ''
+            );
+
+          select.appendChild(
+            option
+          );
+
+        });
+
+    }
+
+
+    function populateShiftSelect() {
+
+      const select =
+        document.getElementById(
+          'scheduleShift'
+        );
+
+      select.innerHTML =
+        '<option value="">Pilih Shift</option>';
+
+      SCHEDULE_DATA.shifts
+        .forEach(function(shift) {
+
+          const option =
+            document.createElement(
+              'option'
+            );
+
+          option.value =
+            shift.shiftId;
+
+          let label =
+            shift.shiftId +
+            ' · ' +
+            shift.shiftName;
+
+          if (
+            shift.startTime ||
+            shift.endTime
+          ) {
+
+            label +=
+              ' (' +
+              (
+                shift.startTime ||
+                '--:--'
+              ) +
+              ' - ' +
+              (
+                shift.endTime ||
+                '--:--'
+              ) +
+              ')';
+
+          }
+
+          option.textContent =
+            label;
+
+          select.appendChild(
+            option
+          );
+
+        });
+
+    }
+
+
+    /* ========================================================
+       TABLE
+       ======================================================== */
+
+    function renderScheduleTable() {
+
+      const wrapper =
+        document.getElementById(
+          'scheduleTableWrapper'
+        );
+
+      const empty =
+        document.getElementById(
+          'scheduleEmpty'
+        );
+
+      const body =
+        document.getElementById(
+          'scheduleTableBody'
+        );
+
+      body.innerHTML = '';
+
+      const schedules =
+        SCHEDULE_DATA.schedules || [];
+
+      if (!schedules.length) {
+
+        wrapper.style.display =
+          'none';
+
+        empty.style.display =
+          'block';
+
+        return;
+      }
+
+      wrapper.style.display =
+        'block';
+
+      empty.style.display =
+        'none';
+
+      schedules.forEach(
+        function(schedule) {
+
+          const tr =
+            document.createElement(
+              'tr'
+            );
+
+          const shiftClass =
+            String(
+              schedule.shiftId
+            ).toUpperCase() ===
+            'S010'
+              ? 'shift-badge shift-24'
+              : 'shift-badge';
+
+          tr.innerHTML = `
+
+            <td>
+              <strong>
+                ${escapeHtml(
+                  formatDateDisplay(
+                    schedule.date
+                  )
+                )}
+              </strong>
+            </td>
+
+            <td>
+
+              <div class="employee-name">
+                ${escapeHtml(
+                  schedule.employeeName
+                )}
+              </div>
+
+              <div class="employee-no">
+                ${escapeHtml(
+                  schedule.employeeNo || '-'
+                )}
+              </div>
+
+            </td>
+
+            <td>
+
+              <span class="${shiftClass}">
+                ${escapeHtml(
+                  schedule.shiftId
+                )}
+                ·
+                ${escapeHtml(
+                  schedule.shiftName ||
+                  ''
+                )}
+              </span>
+
+            </td>
+
+            <td>
+
+              <span class="status-badge">
+                ${escapeHtml(
+                  schedule.status ||
+                  'ACTIVE'
+                )}
+              </span>
+
+            </td>
+
+            <td>
+              ${escapeHtml(
+                schedule.note || '-'
+              )}
+            </td>
+
+            <td>
+
+              <button
+                type="button"
+                class="schedule-btn schedule-btn-secondary"
+                onclick='editSchedule(${JSON.stringify(
+                  schedule
+                )})'
+              >
+                ✏️
+              </button>
+
+              <button
+                type="button"
+                class="schedule-btn schedule-btn-danger"
+                onclick="deleteScheduleConfirm(
+                  ${Number(
+                    schedule.rowNumber
+                  )}
+                )"
+              >
+                🗑️
+              </button>
+
+            </td>
+
+          `;
+
+          body.appendChild(
+            tr
+          );
+
+        }
+      );
+
+    }
+
+
+    /* ========================================================
+       MODAL
+       ======================================================== */
+
+    function openScheduleModal() {
+
+      EDITING_SCHEDULE = null;
+
+      document.getElementById(
+        'scheduleModalTitle'
+      ).textContent =
+        'Tambah Jadwal';
+
+      document.getElementById(
+        'scheduleEmployee'
+      ).value = '';
+
+      document.getElementById(
+        'scheduleDate'
+      ).value =
+        document.getElementById(
+          'scheduleStartDate'
+        ).value;
+
+      document.getElementById(
+        'scheduleShift'
+      ).value = '';
+
+      document.getElementById(
+        'scheduleNote'
+      ).value = '';
+
+      document.getElementById(
+        'scheduleSaveButton'
+      ).textContent =
+        '✓ Simpan Jadwal';
+
+      document.getElementById(
+        'scheduleModalBackdrop'
+      ).classList.add(
+        'show'
+      );
+
+    }
+
+
+    function editSchedule(
+      schedule
+    ) {
+
+      EDITING_SCHEDULE =
+        schedule;
+
+      document.getElementById(
+        'scheduleModalTitle'
+      ).textContent =
+        'Edit Jadwal';
+
+      document.getElementById(
+        'scheduleEmployee'
+      ).value =
+        schedule.employeeId;
+
+      document.getElementById(
+        'scheduleDate'
+      ).value =
+        schedule.date;
+
+      document.getElementById(
+        'scheduleShift'
+      ).value =
+        schedule.shiftId;
+
+      document.getElementById(
+        'scheduleNote'
+      ).value =
+        schedule.note || '';
+
+      document.getElementById(
+        'scheduleSaveButton'
+      ).textContent =
+        '✓ Simpan Perubahan';
+
+      document.getElementById(
+        'scheduleModalBackdrop'
+      ).classList.add(
+        'show'
+      );
+
+    }
+
+
+    function closeScheduleModal() {
+
+      document.getElementById(
+        'scheduleModalBackdrop'
+      ).classList.remove(
+        'show'
+      );
+
+    }
+
+
+    /* ========================================================
+       SAVE
+       ======================================================== */
+
+    function saveSchedule() {
+
+      const employeeId =
+        document.getElementById(
+          'scheduleEmployee'
+        ).value;
+
+      const date =
+        document.getElementById(
+          'scheduleDate'
+        ).value;
+
+      const shiftId =
+        document.getElementById(
+          'scheduleShift'
+        ).value;
+
+      const note =
+        document.getElementById(
+          'scheduleNote'
+        ).value.trim();
+
+      if (!employeeId) {
+
+        showWarning(
+          'Pegawai wajib dipilih.'
+        );
+
+        return;
+      }
+
+      if (!date) {
+
+        showWarning(
+          'Tanggal wajib diisi.'
+        );
+
+        return;
+      }
+
+      if (!shiftId) {
+
+        showWarning(
+          'Shift wajib dipilih.'
+        );
+
+        return;
+      }
+
+      const payload = {
+
+        employeeId:
+          employeeId,
+
+        date:
+          date,
+
+        shiftId:
+          shiftId,
+
+        note:
+          note
+
+      };
+
+      const button =
+        document.getElementById(
+          'scheduleSaveButton'
+        );
+
+      button.disabled =
+        true;
+
+      button.textContent =
+        '⏳ Menyimpan...';
+
+      if (
+        EDITING_SCHEDULE
+      ) {
+
+        payload.rowNumber =
+          EDITING_SCHEDULE.rowNumber;
+
+        google.script.run
+
+          .withSuccessHandler(
+            handleSaveScheduleSuccess
+          )
+
+          .withFailureHandler(
+            handleSaveScheduleError
+          )
+
+          .updateSchedule(
+            SESSION_TOKEN,
+            payload
+          );
+
+      } else {
+
+        google.script.run
+
+          .withSuccessHandler(
+            handleSaveScheduleSuccess
+          )
+
+          .withFailureHandler(
+            handleSaveScheduleError
+          )
+
+          .addSchedule(
+            SESSION_TOKEN,
+            payload
+          );
+
+      }
+
+    }
+
+
+    function handleSaveScheduleSuccess(
+      result
+    ) {
+
+      const button =
+        document.getElementById(
+          'scheduleSaveButton'
+        );
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        EDITING_SCHEDULE
+          ? '✓ Simpan Perubahan'
+          : '✓ Simpan Jadwal';
+
+      if (
+        !result ||
+        result.success === false
+      ) {
+
+        if (
+          result &&
+          result.code ===
+          'SCHEDULE_COLLISION'
+        ) {
+
+          Swal.fire({
+
+            icon:
+              'warning',
+
+            title:
+              'Jadwal Bentrok',
+
+            text:
+              result.message ||
+              'Pegawai sudah memiliki jadwal pada tanggal tersebut.',
+
+            confirmButtonText:
+              'Mengerti',
+
+            confirmButtonColor:
+              '#16458f'
+
+          });
+
+          return;
+        }
+
+        showError(
+          result &&
+          result.message
+            ? result.message
+            : 'Jadwal gagal disimpan.'
+        );
+
+        return;
+      }
+
+      closeScheduleModal();
+
+      Swal.fire({
+
+        icon:
+          'success',
+
+        title:
+          'Berhasil',
+
+        text:
+          result.message ||
+          'Jadwal berhasil disimpan.',
+
+        showConfirmButton:
+          false,
+
+        timer:
+          1600
+
+      });
+
+      loadScheduleData();
+
+    }
+
+
+    function handleSaveScheduleError(
+      error
+    ) {
+
+      const button =
+        document.getElementById(
+          'scheduleSaveButton'
+        );
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        EDITING_SCHEDULE
+          ? '✓ Simpan Perubahan'
+          : '✓ Simpan Jadwal';
+
+      showError(
+        error &&
+        error.message
+          ? error.message
+          : 'Jadwal gagal disimpan.'
+      );
+
+    }
+
+
+    /* ========================================================
+       DELETE
+       ======================================================== */
+
+    function deleteScheduleConfirm(
+      rowNumber
+    ) {
+
+      Swal.fire({
+
+        icon:
+          'warning',
+
+        title:
+          'Nonaktifkan Jadwal?',
+
+        text:
+          'Jadwal akan dinonaktifkan dan tidak dihapus dari database.',
+
+        showCancelButton:
+          true,
+
+        confirmButtonText:
+          'Ya, Nonaktifkan',
+
+        cancelButtonText:
+          'Batal',
+
+        confirmButtonColor:
+          '#be123c'
+
+      }).then(function(result) {
+
+        if (
+          !result.isConfirmed
+        ) {
+          return;
+        }
+
+        google.script.run
+
+          .withSuccessHandler(
+            function(response) {
+
+              if (
+                !response ||
+                response.success === false
+              ) {
+
+                showError(
+                  response &&
+                  response.message
+                    ? response.message
+                    : 'Jadwal gagal dinonaktifkan.'
+                );
+
+                return;
+              }
+
+              Swal.fire({
+
+                icon:
+                  'success',
+
+                title:
+                  'Berhasil',
+
+                text:
+                  response.message,
+
+                showConfirmButton:
+                  false,
+
+                timer:
+                  1500
+
+              });
+
+              loadScheduleData();
+
+            }
+          )
+
+          .withFailureHandler(
+            handleScheduleError
+          )
+
+          .deleteSchedule(
+            SESSION_TOKEN,
+            rowNumber
+          );
+
+      });
+
+    }
+
+
+    /* ========================================================
+       LOADING
+       ======================================================== */
+
+    function showScheduleLoading() {
+
+      document.getElementById(
+        'scheduleLoading'
+      ).style.display =
+        'block';
+
+      document.getElementById(
+        'scheduleTableWrapper'
+      ).style.display =
+        'none';
+
+      document.getElementById(
+        'scheduleEmpty'
+      ).style.display =
+        'none';
+
+    }
+
+
+    function hideScheduleLoading() {
+
+      document.getElementById(
+        'scheduleLoading'
+      ).style.display =
+        'none';
+
+    }
+
+
+    /* ========================================================
+       ERROR
+       ======================================================== */
+
+    function handleScheduleError(
+      error
+    ) {
+
+      hideScheduleLoading();
+
+      showError(
+        error &&
+        error.message
+          ? error.message
+          : 'Terjadi kesalahan pada modul jadwal.'
+      );
+
+    }
+
+
+    function showWarning(
+      message
+    ) {
+
+      Swal.fire({
+
+        icon:
+          'warning',
+
+        title:
+          'Perhatian',
+
+        text:
+          message,
+
+        confirmButtonText:
+          'Mengerti',
+
+        confirmButtonColor:
+          '#16458f'
+
+      });
+
+    }
+
+
+    function showError(
+      message
+    ) {
+
+      Swal.fire({
+
+        icon:
+          'error',
+
+        title:
+          'Gagal',
+
+        text:
+          message,
+
+        confirmButtonText:
+          'Mengerti',
+
+        confirmButtonColor:
+          '#16458f'
+
+      });
+
+    }
+
+
+    /* ========================================================
+       UTILITY
+       ======================================================== */
+
+    function toDateInputValue(
+      date
+    ) {
+
+      return (
+        date.getFullYear() +
+        '-' +
+        String(
+          date.getMonth() + 1
+        ).padStart(2, '0') +
+        '-' +
+        String(
+          date.getDate()
+        ).padStart(2, '0')
+      );
+
+    }
+
+
+    function formatDateDisplay(
+      value
+    ) {
+
+      if (!value) {
+        return '-';
+      }
+
+      const parts =
+        String(
+          value
+        ).split('-');
+
+      if (
+        parts.length !== 3
+      ) {
+        return value;
+      }
+
+      return (
+        parts[2] +
+        '/' +
+        parts[1] +
+        '/' +
+        parts[0]
+      );
+
+    }
+
+
+    function escapeHtml(
+      value
+    ) {
+
+      return String(
+        value === undefined ||
+        value === null
+          ? ''
+          : value
+      )
+        .replace(
+          /&/g,
+          '&amp;'
+        )
+        .replace(
+          /</g,
+          '&lt;'
+        )
+        .replace(
+          />/g,
+          '&gt;'
+        )
+        .replace(
+          /"/g,
+          '&quot;'
+        )
+        .replace(
+          /'/g,
+          '&#039;'
+        );
+
+    }
+
+
+    document.addEventListener(
+      'keydown',
+      function(event) {
+
+        if (
+          event.key ===
+          'Escape'
+        ) {
+
+          closeScheduleModal();
+
+        }
+
+      }
+    );
+
+  </script>
+
+</body>
+
+</html>

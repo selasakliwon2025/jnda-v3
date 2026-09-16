@@ -1181,6 +1181,13 @@
         !!employeeId &&
         employeeId !== '-';
 
+      const branchAdminRoles = [
+        'ADMIN_CABANG'
+      ];
+
+      const isBranchAdmin =
+        branchAdminRoles.includes(normalized);
+
 
       const managementRoles = [
         'DIREKSI',
@@ -1265,6 +1272,18 @@
             ? 'block'
             : 'none';
 
+      }
+
+      const scheduleMenu =
+        document.getElementById(
+          'scheduleMenuGroup'
+        );
+
+      if (scheduleMenu) {
+        scheduleMenu.style.display =
+          isBranchAdmin
+            ? 'block'
+            : 'none';
       }
 
 
