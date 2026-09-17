@@ -220,6 +220,32 @@ function getSchedules(
     const employee =
       employeeMap[employeeId];
 
+    /* =====================================================
+      DETAIL SHIFT
+      ===================================================== */
+
+    const shiftId =
+      String(
+        row.SHIFT_ID ||
+        ''
+      ).trim();
+
+    const shift =
+      shiftMap[shiftId] ||
+      {};
+
+    const shiftName =
+      shift.shiftName ||
+      '';
+
+    const startTime =
+      shift.startTime ||
+      '';
+
+    const endTime =
+      shift.endTime ||
+      '';
+
     result.push({
 
       scheduleId:
