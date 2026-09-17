@@ -21,6 +21,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 </head>
 
 
@@ -593,39 +599,139 @@
 
     function populateEmployeeSelect() {
 
-      const select =
+      const selects = [
+
         document.getElementById(
           'scheduleEmployee'
-        );
+        ),
 
-      select.innerHTML =
-        '<option value="">Pilih Pegawai</option>';
+        document.getElementById(
+          'scheduleFilterEmployee'
+        )
 
-      SCHEDULE_DATA.employees
-        .forEach(function(employee) {
+      ];
 
-          const option =
-            document.createElement(
-              'option'
-            );
+      selects.forEach(function(select) {
 
-          option.value =
-            employee.employeeId;
+        if (!select) {
+          return;
+        }
 
-          option.textContent =
-            employee.fullName +
-            (
-              employee.employeeNo
-                ? ' · ' +
-                  employee.employeeNo
-                : ''
-            );
+        if (
+          window.jQuery &&
+          $(select).hasClass(
+            'select2-hidden-accessible'
+          )
+        ) {
 
-          select.appendChild(
-            option
+          $(select).select2('destroy');
+
+        }
+
+        select.innerHTML = '';
+
+        const isFilter =
+          select.id ===
+          'scheduleFilterEmployee';
+
+        const firstOption =
+          document.createElement(
+            'option'
           );
 
-        });
+        firstOption.value = '';
+
+        firstOption.textContent =
+          isFilter
+            ? 'Semua Pegawai'
+            : 'Pilih Pegawai';
+
+        select.appendChild(
+          firstOption
+        );
+
+        SCHEDULE_DATA.employees
+          .forEach(function(employee) {
+
+            const option =
+              document.createElement(
+                'option'
+              );
+
+            option.value =
+              employee.employeeId;
+
+            option.textContent =
+              employee.fullName +
+              (
+                employee.employeeNo
+                  ? ' · ' +
+                    employee.employeeNo
+                  : ''
+              );
+
+            select.appendChild(
+              option
+            );
+
+          });
+
+      });
+
+      initializeScheduleSelect2();
+
+    }
+
+    function initializeScheduleSelect2() {
+
+      if (
+        !window.jQuery ||
+        !$.fn.select2
+      ) {
+        console.warn(
+          'Select2 belum tersedia.'
+        );
+
+        return;
+      }
+
+      $('#scheduleEmployee').select2({
+
+        width: '100%',
+
+        dropdownParent:
+          $('#scheduleModalBackdrop'),
+
+        placeholder:
+          'Cari nama atau nomor pegawai...',
+
+        allowClear:
+          true
+
+      });
+
+      $('#scheduleFilterEmployee').select2({
+
+        width: '100%',
+
+        placeholder:
+          'Semua Pegawai',
+
+        allowClear:
+          true
+
+      });
+
+      $('#scheduleFilterEmployee')
+        .off('change.schedule')
+        .on(
+          'change.schedule',
+          function() {
+
+            renderScheduleTable();
+
+          }
+        );
 
     }
 
@@ -714,7 +820,30 @@
       const schedules =
         SCHEDULE_DATA.schedules || [];
 
-      if (!schedules.length) {
+      const filterEmployee =
+        document.getElementById(
+          'scheduleFilterEmployee'
+        );
+
+      const selectedEmployeeId =
+        filterEmployee
+          ? filterEmployee.value
+          : '';
+
+      const filteredSchedules =
+        selectedEmployeeId
+          ? schedules.filter(function(schedule) {
+
+              return String(
+                schedule.employeeId
+              ) === String(
+                selectedEmployeeId
+              );
+
+            })
+          : schedules;
+
+      if (!filteredSchedules.length) {
 
         wrapper.style.display =
           'none';
@@ -731,7 +860,7 @@
       empty.style.display =
         'none';
 
-      schedules.forEach(
+      filteredSchedules.forEach(
         function(schedule) {
 
           const tr =
@@ -777,16 +906,39 @@
 
             <td>
 
-              <span class="${shiftClass}">
-                ${escapeHtml(
-                  schedule.shiftId
-                )}
-                ·
-                ${escapeHtml(
-                  schedule.shiftName ||
-                  ''
-                )}
-              </span>
+              <div class="schedule-shift-info">
+
+                <span class="${shiftClass}">
+
+                  ${escapeHtml(
+                    schedule.shiftId || '-'
+                  )}
+
+                  ·
+
+                  ${escapeHtml(
+                    schedule.shiftName || '-'
+                  )}
+
+                </span>
+
+                <span class="schedule-shift-time">
+
+                  🕒
+
+                  ${escapeHtml(
+                    schedule.startTime || '--:--'
+                  )}
+
+                  –
+
+                  ${escapeHtml(
+                    schedule.endTime || '--:--'
+                  )}
+
+                </span>
+
+              </div>
 
             </td>
 
@@ -802,9 +954,11 @@
             </td>
 
             <td>
-              ${escapeHtml(
-                schedule.note || '-'
-              )}
+              <div class="schedule-note">
+                ${escapeHtml(
+                  schedule.note || '-'
+                )}
+              </div>
             </td>
 
             <td>
@@ -841,6 +995,379 @@
 
         }
       );
+
+    }
+    
+    function getFilteredScheduleRows() {
+
+      const schedules =
+        SCHEDULE_DATA.schedules || [];
+
+      const filter =
+        document.getElementById(
+          'scheduleFilterEmployee'
+        );
+
+      const employeeId =
+        filter
+          ? filter.value
+          : '';
+
+      if (!employeeId) {
+        return schedules;
+      }
+
+      return schedules.filter(function(schedule) {
+
+        return String(
+          schedule.employeeId
+        ) === String(employeeId);
+
+      });
+
+    }
+
+    function downloadScheduleCsv() {
+
+      const rows =
+        getFilteredScheduleRows();
+
+      if (!rows.length) {
+
+        showWarning(
+          'Tidak ada data jadwal untuk diunduh.'
+        );
+
+        return;
+
+      }
+
+      const headers = [
+
+        'Tanggal',
+        'ID Pegawai',
+        'Nama Pegawai',
+        'Shift',
+        'Jam Mulai',
+        'Jam Selesai',
+        'Catatan',
+        'Status'
+
+      ];
+
+      const data = [
+
+        headers,
+
+        ...rows.map(function(schedule) {
+
+          return [
+
+            formatDateDisplay(
+              schedule.date
+            ),
+
+            schedule.employeeId || '',
+
+            schedule.employeeName || '',
+
+            (
+              schedule.shiftId || ''
+            ) +
+            ' - ' +
+            (
+              schedule.shiftName || ''
+            ),
+
+            schedule.startTime || '',
+
+            schedule.endTime || '',
+
+            schedule.note || '',
+
+            schedule.status || 'ACTIVE'
+
+          ];
+
+        })
+
+      ];
+
+      const csv =
+        data.map(function(row) {
+
+          return row.map(function(value) {
+
+            const text =
+              String(value ?? '');
+
+            return '"' +
+              text.replace(
+                /"/g,
+                '""'
+              ) +
+              '"';
+
+          }).join(',');
+
+        }).join('\r\n');
+
+      const blob =
+        new Blob(
+          [
+            '\uFEFF' + csv
+          ],
+          {
+            type:
+              'text/csv;charset=utf-8;'
+          }
+        );
+
+      const url =
+        URL.createObjectURL(blob);
+
+      const link =
+        document.createElement('a');
+
+      link.href = url;
+
+      link.download =
+        'Jadwal_Shift_JNDA.csv';
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(url);
+
+    }
+
+    function printScheduleReport() {
+
+      const rows =
+        getFilteredScheduleRows();
+
+      if (!rows.length) {
+
+        showWarning(
+          'Tidak ada data jadwal untuk dicetak.'
+        );
+
+        return;
+
+      }
+
+      const filter =
+        document.getElementById(
+          'scheduleFilterEmployee'
+        );
+
+      const employeeId =
+        filter
+          ? filter.value
+          : '';
+
+      const employee =
+        SCHEDULE_DATA.employees.find(
+          function(item) {
+
+            return String(
+              item.employeeId
+            ) === String(
+              employeeId
+            );
+
+          }
+        );
+
+      const employeeTitle =
+        employee
+          ? employee.fullName +
+            ' · ' +
+            employee.employeeNo
+          : 'Seluruh Pegawai';
+
+      const tableRows =
+        rows.map(function(schedule) {
+
+          return `
+
+            <tr>
+
+              <td>
+                ${escapeHtml(
+                  formatDateDisplay(
+                    schedule.date
+                  )
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  schedule.employeeName || '-'
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  schedule.shiftId || '-'
+                )}
+                -
+                ${escapeHtml(
+                  schedule.shiftName || '-'
+                )}
+                <br>
+                <small>
+                  ${escapeHtml(
+                    schedule.startTime || '--:--'
+                  )}
+                  -
+                  ${escapeHtml(
+                    schedule.endTime || '--:--'
+                  )}
+                </small>
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  schedule.note || '-'
+                )}
+              </td>
+
+            </tr>
+
+          `;
+
+        }).join('');
+
+      const printWindow =
+        window.open(
+          '',
+          '_blank',
+          'width=1100,height=750'
+        );
+
+      if (!printWindow) {
+
+        showWarning(
+          'Pop-up diblokir browser. Izinkan pop-up untuk mencetak.'
+        );
+
+        return;
+
+      }
+
+      printWindow.document.write(`
+
+        <!DOCTYPE html>
+
+        <html lang="id">
+
+        <head>
+
+          <title>
+            Jadwal Shift - JNDA
+          </title>
+
+          <style>
+
+            body {
+              font-family: Arial, sans-serif;
+              padding: 30px;
+              color: #172033;
+            }
+
+            h1 {
+              margin-bottom: 5px;
+              color: #16458f;
+            }
+
+            p {
+              margin-top: 5px;
+              color: #667085;
+            }
+
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 25px;
+            }
+
+            th,
+            td {
+              border: 1px solid #cbd5e1;
+              padding: 10px;
+              text-align: left;
+              font-size: 12px;
+            }
+
+            th {
+              background: #edf4ff;
+              color: #16458f;
+            }
+
+            @media print {
+
+              body {
+                padding: 0;
+              }
+
+            }
+
+          </style>
+
+        </head>
+
+        <body>
+
+          <h1>
+            JNDA - Jadwal Shift Pegawai
+          </h1>
+
+          <p>
+            Pegawai: ${escapeHtml(
+              employeeTitle
+            )}
+          </p>
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Tanggal</th>
+                <th>Pegawai</th>
+                <th>Shift / Jam Kerja</th>
+                <th>Catatan</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              ${tableRows}
+
+            </tbody>
+
+          </table>
+
+        </body>
+
+        </html>
+
+      `);
+
+      printWindow.document.close();
+
+      printWindow.focus();
+
+      setTimeout(function() {
+
+        printWindow.print();
+
+      }, 500);
 
     }
 
