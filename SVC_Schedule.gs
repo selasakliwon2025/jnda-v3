@@ -155,6 +155,25 @@ function getSchedules(
       return;
     }
 
+    /* =====================================================
+      FILTER JADWAL AKTIF
+      ACTIVE = FALSE tidak ditampilkan
+      ===================================================== */
+
+    const activeValue =
+      row.ACTIVE;
+
+    if (
+      activeValue === false ||
+      String(activeValue)
+        .trim()
+        .toUpperCase() === 'FALSE'
+    ) {
+      return;
+    }
+
+
+
     /*
      * Security:
      * Hanya pegawai yang berada dalam
@@ -708,12 +727,12 @@ function updateSchedule(
 
   _scheduleSetColumnValue(
     sheet,
-    row,
+    rowNumber,
     normalizedHeaders,
     [
       'ACTIVE'
     ],
-    false
+    true
   );
 
   _scheduleSetColumnValue(
@@ -829,9 +848,9 @@ function deleteSchedule(
     row,
     normalizedHeaders,
     [
-      'STATUS'
+      'ACTIVE'
     ],
-    'INACTIVE'
+    false
   );
 
   _scheduleSetColumnValue(
@@ -2081,82 +2100,88 @@ function _scheduleNormalizeDateString(
 }
 
 
-function _scheduleGetRowDate(
-  row
-) {
+function _scheduleGetRowDate(row) {
 
-  const keys = [
+  if (!row) {
+    return '';
+  }
 
-    'START_DATE',
-    'SCHEDULE_DATE',
-    'WORK_DATE',
-    'DATE'
+  const rawDate =
+    row.START_DATE ||
+    row.SCHEDULE_DATE ||
+    row.WORK_DATE ||
+    row.DATE ||
+    row.END_DATE ||
+    '';
 
-  ];
+  if (!rawDate) {
+    return '';
+  }
 
-  for (
-    let i = 0;
-    i < keys.length;
-    i++
+  // Jika data berupa objek Date dari Google Sheets
+  if (
+    Object.prototype.toString.call(rawDate) ===
+    '[object Date]'
   ) {
 
-    const value =
-      row[keys[i]];
-
-    if (
-      value instanceof Date &&
-      !isNaN(value.getTime())
-    ) {
-
-      return Utilities.formatDate(
-        value,
-        getConfig(
-          'TIMEZONE'
-        ) || 'Asia/Jakarta',
-        'yyyy-MM-dd'
-      );
+    if (isNaN(rawDate.getTime())) {
+      return '';
     }
 
-    const text =
-      String(
-        value ||
-        ''
-      ).trim();
+    return Utilities.formatDate(
+      rawDate,
+      'Asia/Jakarta',
+      'yyyy-MM-dd'
+    );
+  }
 
-    if (
-      /^\d{4}-\d{2}-\d{2}/.test(
-        text
-      )
-    ) {
+  const value =
+    String(rawDate).trim();
 
-      return text.substring(
-        0,
-        10
-      );
+  if (!value) {
+    return '';
+  }
+
+  // Format yyyy-MM-dd
+  if (
+    /^\d{4}-\d{2}-\d{2}$/.test(value)
+  ) {
+    return value;
+  }
+
+  // Format dd/MM/yyyy
+  const parts =
+    value.split(/[\/\-]/);
+
+  if (parts.length >= 3) {
+
+    let day;
+    let month;
+    let year;
+
+    if (parts[0].length === 4) {
+      year = Number(parts[0]);
+      month = Number(parts[1]);
+      day = Number(parts[2]);
+    } else {
+      day = Number(parts[0]);
+      month = Number(parts[1]);
+      year = Number(parts[2]);
     }
 
-    /*
-     * Antisipasi format dd/MM/yyyy.
-     */
+    if (
+      year > 1900 &&
+      month >= 1 &&
+      month <= 12 &&
+      day >= 1 &&
+      day <= 31
+    ) {
 
-    const match =
-      text.match(
-        /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
-      );
-
-    if (match) {
-
-      return (
-        match[3] +
-        '-' +
-        String(
-          match[2]
-        ).padStart(2, '0') +
-        '-' +
-        String(
-          match[1]
-        ).padStart(2, '0')
-      );
+      return [
+        String(year),
+        String(month).padStart(2, '0'),
+        String(day).padStart(2, '0')
+      ].join('-');
     }
   }
 
