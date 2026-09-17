@@ -135,6 +135,24 @@ function getSchedules(
 
   });
 
+  /* =====================================================
+   MASTER SHIFT MAP
+   Mengambil nama dan jam kerja dari MS_Shift
+   ===================================================== */
+
+  const masterShifts =
+    _scheduleGetShifts();
+
+  const shiftMap = {};
+
+  masterShifts.forEach(function(shift) {
+
+    shiftMap[
+      shift.shiftId
+    ] = shift;
+
+  });
+
   const rows =
     _scheduleGetSheetObjects(
       SCHEDULE_EMPLOYEE_SHIFT_SHEET
@@ -228,25 +246,32 @@ function getSchedules(
         scheduleDate,
 
       shiftId:
-        String(
-          row.SHIFT_ID ||
-          row.shiftId ||
-          ''
-        ).trim(),
+        shiftId,
 
       shiftName:
-        String(
-          row.SHIFT_NAME ||
-          row.shiftName ||
-          ''
-        ).trim(),
+        shiftName,
+
+      startTime:
+        startTime,
+
+      endTime:
+        endTime,
+
+      scheduledMinutes:
+        Number(
+          shift.scheduledMinutes ||
+          0
+        ),
 
       status:
         String(
-          row.STATUS ||
-          row.status ||
-          'ACTIVE'
-        ).trim(),
+          row.ACTIVE === false ||
+          String(row.ACTIVE)
+            .trim()
+            .toUpperCase() === 'FALSE'
+            ? 'INACTIVE'
+            : 'ACTIVE'
+        ),
 
       note:
         String(
@@ -1555,17 +1580,14 @@ function _scheduleFindCollision(
       continue;
     }
 
-    const rowStatus =
-      String(
-        row.STATUS ||
-        'ACTIVE'
-      )
-        .trim()
-        .toUpperCase();
+    const activeValue =
+      row.ACTIVE;
 
     if (
-      rowStatus ===
-      'INACTIVE'
+      activeValue === false ||
+      String(activeValue)
+        .trim()
+        .toUpperCase() === 'FALSE'
     ) {
       continue;
     }
