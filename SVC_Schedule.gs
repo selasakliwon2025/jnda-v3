@@ -708,12 +708,12 @@ function updateSchedule(
 
   _scheduleSetColumnValue(
     sheet,
-    rowNumber,
+    row,
     normalizedHeaders,
     [
-      'STATUS'
+      'ACTIVE'
     ],
-    'ACTIVE'
+    false
   );
 
   _scheduleSetColumnValue(
@@ -1735,268 +1735,268 @@ function _scheduleGetHeaders(
 }
 
 
-    function _scheduleBuildRow(
-      headers,
-      data
+function _scheduleBuildRow(
+  headers,
+  data
+) {
+
+  const normalizedHeaders =
+    headers.map(function(header) {
+
+      return String(header || '')
+        .trim()
+        .toUpperCase();
+
+    });
+
+
+  const row =
+    new Array(
+      normalizedHeaders.length
+    ).fill('');
+
+
+  function setValue(
+    columnNames,
+    value
+  ) {
+
+    for (
+      let i = 0;
+      i < columnNames.length;
+      i++
     ) {
 
-      const normalizedHeaders =
-        headers.map(function(header) {
-
-          return String(header || '')
-            .trim()
-            .toUpperCase();
-
-        });
-
-
-      const row =
-        new Array(
-          normalizedHeaders.length
-        ).fill('');
-
-
-      function setValue(
-        columnNames,
-        value
-      ) {
-
-        for (
-          let i = 0;
-          i < columnNames.length;
-          i++
-        ) {
-
-          const index =
-            normalizedHeaders.indexOf(
-              columnNames[i]
-            );
-
-          if (index !== -1) {
-
-            row[index] =
-              value;
-
-            return;
-
-          }
-
-        }
-
-      }
-
-
-      /*
-      * ======================================================
-      * EMPLOYEE SHIFT ID
-      * ======================================================
-      */
-
-      const employeeShiftId =
-        'ES-' +
-        Utilities.getUuid()
-          .replace(/-/g, '')
-          .substring(0, 12)
-          .toUpperCase();
-
-
-      setValue(
-        [
-          'EMPLOYEE_SHIFT_ID'
-        ],
-        employeeShiftId
-      );
-
-
-      /*
-      * ======================================================
-      * EMPLOYEE
-      * ======================================================
-      */
-
-      setValue(
-        [
-          'EMPLOYEE_ID'
-        ],
-        String(
-          data.employeeId || ''
-        ).trim()
-      );
-
-
-      /*
-      * ======================================================
-      * SHIFT
-      * ======================================================
-      */
-
-      setValue(
-        [
-          'SHIFT_ID'
-        ],
-        String(
-          data.shiftId || ''
-        ).trim()
-      );
-
-
-      /*
-      * ======================================================
-      * DATE
-      *
-      * Gunakan tanggal saja.
-      * Tidak menggunakan jam 12:00.
-      * ======================================================
-      */
-
-      const scheduleDate =
-        _scheduleDateToSheetValue(
-          data.date
+      const index =
+        normalizedHeaders.indexOf(
+          columnNames[i]
         );
 
+      if (index !== -1) {
 
-      setValue(
-        [
-          'START_DATE',
-          'SCHEDULE_DATE',
-          'WORK_DATE',
-          'DATE'
-        ],
-        scheduleDate
-      );
+        row[index] =
+          value;
 
-
-      /*
-      * END_DATE
-      *
-      * Untuk roster harian:
-      *
-      * START_DATE = END_DATE
-      *
-      * Artinya assignment berlaku
-      * hanya pada tanggal tersebut.
-      */
-
-      setValue(
-        [
-          'END_DATE'
-        ],
-        scheduleDate
-      );
-
-
-      /*
-      * ======================================================
-      * DAY OF WEEK
-      * ======================================================
-      */
-
-      if (
-        scheduleDate instanceof Date &&
-        !isNaN(
-          scheduleDate.getTime()
-        )
-      ) {
-
-        const days = [
-
-          'SUNDAY',
-          'MONDAY',
-          'TUESDAY',
-          'WEDNESDAY',
-          'THURSDAY',
-          'FRIDAY',
-          'SATURDAY'
-
-        ];
-
-        setValue(
-          [
-            'DAY_OF_WEEK'
-          ],
-          days[
-            scheduleDate.getDay()
-          ]
-        );
+        return;
 
       }
-
-
-      /*
-      * ======================================================
-      * ACTIVE
-      *
-      * Sheet menggunakan ACTIVE,
-      * bukan STATUS.
-      * ======================================================
-      */
-
-      setValue(
-        [
-          'ACTIVE'
-        ],
-        true
-      );
-
-
-      /*
-      * Jika suatu saat sheet menggunakan
-      * STATUS, tetap kompatibel.
-      */
-
-      setValue(
-        [
-          'STATUS'
-        ],
-        'ACTIVE'
-      );
-
-
-      /*
-      * ======================================================
-      * NOTE
-      * ======================================================
-      */
-
-      setValue(
-        [
-          'NOTE',
-          'REMARK',
-          'NOTES'
-        ],
-        String(
-          data.note || ''
-        ).trim()
-      );
-
-
-      /*
-      * ======================================================
-      * AUDIT
-      * ======================================================
-      */
-
-      setValue(
-        [
-          'CREATED_AT'
-        ],
-        data.now ||
-        new Date()
-      );
-
-
-      setValue(
-        [
-          'UPDATED_AT'
-        ],
-        data.now ||
-        new Date()
-      );
-
-
-      return row;
 
     }
+
+  }
+
+
+  /*
+   * ======================================================
+   * EMPLOYEE SHIFT ID
+   * ======================================================
+   */
+
+  const employeeShiftId =
+    'ES-' +
+    Utilities.getUuid()
+      .replace(/-/g, '')
+      .substring(0, 12)
+      .toUpperCase();
+
+
+  setValue(
+    [
+      'EMPLOYEE_SHIFT_ID'
+    ],
+    employeeShiftId
+  );
+
+
+  /*
+   * ======================================================
+   * EMPLOYEE
+   * ======================================================
+   */
+
+  setValue(
+    [
+      'EMPLOYEE_ID'
+    ],
+    String(
+      data.employeeId || ''
+    ).trim()
+  );
+
+
+  /*
+   * ======================================================
+   * SHIFT
+   * ======================================================
+   */
+
+  setValue(
+    [
+      'SHIFT_ID'
+    ],
+    String(
+      data.shiftId || ''
+    ).trim()
+  );
+
+
+  /*
+   * ======================================================
+   * DATE
+   *
+   * Gunakan tanggal saja.
+   * Tidak menggunakan jam 12:00.
+   * ======================================================
+   */
+
+  const scheduleDate =
+    _scheduleDateToSheetValue(
+      data.date
+    );
+
+
+  setValue(
+    [
+      'START_DATE',
+      'SCHEDULE_DATE',
+      'WORK_DATE',
+      'DATE'
+    ],
+    scheduleDate
+  );
+
+
+  /*
+   * END_DATE
+   *
+   * Untuk roster harian:
+   *
+   * START_DATE = END_DATE
+   *
+   * Artinya assignment berlaku
+   * hanya pada tanggal tersebut.
+   */
+
+  setValue(
+    [
+      'END_DATE'
+    ],
+    scheduleDate
+  );
+
+
+  /*
+   * ======================================================
+   * DAY OF WEEK
+   * ======================================================
+   */
+
+  if (
+    scheduleDate instanceof Date &&
+    !isNaN(
+      scheduleDate.getTime()
+    )
+  ) {
+
+    const days = [
+
+      'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY'
+
+    ];
+
+    setValue(
+      [
+        'DAY_OF_WEEK'
+      ],
+      days[
+        scheduleDate.getDay()
+      ]
+    );
+
+  }
+
+
+  /*
+   * ======================================================
+   * ACTIVE
+   *
+   * Sheet menggunakan ACTIVE,
+   * bukan STATUS.
+   * ======================================================
+   */
+
+  setValue(
+    [
+      'ACTIVE'
+    ],
+    true
+  );
+
+
+  /*
+   * Jika suatu saat sheet menggunakan
+   * STATUS, tetap kompatibel.
+   */
+
+  setValue(
+    [
+      'STATUS'
+    ],
+    'ACTIVE'
+  );
+
+
+  /*
+   * ======================================================
+   * NOTE
+   * ======================================================
+   */
+
+  setValue(
+    [
+      'NOTE',
+      'REMARK',
+      'NOTES'
+    ],
+    String(
+      data.note || ''
+    ).trim()
+  );
+
+
+  /*
+   * ======================================================
+   * AUDIT
+   * ======================================================
+   */
+
+  setValue(
+    [
+      'CREATED_AT'
+    ],
+    data.now ||
+    new Date()
+  );
+
+
+  setValue(
+    [
+      'UPDATED_AT'
+    ],
+    data.now ||
+    new Date()
+  );
+
+
+  return row;
+
+}
 
 
 function _scheduleSetColumnValue(
@@ -2164,30 +2164,36 @@ function _scheduleGetRowDate(
 }
 
 
-function _scheduleDateToSheetValue(
-  value
-) {
+function _scheduleDateToSheetValue(value) {
 
-  const date =
-    _scheduleParseDate(
-      value
-    );
+  const dateText =
+    _scheduleNormalizeDateString(value);
 
-  if (!date) {
+  if (!dateText) {
     return '';
   }
 
+  const parts =
+    dateText.split('-');
 
+  const year =
+    Number(parts[0]);
+
+  const month =
+    Number(parts[1]) - 1;
+
+  const day =
+    Number(parts[2]);
+
+  // Simpan tanggal pada pukul 00:00:00
   return new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-    0,
+    year,
+    month,
+    day,
     0,
     0,
     0
   );
-
 }
 
 
