@@ -1430,20 +1430,40 @@
       ).textContent =
         'Edit Jadwal';
 
-      document.getElementById(
-        'scheduleEmployee'
-      ).value =
-        schedule.employeeId;
+      const employeeSelect =
+        document.getElementById(
+          'scheduleEmployee'
+        );
+
+      if (employeeSelect) {
+
+        employeeSelect.value =
+          schedule.employeeId || '';
+
+        if (
+          window.jQuery &&
+          $(employeeSelect).hasClass(
+            'select2-hidden-accessible'
+          )
+        ) {
+
+          $(employeeSelect)
+            .val(schedule.employeeId || '')
+            .trigger('change');
+
+        }
+
+      }
 
       document.getElementById(
         'scheduleDate'
       ).value =
-        schedule.date;
+        schedule.date || '';
 
       document.getElementById(
         'scheduleShift'
       ).value =
-        schedule.shiftId;
+        schedule.shiftId || '';
 
       document.getElementById(
         'scheduleNote'
