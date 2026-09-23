@@ -2512,7 +2512,6 @@
         .trim()
         .toUpperCase();
 
-
       const employeeType =
         String(
           document.getElementById(
@@ -2522,6 +2521,35 @@
         .trim()
         .toUpperCase();
 
+
+      /* =====================================================
+        MODE KAPAL → OTOMATIS CREW
+        ===================================================== */
+
+      const employeeTypeSelect =
+        document.getElementById(
+          'checkInEmployeeType'
+        );
+
+      if (
+        mode === 'SHIP' &&
+        employeeTypeSelect
+      ) {
+
+        employeeTypeSelect.value =
+          'CREW';
+
+        employeeTypeSelect.disabled =
+          true;
+
+      } else if (
+        employeeTypeSelect
+      ) {
+
+        employeeTypeSelect.disabled =
+          false;
+
+      }
 
       const shiftSelect =
         document.getElementById(
