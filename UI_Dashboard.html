@@ -2700,7 +2700,7 @@ body.attendance-modal-open {
 
           <button
             class="attendance-button check-out"
-            onclick="openAttendance('out')">
+            onclick="openCheckOutModal()"
 
             <div class="attendance-button-icon">
               🔴
@@ -3165,11 +3165,7 @@ f
         MODAL ABSEN MASUK
         ========================================================= -->
 
-    <div
-      id="checkInModal"
-      class="attendance-modal"
-      aria-hidden="true"
-    >
+    <div id="checkInModal" class="attendance-modal" aria-hidden="true">
 
       <div
         class="attendance-modal-overlay"
@@ -3615,5 +3611,210 @@ f
       </div>
 
     </div>
+
+    <!-- =========================================================
+     MODAL ABSEN PULANG
+     ========================================================= -->
+
+    <div
+      id="checkOutModal"
+      class="attendance-modal"
+      aria-hidden="true"
+    >
+
+      <div
+        class="attendance-modal-overlay"
+        onclick="closeCheckOutModal()"
+      ></div>
+
+
+      <div
+        class="attendance-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="checkOutModalTitle"
+      >
+
+        <!-- HEADER -->
+        <div class="attendance-modal-header">
+
+          <div class="attendance-modal-title-wrap">
+
+            <div class="attendance-modal-icon">
+              ✓
+            </div>
+
+            <div>
+
+              <div
+                id="checkOutModalTitle"
+                class="attendance-modal-title"
+              >
+                Konfirmasi Absen Pulang
+              </div>
+
+              <div class="attendance-modal-subtitle">
+                Pastikan Anda ingin menyelesaikan sesi kehadiran hari ini
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="attendance-modal-close"
+            onclick="closeCheckOutModal()"
+            aria-label="Tutup"
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <!-- BODY -->
+        <div class="attendance-modal-body">
+
+          <!-- INFO KEHADIRAN -->
+          <div
+            class="attendance-office-schedule"
+            style="margin-bottom:20px;"
+          >
+
+            <div class="office-schedule-icon">
+              🕐
+            </div>
+
+
+            <div class="office-schedule-content">
+
+              <div class="office-schedule-day">
+                Absen Masuk
+              </div>
+
+              <div
+                id="checkOutCheckInTime"
+                class="office-schedule-hours"
+              >
+                -
+              </div>
+
+              <div
+                id="checkOutWorkDate"
+                class="office-schedule-tolerance"
+              >
+                -
+              </div>
+
+            </div>
+
+
+            <div class="office-schedule-auto">
+              OPEN
+            </div>
+
+          </div>
+
+
+          <!-- STATUS -->
+          <div class="attendance-field">
+
+            <label class="attendance-label">
+              Status Kehadiran
+            </label>
+
+            <div
+              style="
+                display:flex;
+                align-items:center;
+                gap:10px;
+                padding:14px 16px;
+                border-radius:12px;
+                background:#fff7ed;
+                border:1px solid #fed7aa;
+                color:#c2410c;
+                font-size:13px;
+                font-weight:700;
+              "
+            >
+
+              <span style="font-size:18px;">
+                🟠
+              </span>
+
+              <span>
+                Sesi absensi masih aktif
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- KETERANGAN -->
+          <div class="attendance-field">
+
+            <label
+              for="checkOutRemark"
+              class="attendance-label"
+            >
+              Keterangan Tambahan
+            </label>
+
+            <textarea
+              id="checkOutRemark"
+              class="attendance-textarea"
+              rows="4"
+              maxlength="500"
+              placeholder="Keterangan tambahan saat absen pulang (opsional)"
+            ></textarea>
+
+            <div class="attendance-counter">
+              <span id="checkOutRemarkCounter">0</span>/500
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+        <div class="attendance-modal-footer">
+
+          <button
+            type="button"
+            class="attendance-btn attendance-btn-cancel"
+            onclick="closeCheckOutModal()"
+          >
+            Batal
+          </button>
+
+
+          <button
+            type="button"
+            id="confirmCheckOutButton"
+            class="attendance-btn attendance-btn-confirm"
+            onclick="confirmCheckOut()"
+          >
+
+            <span class="confirm-check-icon">
+              ✓
+            </span>
+
+            <span>
+              Konfirmasi Absen Pulang
+            </span>
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
 
 </div>
