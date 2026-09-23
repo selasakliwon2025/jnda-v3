@@ -1015,66 +1015,27 @@ function checkOut(sessionToken, payload) {
 
 
     /* --------------------------------------------------------
-     * 4. SHIFT
-     * ------------------------------------------------------ */
+    * 4. FIND OPEN ATTENDANCE
+    *
+    * Checkout tidak boleh hanya mencari berdasarkan
+    * WORK_DATE hari ini.
+    *
+    * Yang dicari adalah sesi OPEN milik employee.
+    *
+    * Ini menangani:
+    * - session yang tertinggal beberapa hari
+    * - shift malam
+    * - shift 24 jam
+    * - pergantian tanggal
+    * ------------------------------------------------------ */
 
-    const shift =
-      _attendanceGetEmployeeShift(
-        employeeId,
-        now
+    const openAttendance =
+      _attendanceFindOpenAttendanceByEmployee(
+        employeeId
       );
-
-
-    /* --------------------------------------------------------
-     * 5. WORK DATE
-     *
-     * Penting untuk night shift.
-     * ------------------------------------------------------ */
-
-    const workDate =
-      _attendanceResolveWorkDate(
-        now,
-        timezone,
-        shift
-      );
-
-
-    /* --------------------------------------------------------
-     * 6. FIND OPEN / EXISTING
-     * ------------------------------------------------------ */
 
     let existing =
-      _attendanceFindByEmployeeAndWorkDate(
-        employeeId,
-        workDate
-      );
-
-
-    /*
-     * Jika tidak ditemukan berdasarkan tanggal sekarang,
-     * cek kemungkinan night shift dari hari sebelumnya.
-     *
-     * Contoh:
-     *
-     * 14 Sep 19:00 masuk
-     * 15 Sep 06:00 pulang
-     *
-     * WORK_DATE = 14 Sep
-     */
-
-    if (!existing) {
-
-      const previousWorkDate =
-        _attendanceGetPreviousDate(
-          workDate
-        );
-
-      existing =
-        _attendanceFindByEmployeeAndWorkDate(
-          employeeId,
-          previousWorkDate
-        );
-    }
+      openAttendance;
 
 
     /* --------------------------------------------------------
@@ -1307,6 +1268,97 @@ function checkOut(sessionToken, payload) {
       // ignore
     }
   }
+}
+
+/* ============================================================
+ * PUBLIC - OPEN ATTENDANCE
+ * ============================================================ */
+
+/**
+ * Mengambil sesi attendance yang masih OPEN.
+ *
+ * Berbeda dengan getTodayAttendance():
+ * fungsi ini tidak membatasi WORK_DATE hari ini.
+ *
+ * Digunakan khusus untuk proses Absen Pulang.
+ */
+function getOpenAttendance(sessionToken) {
+
+  const context =
+    _attendanceGetContext(
+      sessionToken
+    );
+
+  const employee =
+    context.employee;
+
+  const employeeId =
+    String(
+      employee.EMPLOYEE_ID || ''
+    ).trim();
+
+  if (!employeeId) {
+
+    throw new Error(
+      'EMPLOYEE_ID pegawai tidak ditemukan.'
+    );
+  }
+
+
+  const timezoneInfo =
+    _attendanceGetEmployeeTimezone(
+      employee
+    );
+
+
+  const openAttendance =
+    _attendanceFindOpenAttendanceByEmployee(
+      employeeId
+    );
+
+
+  /* ----------------------------------------------------------
+   * TIDAK ADA SESSION OPEN
+   * -------------------------------------------------------- */
+
+  if (!openAttendance) {
+
+    return {
+
+      success: false,
+
+      code:
+        'NOT_CHECKED_IN',
+
+      message:
+        'Anda tidak memiliki sesi absen masuk yang masih aktif.'
+
+    };
+  }
+
+
+  /* ----------------------------------------------------------
+   * SESSION DITEMUKAN
+   * -------------------------------------------------------- */
+
+  return {
+
+    success: true,
+
+    code:
+      'OPEN_ATTENDANCE_FOUND',
+
+    message:
+      'Sesi absen masuk ditemukan.',
+
+    attendance:
+      _attendanceBuildResult(
+        openAttendance.record,
+        timezoneInfo.timezone,
+        timezoneInfo.label
+      )
+
+  };
 }
 
 
