@@ -174,10 +174,16 @@
 
       if (!SESSION_TOKEN) {
 
-        redirectToLogin();
+        console.warn(
+          'JNDA CHECK-OUT: SESSION TOKEN TIDAK DITEMUKAN'
+        );
+
+        showAttendanceMessage(
+          'Session tidak tersedia. Silakan refresh halaman.',
+          'error'
+        );
 
         return;
-
       }
 
 
@@ -3084,7 +3090,14 @@
 
       if (!SESSION_TOKEN) {
 
-        redirectToLogin();
+        console.warn(
+          'JNDA CHECK-OUT: SESSION TOKEN TIDAK DITEMUKAN'
+        );
+
+        showAttendanceMessage(
+          'Session tidak tersedia. Silakan refresh halaman.',
+          'error'
+        );
 
         return;
       }
@@ -3416,7 +3429,14 @@
 
       if (!SESSION_TOKEN) {
 
-        redirectToLogin();
+        console.warn(
+          'JNDA CHECK-OUT: SESSION TOKEN TIDAK DITEMUKAN'
+        );
+
+        showAttendanceMessage(
+          'Session tidak tersedia. Silakan refresh halaman.',
+          'error'
+        );
 
         return;
       }
