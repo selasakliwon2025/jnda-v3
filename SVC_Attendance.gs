@@ -1270,97 +1270,6 @@ function checkOut(sessionToken, payload) {
   }
 }
 
-/* ============================================================
- * PUBLIC - OPEN ATTENDANCE
- * ============================================================ */
-
-/**
- * Mengambil sesi attendance yang masih OPEN.
- *
- * Berbeda dengan getTodayAttendance():
- * fungsi ini tidak membatasi WORK_DATE hari ini.
- *
- * Digunakan khusus untuk proses Absen Pulang.
- */
-function getOpenAttendance(sessionToken) {
-
-  const context =
-    _attendanceGetContext(
-      sessionToken
-    );
-
-  const employee =
-    context.employee;
-
-  const employeeId =
-    String(
-      employee.EMPLOYEE_ID || ''
-    ).trim();
-
-  if (!employeeId) {
-
-    throw new Error(
-      'EMPLOYEE_ID pegawai tidak ditemukan.'
-    );
-  }
-
-
-  const timezoneInfo =
-    _attendanceGetEmployeeTimezone(
-      employee
-    );
-
-
-  const openAttendance =
-    _attendanceFindOpenAttendanceByEmployee(
-      employeeId
-    );
-
-
-  /* ----------------------------------------------------------
-   * TIDAK ADA SESSION OPEN
-   * -------------------------------------------------------- */
-
-  if (!openAttendance) {
-
-    return {
-
-      success: false,
-
-      code:
-        'NOT_CHECKED_IN',
-
-      message:
-        'Anda tidak memiliki sesi absen masuk yang masih aktif.'
-
-    };
-  }
-
-
-  /* ----------------------------------------------------------
-   * SESSION DITEMUKAN
-   * -------------------------------------------------------- */
-
-  return {
-
-    success: true,
-
-    code:
-      'OPEN_ATTENDANCE_FOUND',
-
-    message:
-      'Sesi absen masuk ditemukan.',
-
-    attendance:
-      _attendanceBuildResult(
-        openAttendance.record,
-        timezoneInfo.timezone,
-        timezoneInfo.label
-      )
-
-  };
-}
-
 
 /* ============================================================
  * PUBLIC - TODAY ATTENDANCE
@@ -1491,6 +1400,98 @@ function getTodayAttendance(sessionToken) {
     attendance:
       _attendanceBuildResult(
         existing.record,
+        timezoneInfo.timezone,
+        timezoneInfo.label
+      )
+
+  };
+}
+
+
+/* ============================================================
+ * PUBLIC - OPEN ATTENDANCE
+ * ============================================================ */
+
+/**
+ * Mengambil sesi attendance yang masih OPEN.
+ *
+ * Berbeda dengan getTodayAttendance():
+ * fungsi ini tidak membatasi WORK_DATE hari ini.
+ *
+ * Digunakan khusus untuk proses Absen Pulang.
+ */
+function getOpenAttendance(sessionToken) {
+
+  const context =
+    _attendanceGetContext(
+      sessionToken
+    );
+
+  const employee =
+    context.employee;
+
+  const employeeId =
+    String(
+      employee.EMPLOYEE_ID || ''
+    ).trim();
+
+  if (!employeeId) {
+
+    throw new Error(
+      'EMPLOYEE_ID pegawai tidak ditemukan.'
+    );
+  }
+
+
+  const timezoneInfo =
+    _attendanceGetEmployeeTimezone(
+      employee
+    );
+
+
+  const openAttendance =
+    _attendanceFindOpenAttendanceByEmployee(
+      employeeId
+    );
+
+
+  /* ----------------------------------------------------------
+   * TIDAK ADA SESSION OPEN
+   * -------------------------------------------------------- */
+
+  if (!openAttendance) {
+
+    return {
+
+      success: false,
+
+      code:
+        'NOT_CHECKED_IN',
+
+      message:
+        'Anda tidak memiliki sesi absen masuk yang masih aktif.'
+
+    };
+  }
+
+
+  /* ----------------------------------------------------------
+   * SESSION DITEMUKAN
+   * -------------------------------------------------------- */
+
+  return {
+
+    success: true,
+
+    code:
+      'OPEN_ATTENDANCE_FOUND',
+
+    message:
+      'Sesi absen masuk ditemukan.',
+
+    attendance:
+      _attendanceBuildResult(
+        openAttendance.record,
         timezoneInfo.timezone,
         timezoneInfo.label
       )
