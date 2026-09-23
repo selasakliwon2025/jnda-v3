@@ -2512,11 +2512,14 @@
         .trim()
         .toUpperCase();
 
-      const employeeType =
+      const employeeTypeSelect =
+        document.getElementById(
+          'checkInEmployeeType'
+        );
+
+      let employeeType =
         String(
-          document.getElementById(
-            'checkInEmployeeType'
-          )?.value || ''
+          employeeTypeSelect?.value || ''
         )
         .trim()
         .toUpperCase();
@@ -2525,11 +2528,6 @@
       /* =====================================================
         MODE KAPAL → OTOMATIS CREW
         ===================================================== */
-
-      const employeeTypeSelect =
-        document.getElementById(
-          'checkInEmployeeType'
-        );
 
       if (
         mode === 'SHIP' &&
@@ -2541,6 +2539,10 @@
 
         employeeTypeSelect.disabled =
           true;
+
+        /* penting: update variabel juga */
+        employeeType =
+          'CREW';
 
       } else if (
         employeeTypeSelect
