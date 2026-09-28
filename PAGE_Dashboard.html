@@ -1445,33 +1445,28 @@
         ) ||
         '';
 
-      /*
-       * Hapus token lokal lebih dulu.
-       * Jika server gagal sekalipun, browser ini tidak
-       * akan tetap memakai session lama.
-       */
-      localStorage.removeItem(
-        'JNDA_SESSION_TOKEN'
-      );
-
-      SESSION_TOKEN = '';
-      CURRENT_SESSION = null;
-
       if (typeof closeMobileSidebar === 'function') {
         closeMobileSidebar();
       }
 
       /*
-       * Tidak ada token -> langsung kembali ke login.
+       * Jika session memang sudah tidak ada,
+       * langsung kembali ke login.
        */
       if (!token) {
+        localStorage.removeItem(
+          'JNDA_SESSION_TOKEN'
+        );
+        SESSION_TOKEN = '';
+        CURRENT_SESSION = null;
         redirectToLogin();
         return;
       }
 
       /*
-       * Konfirmasi logout. Jika SweetAlert tidak tersedia,
-       * proses tetap dilanjutkan tanpa bergantung pada CDN.
+       * Konfirmasi logout.
+       * Token BARU dihapus setelah user menekan "Ya, Keluar".
+       * Jadi tombol "Batal" tetap membawa user ke dashboard.
        */
       if (typeof Swal !== 'undefined') {
 
@@ -1492,32 +1487,38 @@
 
           if (!result.isConfirmed) {
             window.JNDA_LOGOUT_PROCESSING = false;
-            /*
-             * Token sudah dihapus, jadi kembali ke login
-             * agar state browser tetap konsisten.
-             */
-            redirectToLogin();
             return;
           }
 
-          executeLogoutRequest(token);
+          completeLogout(token);
 
         });
 
         return;
       }
 
-      executeLogoutRequest(token);
+      completeLogout(token);
     }
 
 
-    function executeLogoutRequest(token) {
+    function completeLogout(token) {
 
-      if (!token) {
-        redirectToLogin();
-        return;
-      }
+      /*
+       * Hapus token lokal setelah user benar-benar
+       * mengonfirmasi logout.
+       */
+      localStorage.removeItem(
+        'JNDA_SESSION_TOKEN'
+      );
 
+      SESSION_TOKEN = '';
+      CURRENT_SESSION = null;
+
+      /*
+       * Jika API google.script.run tidak tersedia,
+       * tetap arahkan ke login karena token lokal
+       * sudah dibersihkan.
+       */
       if (
         typeof google === 'undefined' ||
         !google.script ||
@@ -1531,7 +1532,9 @@
 
         .withSuccessHandler(
           function () {
+
             redirectToLogin();
+
           }
         )
 
@@ -1544,7 +1547,7 @@
             );
 
             /*
-             * Token lokal sudah dihapus.
+             * Token lokal sudah terhapus.
              * Tetap arahkan user ke login.
              */
             redirectToLogin();
