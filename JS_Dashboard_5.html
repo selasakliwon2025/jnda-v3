@@ -1,1 +1,558 @@
+function updateCheckInShiftUI() {
 
+      const mode =
+        String(
+          document.getElementById(
+            'checkInMode'
+          )?.value || ''
+        )
+        .trim()
+        .toUpperCase();
+
+      const employeeTypeSelect =
+        document.getElementById(
+          'checkInEmployeeType'
+        );
+
+      let employeeType =
+        String(
+          employeeTypeSelect?.value || ''
+        )
+        .trim()
+        .toUpperCase();
+
+
+      /* =====================================================
+        MODE KAPAL → OTOMATIS CREW
+        ===================================================== */
+
+      if (
+        mode === 'SHIP' &&
+        employeeTypeSelect
+      ) {
+
+        employeeTypeSelect.value =
+          'CREW';
+
+        employeeTypeSelect.disabled =
+          true;
+
+        /* penting: update variabel juga */
+        employeeType =
+          'CREW';
+
+      } else if (
+        employeeTypeSelect
+      ) {
+
+        employeeTypeSelect.disabled =
+          false;
+
+      }
+
+      const shiftSelect =
+        document.getElementById(
+          'checkInShift'
+        );
+
+
+      const manualShift =
+        document.getElementById(
+          'checkInManualShift'
+        );
+
+
+      const officeSchedule =
+        document.getElementById(
+          'checkInOfficeSchedule'
+        );
+
+
+      const crewSchedule =
+        document.getElementById(
+          'checkInCrewSchedule'
+        );
+
+
+      const attachmentField =
+        document.getElementById(
+          'checkInDinasAttachmentField'
+        );
+
+
+      const officeDay =
+        document.getElementById(
+          'checkInOfficeDay'
+        );
+
+
+      const officeHours =
+        document.getElementById(
+          'checkInOfficeHours'
+        );
+
+
+      const officeTolerance =
+        document.getElementById(
+          'checkInOfficeTolerance'
+        );
+
+
+      const crewDay =
+        document.getElementById(
+          'checkInCrewDay'
+        );
+
+
+      if (!shiftSelect) {
+        return;
+      }
+
+
+      /* =====================================================
+        RESET TAMPILAN
+        ===================================================== */
+
+      if (manualShift) {
+        manualShift.style.display = '';
+      }
+
+      shiftSelect.disabled = false;
+      shiftSelect.style.display = '';
+
+
+      if (officeSchedule) {
+        officeSchedule.hidden = true;
+      }
+
+
+      if (crewSchedule) {
+        crewSchedule.hidden = true;
+      }
+
+
+      /* =====================================================
+        DINAS LUAR
+        ===================================================== */
+
+      if (attachmentField) {
+
+        attachmentField.hidden =
+          mode !== 'DINAS_LUAR';
+
+      }
+
+
+      /* =====================================================
+        CREW DI ATAS KAPAL
+        ===================================================== */
+
+      if (
+        mode === 'SHIP' &&
+        employeeType === 'CREW'
+      ) {
+
+        shiftSelect.value = '';
+        shiftSelect.disabled = true;
+        shiftSelect.style.display = 'none';
+
+
+        if (manualShift) {
+          manualShift.style.display = 'none';
+        }
+
+
+        if (crewSchedule) {
+          crewSchedule.hidden = false;
+        }
+
+
+        if (crewDay) {
+          crewDay.textContent =
+            'Crew Kapal';
+        }
+
+
+        return;
+      }
+
+
+      /* =====================================================
+        OFFICE HOUR
+
+        Berlaku untuk:
+        - OFFICE_HOUR + WFO
+        - WFH
+        - DINAS_LUAR
+        ===================================================== */
+
+      const useOfficeHour =
+        (
+          mode === 'WFO' &&
+          employeeType === 'OFFICE_HOUR'
+        ) ||
+        mode === 'WFH' ||
+        mode === 'DINAS_LUAR';
+
+
+      if (useOfficeHour) {
+
+        shiftSelect.value = '';
+        shiftSelect.disabled = true;
+        shiftSelect.style.display = 'none';
+
+
+        if (manualShift) {
+          manualShift.style.display = 'none';
+        }
+
+
+        if (officeSchedule) {
+          officeSchedule.hidden = false;
+        }
+
+
+        const now =
+          new Date();
+
+        const day =
+          now.getDay();
+
+
+        if (
+          day >= 1 &&
+          day <= 4
+        ) {
+
+          if (officeDay) {
+            officeDay.textContent =
+              'Office Hour · Senin – Kamis';
+          }
+
+          if (officeHours) {
+            officeHours.textContent =
+              '08:00 – 16:30';
+          }
+
+        }
+
+        else if (day === 5) {
+
+          if (officeDay) {
+            officeDay.textContent =
+              'Office Hour · Jumat';
+          }
+
+          if (officeHours) {
+            officeHours.textContent =
+              '08:00 – 17:00';
+          }
+
+        }
+
+        else {
+
+          if (officeDay) {
+            officeDay.textContent =
+              'Office Hour · Weekend';
+          }
+
+          if (officeHours) {
+            officeHours.textContent =
+              'Tidak ada jadwal';
+          }
+
+        }
+
+
+        if (officeTolerance) {
+
+          officeTolerance.textContent =
+            'Toleransi keterlambatan 18 menit';
+
+        }
+
+
+        return;
+      }
+
+    }
+
+    
+
+
+    /* =========================================================
+      CONFIRM ABSEN
+      ========================================================= */
+
+    function confirmCheckIn() {
+
+      /*
+      * Ambil value form
+      */
+
+      const mode =
+        document.getElementById(
+          'checkInMode'
+        )?.value || '';
+
+
+      const employeeType =
+        document.getElementById(
+          'checkInEmployeeType'
+        )?.value || '';
+
+
+      const shiftId =
+        document.getElementById(
+          'checkInShift'
+        )?.value || '';
+
+
+      const remark =
+        document.getElementById(
+          'checkInRemark'
+        )?.value.trim() || '';
+
+
+      /*
+      * Validasi
+      */
+
+      if (!mode) {
+
+        showAttendanceMessage(
+          'Silakan pilih Mode Absen.',
+          'warning'
+        );
+
+        document
+          .getElementById('checkInMode')
+          ?.focus();
+
+        return;
+      }
+
+
+      if (!employeeType) {
+
+        showAttendanceMessage(
+          'Silakan pilih Type Pegawai.',
+          'warning'
+        );
+
+        document
+          .getElementById('checkInEmployeeType')
+          ?.focus();
+
+        return;
+      }
+
+      /* =====================================================
+        VALIDASI LAMPIRAN DINAS LUAR
+        ===================================================== */
+
+      if (
+        String(mode)
+          .trim()
+          .toUpperCase() === 'DINAS_LUAR'
+      ) {
+
+        const attachment =
+          document.getElementById(
+            'checkInDinasAttachment'
+          );
+
+
+        if (
+          !attachment ||
+          !attachment.files ||
+          !attachment.files.length
+        ) {
+
+          showAttendanceMessage(
+            'Surat Dinas wajib dilampirkan untuk Mode Dinas Luar.',
+            'warning'
+          );
+
+
+          attachment?.focus();
+
+          return;
+        }
+
+      }
+
+
+      /* =====================================================
+        VALIDASI SHIFT
+        ===================================================== */
+
+      const modeUpper =
+        String(mode)
+          .trim()
+          .toUpperCase();
+
+
+      const employeeTypeUpper =
+        String(employeeType)
+          .trim()
+          .toUpperCase();
+
+
+      const autoShift =
+        (
+          modeUpper === 'SHIP' &&
+          employeeTypeUpper === 'CREW'
+        ) ||
+        (
+          modeUpper === 'WFO' &&
+          employeeTypeUpper === 'OFFICE_HOUR'
+        ) ||
+        modeUpper === 'WFH' ||
+        modeUpper === 'DINAS_LUAR';
+
+
+      /*
+      * Hanya minta shift jika memang
+      * menggunakan pilihan manual.
+      */
+
+      if (
+        !autoShift &&
+        !shiftId
+      ) {
+
+        showAttendanceMessage(
+          'Silakan pilih Shift & Jam Kerja.',
+          'warning'
+        );
+
+
+        document
+          .getElementById(
+            'checkInShift'
+          )
+          ?.focus();
+
+
+        return;
+      }
+
+
+      /*
+      * Token
+      */
+
+      SESSION_TOKEN =
+        localStorage.getItem(
+          'JNDA_SESSION_TOKEN'
+        ) || SESSION_TOKEN;
+
+
+      if (!SESSION_TOKEN) {
+
+        showAttendanceMessage(
+          'Session tidak tersedia.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      /*
+      * Disable button
+      */
+
+      const button =
+        document.getElementById(
+          'confirmCheckInButton'
+        );
+
+      if (button) {
+
+        button.disabled = true;
+
+        button.dataset.originalText =
+          button.innerHTML;
+
+        button.innerHTML =
+          '⏳ Memproses...';
+
+      }
+
+
+      /*
+      * Payload
+      */
+
+      const payload = {
+
+        attendanceMode:
+          mode,
+
+        employeeType:
+          employeeType,
+
+        shiftId:
+          shiftId,
+
+        remark:
+          remark
+
+      };
+
+
+      console.log(
+        'JNDA Check In Payload:',
+        payload
+      );
+
+
+      /*
+      * Panggil backend
+      *
+      * TIDAK REDIRECT
+      */
+
+      Swal.fire({
+
+        title: 'Memproses Absen...',
+
+        text: 'Mohon tunggu sebentar.',
+
+        allowOutsideClick: false,
+
+        allowEscapeKey: false,
+
+        showConfirmButton: false,
+
+        didOpen: function () {
+
+          Swal.showLoading();
+
+        }
+
+      });
+
+      google.script.run
+
+        .withSuccessHandler(
+          handleCheckInSuccess
+        )
+
+        .withFailureHandler(
+          handleCheckInError
+        )
+
+        .checkIn(
+          SESSION_TOKEN,
+          payload
+        );
+
+    } 
+
+    /* =========================================================
+      CHECK-OUT MODAL
+      ========================================================= */
