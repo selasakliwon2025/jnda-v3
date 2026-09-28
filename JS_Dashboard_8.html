@@ -1,1 +1,180 @@
+function updateRemarkCounter() {
 
+      const input =
+        document.getElementById(
+          'checkInRemark'
+        );
+
+      const counter =
+        document.getElementById(
+          'checkInRemarkCounter'
+        );
+
+
+      if (!input || !counter) {
+        return;
+      }
+
+
+      counter.textContent =
+        input.value.length;
+
+    }
+
+
+    /* =========================================================
+      ATTENDANCE MESSAGE
+      ========================================================= */
+
+    function showAttendanceMessage(
+      message,
+      type = 'info'
+    ) {
+
+      const iconMap = {
+        success: 'success',
+        warning: 'warning',
+        error: 'error',
+        info: 'info'
+      };
+
+      const titleMap = {
+        success: 'Berhasil',
+        warning: 'Perhatian',
+        error: 'Gagal',
+        info: 'Informasi'
+      };
+
+      return Swal.fire({
+
+        icon:
+          iconMap[type] || 'info',
+
+        title:
+          titleMap[type] || 'Informasi',
+
+        text:
+          message || 'Tidak ada informasi.',
+
+        confirmButtonText:
+          'OK',
+
+        confirmButtonColor:
+          '#16458f',
+
+        customClass: {
+          popup: 'jnda-swal-popup'
+        }
+
+      });
+
+    }
+
+    function initDinasAttachment() {
+
+      const input =
+        document.getElementById(
+          'checkInDinasAttachment'
+        );
+
+      const name =
+        document.getElementById(
+          'checkInDinasAttachmentName'
+        );
+
+
+      if (!input) {
+        return;
+      }
+
+
+      input.addEventListener(
+        'change',
+        function () {
+
+          const file =
+            input.files &&
+            input.files[0];
+
+
+          if (!file) {
+
+            if (name) {
+              name.textContent = '';
+              name.classList.remove('error');
+            }
+
+            return;
+          }
+
+
+          const maxSize =
+            5 * 1024 * 1024;
+
+
+          const allowedTypes = [
+            'application/pdf',
+            'image/jpeg',
+            'image/png'
+          ];
+
+
+          if (
+            !allowedTypes.includes(
+              file.type
+            )
+          ) {
+
+            input.value = '';
+
+            if (name) {
+
+              name.textContent =
+                'Format file tidak didukung. Gunakan PDF, JPG, JPEG atau PNG.';
+
+              name.classList.add(
+                'error'
+              );
+
+            }
+
+            return;
+          }
+
+
+          if (
+            file.size > maxSize
+          ) {
+
+            input.value = '';
+
+            if (name) {
+
+              name.textContent =
+                'Ukuran file maksimal 5 MB.';
+
+              name.classList.add(
+                'error'
+              );
+
+            }
+
+            return;
+          }
+
+
+          if (name) {
+
+            name.textContent =
+              '📄 ' + file.name;
+
+            name.classList.remove(
+              'error'
+            );
+
+          }
+
+        }
+      );
+
+    }
