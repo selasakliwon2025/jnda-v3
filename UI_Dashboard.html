@@ -1,22 +1,33 @@
 <style>
 
+/* =========================================================
+   JN DAILY ATTENDANCE
+   MOBILE APP DASHBOARD
+   UI ONLY
+   Backend PAGE_Dashboard.html TETAP
+   ========================================================= */
+
 :root {
-  --primary: #16458f;
-  --primary-2: #2476c9;
-  --primary-soft: #eaf3ff;
 
-  --green: #16a34a;
-  --red: #dc2626;
+  --jn-blue: #0b5fc6;
+  --jn-blue-dark: #084b9b;
+  --jn-blue-soft: #eaf4ff;
 
-  --text: #172033;
-  --muted: #728096;
+  --jn-green: #18a957;
+  --jn-red: #e5484d;
 
-  --bg: #eef4fa;
-  --card: rgba(255,255,255,.92);
+  --text: #17324d;
+  --muted: #7890a6;
 
-  --border: rgba(148,163,184,.18);
+  --bg: #f3f8fc;
 
-  --sidebar: 260px;
+  --white: #ffffff;
+
+  --border: #e3edf5;
+
+  --shadow:
+    0 10px 35px rgba(30, 84, 130, .08);
+
 }
 
 
@@ -28,35 +39,75 @@
   box-sizing: border-box;
 }
 
+
+html,
 body {
+
   margin: 0;
+  padding: 0;
+
+  width: 100%;
+
+  min-height: 100%;
+
+}
+
+
+body {
 
   font-family:
-    Inter,
-    "Segoe UI",
+    'Poppins',
+    'Segoe UI',
     Arial,
     sans-serif;
 
   color: var(--text);
 
   background:
+
     radial-gradient(
-      circle at 0% 0%,
-      rgba(36,118,201,.14),
-      transparent 30%
+      circle at 10% 0%,
+      rgba(67, 167, 230, .13),
+      transparent 27%
     ),
-    radial-gradient(
-      circle at 100% 100%,
-      rgba(14,165,233,.10),
-      transparent 28%
-    ),
+
     linear-gradient(
-      135deg,
-      #eef4fa,
-      #f7faff
+      180deg,
+      #eef8ff 0%,
+      #f7fbfe 48%,
+      #f2f8fc 100%
     );
 
   min-height: 100vh;
+
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+
+::-webkit-scrollbar-thumb {
+
+  background:
+    #c9dceb;
+
+  border-radius: 20px;
+
+}
+
+
+::-webkit-scrollbar-track {
+
+  background:
+    transparent;
+
 }
 
 
@@ -71,17 +122,8 @@ body {
   left: 0;
   top: 0;
 
-  width: var(--sidebar);
+  width: 250px;
   height: 100vh;
-
-  background:
-    linear-gradient(
-      180deg,
-      #123b7c,
-      #0d2d61
-    );
-
-  color: white;
 
   z-index: 1000;
 
@@ -89,36 +131,114 @@ body {
 
   flex-direction: column;
 
+  background:
+
+    linear-gradient(
+      180deg,
+      #0a4f9f 0%,
+      #063d80 100%
+    );
+
+  color: #fff;
+
+  box-shadow:
+    8px 0 30px
+    rgba(4, 49, 96, .12);
+
   transition:
     transform .25s ease;
+
 }
 
+
+/* =========================================================
+   SIDEBAR BRAND
+   ========================================================= */
+
+.sidebar-brand {
+
+  padding:
+    22px 20px 17px;
+
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.12);
+
+}
+
+
+.sidebar-brand-logo {
+
+  width: 125px;
+
+  height: 55px;
+
+  object-fit: contain;
+
+  object-position: left center;
+
+}
+
+
+.sidebar-brand-title {
+
+  margin-top: 4px;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+}
+
+
+.sidebar-brand-subtitle {
+
+  margin-top: 2px;
+
+  font-size: 9px;
+
+  color:
+    rgba(255,255,255,.65);
+
+  letter-spacing:
+    .4px;
+
+}
+
+
+/* =========================================================
+   SIDEBAR NAV
+   ========================================================= */
 
 .sidebar-nav {
 
   flex: 1;
 
-  padding: 25px 13px;
-
   overflow-y: auto;
+
+  padding:
+    18px 12px;
+
 }
 
 
 .nav-section-title {
 
   padding:
-    12px 13px 7px;
-
-  font-size: 9px;
+    10px 11px 7px;
 
   color:
     rgba(255,255,255,.45);
+
+  font-size: 8px;
 
   font-weight: 800;
 
   text-transform: uppercase;
 
-  letter-spacing: 1px;
+  letter-spacing:
+    1.2px;
+
 }
 
 
@@ -126,27 +246,32 @@ body {
 
   width: 100%;
 
-  border: 0;
-
-  background: transparent;
-
-  color:
-    rgba(255,255,255,.72);
+  min-height: 45px;
 
   display: flex;
 
   align-items: center;
 
-  gap: 12px;
-
-  padding:
-    12px 13px;
+  gap: 11px;
 
   margin-bottom: 4px;
 
+  padding:
+    10px 12px;
+
+  border: 0;
+
   border-radius: 11px;
 
-  font-size: 12px;
+  background:
+    transparent;
+
+  color:
+    rgba(255,255,255,.74);
+
+  font-family: inherit;
+
+  font-size: 11px;
 
   font-weight: 600;
 
@@ -154,38 +279,43 @@ body {
 
   cursor: pointer;
 
-  transition: .2s;
+  transition: .2s ease;
+
 }
 
 
 .nav-item:hover {
 
   background:
-    rgba(255,255,255,.09);
+    rgba(255,255,255,.10);
 
-  color: white;
+  color: #fff;
+
 }
 
 
 .nav-item.active {
 
   background:
-    rgba(255,255,255,.16);
+    rgba(255,255,255,.17);
 
-  color: white;
+  color: #fff;
 
   box-shadow:
-    inset 3px 0 0 #53b4ff;
+    inset 3px 0 0
+    #6fd0ff;
+
 }
 
 
 .nav-icon {
 
-  width: 22px;
+  width: 23px;
 
   text-align: center;
 
   font-size: 16px;
+
 }
 
 
@@ -195,11 +325,12 @@ body {
 
 .sidebar-footer {
 
-  padding: 14px;
+  padding: 13px;
 
   border-top:
     1px solid
-    rgba(255,255,255,.08);
+    rgba(255,255,255,.10);
+
 }
 
 
@@ -207,26 +338,39 @@ body {
 
   width: 100%;
 
+  height: 42px;
+
   border: 0;
 
   border-radius: 10px;
 
   background:
-    rgba(255,255,255,.08);
+    rgba(255,255,255,.09);
 
   color:
-    rgba(255,255,255,.78);
+    rgba(255,255,255,.82);
 
-  padding: 11px;
+  font-family: inherit;
+
+  font-size: 10px;
+
+  font-weight: 700;
 
   cursor: pointer;
 
-  font-weight: 700;
+}
+
+
+.logout-button:hover {
+
+  background:
+    rgba(255,255,255,.15);
+
 }
 
 
 /* =========================================================
-   OVERLAY
+   MOBILE SIDEBAR OVERLAY
    ========================================================= */
 
 .sidebar-overlay {
@@ -237,10 +381,21 @@ body {
 
   inset: 0;
 
-  background:
-    rgba(15,23,42,.48);
-
   z-index: 900;
+
+  background:
+    rgba(6,34,63,.42);
+
+  backdrop-filter:
+    blur(2px);
+
+}
+
+
+.sidebar-overlay.mobile-open {
+
+  display: block;
+
 }
 
 
@@ -250,19 +405,18 @@ body {
 
 .jnda-main {
 
-  margin-left: var(--sidebar);
+  margin-left: 250px;
 
   min-height: 100vh;
+
 }
 
 
 /* =========================================================
-   NAVBAR
+   TOPBAR
    ========================================================= */
 
 .jnda-topbar {
-
-  height: 76px;
 
   position: sticky;
 
@@ -270,15 +424,7 @@ body {
 
   z-index: 800;
 
-  background:
-    rgba(255,255,255,.88);
-
-  backdrop-filter:
-    blur(15px);
-
-  border-bottom:
-    1px solid
-    var(--border);
+  height: 70px;
 
   display: flex;
 
@@ -287,7 +433,21 @@ body {
   justify-content: space-between;
 
   padding:
-    0 28px;
+    0 25px;
+
+  background:
+    rgba(255,255,255,.88);
+
+  backdrop-filter:
+    blur(16px);
+
+  -webkit-backdrop-filter:
+    blur(16px);
+
+  border-bottom:
+    1px solid
+    rgba(168,191,211,.20);
+
 }
 
 
@@ -297,7 +457,8 @@ body {
 
   align-items: center;
 
-  gap: 14px;
+  gap: 12px;
+
 }
 
 
@@ -306,24 +467,30 @@ body {
   display: none;
 
   width: 40px;
+
   height: 40px;
 
-  border: 1px solid #dce4ef;
+  border:
+    1px solid
+    var(--border);
 
   border-radius: 11px;
 
-  background: white;
+  background:
+    #fff;
 
-  color: var(--primary);
+  color:
+    var(--jn-blue);
 
-  font-size: 20px;
+  font-size: 18px;
 
   cursor: pointer;
+
 }
 
 
 /* =========================================================
-   3 LOGOS NAVBAR
+   NAVBAR LOGOS
    ========================================================= */
 
 .navbar-logos {
@@ -332,33 +499,37 @@ body {
 
   align-items: center;
 
-  gap: 13px;
-}
+  gap: 10px;
 
-
-.navbar-logo.jn {
-
-  width: 120px;
-
-  height: 50px;
-}
-
-
-.navbar-logo.partner {
-
-  width: 70px;
-
-  height: 44px;
 }
 
 
 .navbar-logo {
 
+  display: block;
+
   object-fit: contain;
 
   object-position: center;
 
-  background: transparent;
+}
+
+
+.navbar-logo.jn {
+
+  width: 100px;
+
+  height: 42px;
+
+}
+
+
+.navbar-logo.partner {
+
+  width: 58px;
+
+  height: 38px;
+
 }
 
 
@@ -366,10 +537,11 @@ body {
 
   width: 1px;
 
-  height: 30px;
+  height: 23px;
 
   background:
-    #dce3ed;
+    #dce7ef;
+
 }
 
 
@@ -384,6 +556,7 @@ body {
   align-items: center;
 
   gap: 10px;
+
 }
 
 
@@ -393,7 +566,7 @@ body {
 
   height: 38px;
 
-  border-radius: 50%;
+  flex-shrink: 0;
 
   display: flex;
 
@@ -401,16 +574,26 @@ body {
 
   justify-content: center;
 
+  border-radius: 50%;
+
   background:
+
     linear-gradient(
       135deg,
-      #16458f,
-      #2476c9
+      #0879df,
+      #0b55a6
     );
 
-  color: white;
+  color: #fff;
+
+  font-size: 12px;
 
   font-weight: 800;
+
+  box-shadow:
+    0 4px 12px
+    rgba(11,95,198,.22);
+
 }
 
 
@@ -419,6 +602,10 @@ body {
   font-size: 11px;
 
   font-weight: 800;
+
+  color:
+    #183b58;
+
 }
 
 
@@ -426,9 +613,11 @@ body {
 
   margin-top: 2px;
 
-  font-size: 9px;
+  font-size: 8px;
 
-  color: var(--muted);
+  color:
+    var(--muted);
+
 }
 
 
@@ -438,631 +627,16 @@ body {
 
 .jnda-content {
 
-  max-width: 1500px;
-
-  margin: auto;
-
-  padding:
-    25px 28px 40px;
-}
-
-
-/* =========================================================
-   HERO
-   ========================================================= */
-
-.welcome-card {
-
-  position: relative;
-
-  min-height: 300px;
-
-  overflow: hidden;
-
-  border-radius: 24px;
-
-  background:
-    linear-gradient(
-      90deg,
-      rgba(5,29,67,.95),
-      rgba(10,64,130,.72),
-      rgba(10,64,130,.10)
-    ),
-    url("https://drive.google.com/thumbnail?id=1iiQ50buH6f-re9v1MFQ3BKF0axih1fTz&sz=w1600")
-    center / cover no-repeat;
-
-  box-shadow:
-    0 18px 45px
-    rgba(22,69,143,.16);
-}
-
-
-.welcome-content {
-
-  position: relative;
-
-  z-index: 2;
-
-  max-width: 650px;
-
-  padding: 36px;
-
-  color: white;
-}
-
-.welcome-clock {
-  position: absolute;
-  top: 28px;
-  right: 30px;
-
-  z-index: 5;
-
-  min-width: 170px;
-
-  padding: 12px 16px;
-
-  border-radius: 15px;
-
-  background: rgba(255,255,255,.12);
-
-  border: 1px solid rgba(255,255,255,.20);
-
-  backdrop-filter: blur(10px);
-
-  -webkit-backdrop-filter: blur(10px);
-
-  text-align: right;
-
-  color: #fff;
-
-  box-shadow:
-    0 10px 30px
-    rgba(0,0,0,.10);
-}
-
-.welcome-clock-time {
-  font-size: 25px;
-  line-height: 1;
-
-  font-weight: 800;
-
-  letter-spacing: 1px;
-
-  font-variant-numeric: tabular-nums;
-}
-
-.welcome-clock-zone {
-  margin-top: 6px;
-
-  font-size: 9px;
-
-  font-weight: 800;
-
-  letter-spacing: .8px;
-
-  text-transform: uppercase;
-
-  color: rgba(255,255,255,.78);
-}
-
-
-/* MOBILE */
-
-@media (max-width: 700px) {
-
-  .welcome-clock {
-    top: 18px;
-    right: 18px;
-
-    min-width: 135px;
-
-    padding: 9px 12px;
-
-    border-radius: 12px;
-  }
-
-  .welcome-clock-time {
-    font-size: 18px;
-  }
-
-  .welcome-clock-zone {
-    font-size: 8px;
-  }
-
-  .welcome-content {
-    padding-top: 95px;
-  }
-
-}
-
-
-.welcome-kicker {
-
-  display: inline-flex;
-
-  padding:
-    7px 11px;
-
-  border-radius: 30px;
-
-  background:
-    rgba(255,255,255,.13);
-
-  border:
-    1px solid
-    rgba(255,255,255,.16);
-
-  font-size: 9px;
-
-  font-weight: 800;
-
-  letter-spacing: .8px;
-
-  text-transform: uppercase;
-}
-
-
-.welcome-title {
-
-  margin:
-    20px 0 4px;
-
-  font-size:
-    clamp(27px,4vw,43px);
-
-  line-height: 1.1;
-
-  font-weight: 800;
-}
-
-
-.welcome-name {
-
-  font-size: 20px;
-
-  font-weight: 700;
-
-  color:
-    #dcecff;
-}
-
-
-.welcome-meta {
-
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 8px 18px;
-
-  margin-top: 15px;
-
-  font-size: 11px;
-
-  color:
-    rgba(255,255,255,.86);
-}
-
-
-/* =========================================================
-   ATTENDANCE BUTTON
-   ========================================================= */
-
-.attendance-actions {
-
-  display: grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap: 14px;
-
-  margin-top: 16px;
-}
-
-
-.attendance-button {
-
-  border: 0;
-
-  border-radius: 17px;
-
-  min-height: 76px;
-
-  padding: 13px 17px;
-
-  color: white;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 13px;
-
-  text-align: left;
-
-  cursor: pointer;
-
-  box-shadow:
-    0 10px 25px
-    rgba(15,23,42,.10);
-
-  transition: .2s;
-}
-
-
-.attendance-button:hover {
-
-  transform:
-    translateY(-2px);
-}
-
-
-.attendance-button.check-in {
-
-  background:
-    linear-gradient(
-      135deg,
-      #159447,
-      #22b95c
-    );
-}
-
-
-.attendance-button.check-out {
-
-  background:
-    linear-gradient(
-      135deg,
-      #cf2730,
-      #ed4850
-    );
-}
-
-
-.attendance-button-icon {
-
-  width: 40px;
-  height: 40px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  border-radius: 12px;
-
-  background:
-    rgba(255,255,255,.15);
-
-  font-size: 18px;
-}
-
-
-/* =========================================================
-   CARD
-   ========================================================= */
-
-.jnda-card {
-
-  background:
-    var(--card);
-
-  border:
-    1px solid
-    var(--border);
-
-  border-radius: 18px;
-
-  box-shadow:
-    0 9px 30px
-    rgba(15,23,42,.045);
-
-  overflow: hidden;
-}
-
-
-.card-header {
-
-  padding: 17px 19px;
-
-  border-bottom:
-    1px solid
-    #edf1f5;
-}
-
-
-.card-title {
-
-  margin: 0;
-
-  font-size: 13px;
-
-  font-weight: 800;
-}
-
-
-.card-subtitle {
-
-  margin-top: 3px;
-
-  font-size: 9px;
-
-  color: var(--muted);
-}
-
-
-.card-body {
-
-  padding: 19px;
-}
-
-
-/* =========================================================
-   GRID
-   ========================================================= */
-
-.dashboard-grid {
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0,1.4fr)
-    minmax(300px,.7fr);
-
-  gap: 16px;
-
-  margin-top: 18px;
-}
-
-
-/* =========================================================
-   PROFILE
-   ========================================================= */
-
-.profile-layout {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 14px;
-}
-
-
-.profile-avatar {
-
-  width: 58px;
-
-  height: 58px;
-
-  border-radius: 16px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  background:
-    var(--primary-soft);
-
-  color:
-    var(--primary);
-
-  font-weight: 800;
-
-  font-size: 19px;
-}
-
-
-.profile-name {
-
-  font-size: 15px;
-
-  font-weight: 800;
-}
-
-
-.profile-nip {
-
-  margin-top: 3px;
-
-  font-size: 10px;
-
-  color: var(--muted);
-}
-
-
-.profile-context {
-
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 6px;
-
-  margin-top: 8px;
-}
-
-
-.context-chip {
-
-  padding:
-    5px 8px;
-
-  border-radius: 7px;
-
-  background:
-    #f0f6ff;
-
-  color:
-    #35649b;
-
-  font-size: 9px;
-
-  font-weight: 700;
-}
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-.today-status {
-
-  display: grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap: 10px;
-}
-
-
-.status-box {
-
-  padding: 13px;
-
-  border-radius: 12px;
-
-  background:
-    #f6f9fd;
-
-  border:
-    1px solid
-    #e9eff6;
-}
-
-
-.status-label {
-
-  font-size: 9px;
-
-  color: var(--muted);
-}
-
-
-.status-value {
-
-  margin-top: 5px;
-
-  font-size: 15px;
-
-  font-weight: 800;
-}
-
-
-/* =========================================================
-   MANAGEMENT
-   ========================================================= */
-
-.management-section {
-
-  display: none;
-
-  margin-top: 18px;
-}
-
-
-.management-grid {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(4,1fr);
-
-  gap: 10px;
-}
-
-
-.management-stat {
-
-  padding: 15px;
-
-  border-radius: 13px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #f2f7ff,
-      #ffffff
-    );
-
-  border:
-    1px solid
-    #e1eaf5;
-}
-
-
-.management-stat-label {
-
-  font-size: 9px;
-
-  color: var(--muted);
-
-  font-weight: 700;
-}
-
-
-.management-stat-value {
-
-  margin-top: 6px;
-
-  font-size: 22px;
-
-  color: var(--primary);
-
-  font-weight: 800;
-}
-
-
-/* =========================================================
-   TABLE
-   ========================================================= */
-
-.attendance-table-wrapper {
-
-  overflow-x: auto;
-}
-
-
-.attendance-table {
-
   width: 100%;
 
-  min-width: 550px;
+  max-width: 1250px;
 
-  border-collapse: collapse;
-}
+  margin:
+    0 auto;
 
+  padding:
+    22px 25px 35px;
 
-.attendance-table th {
-
-  padding: 10px;
-
-  background:
-    #f4f7fb;
-
-  color:
-    #718096;
-
-  font-size: 9px;
-
-  text-align: left;
-}
-
-
-.attendance-table td {
-
-  padding: 12px 10px;
-
-  border-top:
-    1px solid
-    #edf1f5;
-
-  font-size: 10px;
 }
 
 
@@ -1072,19 +646,22 @@ body {
 
 .dashboard-loading {
 
-  min-height: 400px;
+  min-height:
+    calc(100vh - 100px);
 
   display: flex;
-
-  flex-direction: column;
 
   align-items: center;
 
   justify-content: center;
 
+  flex-direction: column;
+
   gap: 12px;
 
-  color: var(--muted);
+  color:
+    var(--muted);
+
 }
 
 
@@ -1096,15 +673,16 @@ body {
 
   border:
     3px solid
-    #dce6f2;
+    #dbeaf6;
 
   border-top-color:
-    var(--primary);
+    var(--jn-blue);
 
   border-radius: 50%;
 
   animation:
-    jnda-spin .8s linear infinite;
+    jnda-spin .75s linear infinite;
+
 }
 
 
@@ -1118,178 +696,1028 @@ body {
 
 
 /* =========================================================
+   DASHBOARD MAIN
+   ========================================================= */
+
+#dashboardMain {
+
+  display: none;
+
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.welcome-card {
+
+  position: relative;
+
+  min-height: 245px;
+
+  overflow: hidden;
+
+  border-radius: 25px;
+
+  background:
+
+    linear-gradient(
+      90deg,
+      rgba(5,45,92,.94) 0%,
+      rgba(8,82,153,.78) 48%,
+      rgba(8,82,153,.15) 100%
+    ),
+
+    url(
+      "https://drive.google.com/thumbnail?id=1iiQ50buH6f-re9v1MFQ3BKF0axih1fTz&sz=w1600"
+    )
+
+    center / cover no-repeat;
+
+  box-shadow:
+
+    0 16px 38px
+    rgba(13,73,128,.17);
+
+}
+
+
+.welcome-card::after {
+
+  content: "";
+
+  position: absolute;
+
+  right: -80px;
+
+  bottom: -100px;
+
+  width: 330px;
+
+  height: 330px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(255,255,255,.07);
+
+}
+
+
+.welcome-content {
+
+  position: relative;
+
+  z-index: 2;
+
+  max-width: 720px;
+
+  padding:
+    31px;
+
+  color: #fff;
+
+}
+
+
+.welcome-kicker {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding:
+    6px 10px;
+
+  border-radius: 20px;
+
+  background:
+    rgba(255,255,255,.13);
+
+  border:
+    1px solid
+    rgba(255,255,255,.16);
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  letter-spacing: .8px;
+
+  text-transform: uppercase;
+
+}
+
+
+.welcome-title {
+
+  margin:
+    17px 0 3px;
+
+  font-size:
+    clamp(25px,3.4vw,38px);
+
+  line-height: 1.1;
+
+  font-weight: 800;
+
+}
+
+
+.welcome-name {
+
+  font-size: 19px;
+
+  font-weight: 700;
+
+  color:
+    #e0f0ff;
+
+}
+
+
+.welcome-meta {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 7px 17px;
+
+  margin-top: 13px;
+
+  color:
+    rgba(255,255,255,.84);
+
+  font-size: 10px;
+
+}
+
+
+/* =========================================================
+   LIVE CLOCK
+   ========================================================= */
+
+.welcome-clock {
+
+  position: absolute;
+
+  top: 25px;
+
+  right: 25px;
+
+  z-index: 5;
+
+  min-width: 145px;
+
+  padding:
+    11px 14px;
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.12);
+
+  border:
+    1px solid
+    rgba(255,255,255,.20);
+
+  backdrop-filter:
+    blur(10px);
+
+  text-align: right;
+
+  color: #fff;
+
+}
+
+
+.welcome-clock-time {
+
+  font-size: 23px;
+
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+
+  font-variant-numeric:
+    tabular-nums;
+
+}
+
+
+.welcome-clock-zone {
+
+  margin-top: 5px;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: .8px;
+
+  text-transform: uppercase;
+
+  color:
+    rgba(255,255,255,.72);
+
+}
+
+
+/* =========================================================
+   ATTENDANCE ACTIONS
+   ========================================================= */
+
+.attendance-actions {
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 13px;
+
+  margin-top: 15px;
+
+}
+
+
+.attendance-button {
+
+  min-height: 72px;
+
+  border: 0;
+
+  border-radius: 17px;
+
+  padding:
+    12px 15px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  color: #fff;
+
+  text-align: left;
+
+  font-family: inherit;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 9px 22px
+    rgba(22,63,99,.10);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease;
+
+}
+
+
+.attendance-button:hover {
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 13px 27px
+    rgba(22,63,99,.15);
+
+}
+
+
+.attendance-button:active {
+
+  transform:
+    translateY(0);
+
+}
+
+
+.attendance-button.check-in {
+
+  background:
+
+    linear-gradient(
+      135deg,
+      #17a856,
+      #20b961
+    );
+
+}
+
+
+.attendance-button.check-out {
+
+  background:
+
+    linear-gradient(
+      135deg,
+      #d93a43,
+      #ec5259
+    );
+
+}
+
+
+.attendance-button-icon {
+
+  width: 42px;
+
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 13px;
+
+  background:
+    rgba(255,255,255,.16);
+
+  font-size: 17px;
+
+}
+
+
+.attendance-button-title {
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+}
+
+
+.attendance-button-subtitle {
+
+  margin-top: 2px;
+
+  font-size: 8px;
+
+  color:
+    rgba(255,255,255,.78);
+
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.jnda-card {
+
+  background:
+    rgba(255,255,255,.94);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 18px;
+
+  box-shadow:
+    var(--shadow);
+
+  overflow: hidden;
+
+}
+
+
+.card-header {
+
+  padding:
+    16px 18px;
+
+  border-bottom:
+    1px solid
+    #edf3f7;
+
+}
+
+
+.card-title {
+
+  margin: 0;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  color:
+    #183b58;
+
+}
+
+
+.card-subtitle {
+
+  margin-top: 3px;
+
+  font-size: 9px;
+
+  color:
+    var(--muted);
+
+}
+
+
+.card-body {
+
+  padding:
+    17px 18px;
+
+}
+
+
+/* =========================================================
+   DASHBOARD GRID
+   ========================================================= */
+
+.dashboard-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0,1.35fr)
+    minmax(280px,.65fr);
+
+  gap: 15px;
+
+  margin-top: 15px;
+
+}
+
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+.profile-layout {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+}
+
+
+.profile-avatar {
+
+  width: 57px;
+
+  height: 57px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 16px;
+
+  background:
+    #e9f4ff;
+
+  color:
+    var(--jn-blue);
+
+  font-size: 18px;
+
+  font-weight: 800;
+
+}
+
+
+.profile-name {
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+}
+
+
+.profile-nip {
+
+  margin-top: 3px;
+
+  font-size: 9px;
+
+  color:
+    var(--muted);
+
+}
+
+
+.profile-context {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 5px;
+
+  margin-top: 7px;
+
+}
+
+
+.context-chip {
+
+  padding:
+    5px 8px;
+
+  border-radius: 7px;
+
+  background:
+    #f0f7ff;
+
+  color:
+    #3e6991;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+}
+
+
+/* =========================================================
+   TODAY STATUS
+   ========================================================= */
+
+.today-status {
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 9px;
+
+}
+
+
+.status-box {
+
+  min-height: 70px;
+
+  padding:
+    11px;
+
+  border-radius: 11px;
+
+  background:
+    #f7fafc;
+
+  border:
+    1px solid
+    #e8f0f5;
+
+}
+
+
+.status-label {
+
+  font-size: 8px;
+
+  color:
+    var(--muted);
+
+}
+
+
+.status-value {
+
+  margin-top: 5px;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  color:
+    #183b58;
+
+}
+
+
+/* =========================================================
+   STATUS COLORS
+   ========================================================= */
+
+.status-success {
+
+  color:
+    #159447 !important;
+
+}
+
+
+.status-warning {
+
+  color:
+    #d97706 !important;
+
+}
+
+
+.status-danger {
+
+  color:
+    #dc2626 !important;
+
+}
+
+
+/* =========================================================
+   QUICK INFO
+   ========================================================= */
+
+.quick-info-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 8px;
+
+}
+
+
+.quick-info {
+
+  padding:
+    11px;
+
+  border-radius: 11px;
+
+  background:
+    #f7fafc;
+
+  border:
+    1px solid
+    #e8f0f5;
+
+}
+
+
+.quick-info-icon {
+
+  font-size: 15px;
+
+}
+
+
+.quick-info-label {
+
+  margin-top: 5px;
+
+  font-size: 8px;
+
+  color:
+    var(--muted);
+
+}
+
+
+.quick-info-value {
+
+  margin-top: 2px;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  color:
+    #264b69;
+
+}
+
+
+/* =========================================================
+   RECENT ATTENDANCE
+   ========================================================= */
+
+.attendance-table-wrapper {
+
+  width: 100%;
+
+  overflow-x: auto;
+
+}
+
+
+.attendance-table {
+
+  width: 100%;
+
+  min-width: 540px;
+
+  border-collapse: collapse;
+
+}
+
+
+.attendance-table th {
+
+  padding:
+    9px;
+
+  background:
+    #f5f9fc;
+
+  color:
+    #71869b;
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  text-align: left;
+
+}
+
+
+.attendance-table td {
+
+  padding:
+    11px 9px;
+
+  border-top:
+    1px solid
+    #edf2f6;
+
+  font-size: 9px;
+
+}
+
+
+.status-pill {
+
+  display: inline-flex;
+
+  padding:
+    4px 7px;
+
+  border-radius: 20px;
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+}
+
+
+.status-pill.success {
+
+  background:
+    #eafaf0;
+
+  color:
+    #15803d;
+
+}
+
+
+.status-pill.warning {
+
+  background:
+    #fff7e6;
+
+  color:
+    #b45309;
+
+}
+
+
+.status-pill.danger {
+
+  background:
+    #fff0f0;
+
+  color:
+    #c62828;
+
+}
+
+
+.status-pill.neutral {
+
+  background:
+    #f0f4f8;
+
+  color:
+    #66788a;
+
+}
+
+
+.empty-state {
+
+  padding:
+    25px;
+
+  text-align: center;
+
+  color:
+    #91a1b1;
+
+  font-size: 10px;
+
+}
+
+
+/* =========================================================
+   PLACEMENT
+   ========================================================= */
+
+.placement-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 9px;
+
+}
+
+
+.placement-item {
+
+  padding:
+    11px;
+
+  border-radius: 11px;
+
+  background:
+    #f7fafc;
+
+  border:
+    1px solid
+    #e8f0f5;
+
+}
+
+
+.placement-label {
+
+  font-size: 8px;
+
+  color:
+    var(--muted);
+
+}
+
+
+.placement-value {
+
+  margin-top: 4px;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  color:
+    #264b69;
+
+}
+
+
+/* =========================================================
+   MANAGEMENT
+   ========================================================= */
+
+.management-section {
+
+  display: none;
+
+  margin-top: 15px;
+
+}
+
+
+.management-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap: 9px;
+
+}
+
+
+.management-stat {
+
+  padding:
+    13px;
+
+  border-radius: 12px;
+
+  background:
+    #f7fafc;
+
+  border:
+    1px solid
+    #e5eef5;
+
+}
+
+
+.management-stat-label {
+
+  font-size: 8px;
+
+  color:
+    var(--muted);
+
+  font-weight: 700;
+
+}
+
+
+.management-stat-value {
+
+  margin-top: 5px;
+
+  font-size: 20px;
+
+  font-weight: 800;
+
+  color:
+    var(--jn-blue);
+
+}
+
+
+/* =========================================================
    FOOTER
    ========================================================= */
 
 .jnda-footer {
 
-  padding: 25px;
+  padding:
+    25px 10px;
 
   text-align: center;
 
-  font-size: 9px;
-
   color:
-    #93a0b2;
+    #91a2b2;
+
+  font-size: 8px;
+
+  line-height: 1.7;
+
 }
 
 
 /* =========================================================
-   MOBILE
+   MOBILE BOTTOM NAVIGATION
    ========================================================= */
 
-@media (max-width: 900px) {
+.mobile-bottom-nav {
 
-  .jnda-sidebar {
-    transform:
-      translateX(-100%);
-  }
-
-  .jnda-sidebar.mobile-open {
-    transform:
-      translateX(0);
-
-    box-shadow:
-      12px 0 40px
-      rgba(15,23,42,.18);
-  }
-
-  .sidebar-overlay.mobile-open {
-    display: block;
-  }
-
-  .jnda-main {
-    margin-left: 0;
-  }
-
-  .mobile-menu-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .jnda-topbar {
-    height: 66px;
-    padding: 0 14px;
-  }
-
-  .navbar-logo.jn {
-    width: 90px;
-    height: 42px;
-  }
-
-  .navbar-logo.partner {
-    width: 50px;
-    height: 36px;
-  }
-
-  .navbar-logos {
-    gap: 7px;
-  }
-
-  .logo-divider {
-    height: 22px;
-  }
-
-  .top-user-text {
-    display: none;
-  }
-
-  .jnda-content {
-    padding: 14px;
-  }
-
-  /* BANNER MOBILE */
-  .welcome-card {
-    min-height: 260px;
-    border-radius: 19px;
-    background-position: 62% center;
-  }
-
-  .welcome-content {
-    padding: 24px 20px;
-  }
-
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .management-grid {
-    grid-template-columns: 1fr 1fr;
-  }
+  display: none;
 
 }
 
-
-@media (max-width: 700px) {
-
-  .welcome-clock {
-    top: 18px;
-    right: 18px;
-
-    min-width: 135px;
-    padding: 9px 12px;
-    border-radius: 12px;
-  }
-
-  .welcome-clock-time {
-    font-size: 18px;
-  }
-
-  .welcome-clock-zone {
-    font-size: 8px;
-  }
-
-}
-
-
-@media (max-width: 560px) {
-
-  .navbar-logo.partner {
-    display: none;
-  }
-
-  .logo-divider {
-    display: none;
-  }
-
-  .navbar-logo.jn {
-    width: 105px;
-  }
-
-  .attendance-actions {
-    grid-template-columns: 1fr;
-  }
-
-  /* BANNER LEBIH PENDEK */
-  .welcome-card {
-    min-height: 250px;
-  }
-
-  .welcome-title {
-    font-size: 24px;
-  }
-
-  .welcome-name {
-    font-size: 16px;
-  }
-
-  .today-status {
-    grid-template-columns: 1fr 1fr;
-  }
-
-}
 
 /* =========================================================
    ATTENDANCE MODAL
    ========================================================= */
 
 body.attendance-modal-open {
+
   overflow: hidden;
+
 }
 
+
 .attendance-modal {
+
   position: fixed;
+
   inset: 0;
 
   z-index: 5000;
@@ -1297,81 +1725,100 @@ body.attendance-modal-open {
   display: none;
 
   align-items: center;
+
   justify-content: center;
 
-  padding: 20px;
+  padding: 15px;
+
 }
 
 
 .attendance-modal.show {
+
   display: flex;
+
 }
 
 
-/* OVERLAY */
-
 .attendance-modal-overlay {
+
   position: absolute;
+
   inset: 0;
 
   background:
-    rgba(15, 23, 42, .58);
+    rgba(8,36,64,.57);
 
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter:
+    blur(5px);
+
+  -webkit-backdrop-filter:
+    blur(5px);
+
 }
 
 
-/* DIALOG */
-
 .attendance-modal-dialog {
+
   position: relative;
 
-  width: min(680px, 100%);
+  z-index: 2;
 
-  max-height: calc(100vh - 40px);
+  width:
+    min(650px,100%);
+
+  max-height:
+    calc(100vh - 30px);
 
   display: flex;
+
   flex-direction: column;
-
-  background: #ffffff;
-
-  border-radius: 20px;
 
   overflow: hidden;
 
+  border-radius: 22px;
+
+  background:
+    #fff;
+
   box-shadow:
-    0 30px 80px
-    rgba(15, 23, 42, .30);
+    0 25px 70px
+    rgba(0,0,0,.28);
 
   animation:
-    attendanceModalIn
-    .22s ease;
+    modal-in .22s ease;
+
 }
 
 
-@keyframes attendanceModalIn {
+@keyframes modal-in {
 
   from {
+
     opacity: 0;
 
     transform:
-      translateY(18px)
-      scale(.97);
+      translateY(15px)
+      scale(.98);
+
   }
 
   to {
+
     opacity: 1;
 
     transform:
       translateY(0)
       scale(1);
+
   }
 
 }
 
 
-/* HEADER */
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
 
 .attendance-modal-header {
 
@@ -1383,19 +1830,21 @@ body.attendance-modal-open {
 
   justify-content: space-between;
 
-  gap: 15px;
+  gap: 10px;
 
   padding:
-    20px 25px;
+    17px 20px;
+
+  color: #fff;
 
   background:
+
     linear-gradient(
       135deg,
-      #1769e0,
-      #2476ed
+      #0b68d2,
+      #0754a9
     );
 
-  color: #ffffff;
 }
 
 
@@ -1405,111 +1854,97 @@ body.attendance-modal-open {
 
   align-items: center;
 
-  gap: 14px;
+  gap: 11px;
 
-  min-width: 0;
 }
 
 
 .attendance-modal-icon {
 
-  width: 42px;
-  height: 42px;
+  width: 40px;
 
-  flex-shrink: 0;
+  height: 40px;
 
   display: flex;
 
   align-items: center;
+
   justify-content: center;
 
   border-radius: 12px;
 
   background:
-    rgba(255,255,255,.16);
+    rgba(255,255,255,.14);
 
-  border:
-    1px solid
-    rgba(255,255,255,.20);
+  font-size: 18px;
 
-  font-size: 22px;
-
-  font-weight: 800;
 }
 
 
 .attendance-modal-title {
 
-  font-size: 20px;
-
-  line-height: 1.25;
+  font-size: 15px;
 
   font-weight: 800;
+
 }
 
 
 .attendance-modal-subtitle {
 
-  margin-top: 4px;
+  margin-top: 2px;
 
-  font-size: 11px;
+  font-size: 8px;
 
   color:
-    rgba(255,255,255,.78);
+    rgba(255,255,255,.72);
+
 }
 
 
 .attendance-modal-close {
 
-  flex-shrink: 0;
+  width: 37px;
 
-  width: 40px;
-  height: 40px;
+  height: 37px;
+
+  flex-shrink: 0;
 
   border: 0;
 
   border-radius: 10px;
 
-  background: transparent;
+  background:
+    rgba(255,255,255,.10);
 
-  color: rgba(255,255,255,.75);
+  color:
+    #fff;
 
-  font-size: 34px;
-
-  line-height: 1;
+  font-size: 24px;
 
   cursor: pointer;
 
-  transition: .2s;
 }
 
 
-.attendance-modal-close:hover {
-
-  background:
-    rgba(255,255,255,.12);
-
-  color: #ffffff;
-
-}
-
-
-/* BODY */
+/* =========================================================
+   MODAL BODY
+   ========================================================= */
 
 .attendance-modal-body {
 
   overflow-y: auto;
 
   padding:
-    24px 25px 10px;
+    20px 20px 5px;
+
 }
 
 
-/* FIELD */
-
 .attendance-field {
 
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+
 }
 
 
@@ -1517,28 +1952,30 @@ body.attendance-modal-open {
 
   display: block;
 
-  margin-bottom: 8px;
+  margin-bottom: 7px;
 
-  font-size: 14px;
+  color:
+    #63798d;
+
+  font-size: 10px;
 
   font-weight: 800;
 
-  color: #68727e;
 }
 
 
 .attendance-label span {
 
-  color: #dc2626;
+  color:
+    #dc2626;
 
 }
 
 
-/* SELECT */
-
 .attendance-select-wrap {
 
   position: relative;
+
 }
 
 
@@ -1546,35 +1983,45 @@ body.attendance-modal-open {
 
   width: 100%;
 
-  min-height: 56px;
+  min-height: 48px;
 
   padding:
-    0 46px 0 18px;
+    0 40px 0 13px;
 
   border:
-    2px solid #dfe4ea;
+    1px solid
+    #dce7ef;
 
-  border-radius: 12px;
+  border-radius: 11px;
 
-  background: #ffffff;
+  outline: 0;
 
-  color: #2f343b;
+  background:
+    #fff;
+
+  color:
+    #294964;
 
   font-family: inherit;
 
-  font-size: 15px;
+  font-size: 11px;
 
   appearance: none;
 
-  -webkit-appearance: none;
-
   cursor: pointer;
 
-  outline: none;
+}
 
-  transition:
-    border-color .2s,
-    box-shadow .2s;
+
+.attendance-select:focus {
+
+  border-color:
+    #3a91e9;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(58,145,233,.10);
+
 }
 
 
@@ -1584,520 +2031,115 @@ body.attendance-modal-open {
 
   position: absolute;
 
+  right: 14px;
+
   top: 50%;
-  right: 17px;
 
   transform:
     translateY(-55%);
 
   pointer-events: none;
 
-  color: #39414a;
+  color:
+    #698196;
 
-  font-size: 24px;
+  font-size: 19px;
 
-  font-weight: 600;
 }
 
-
-.attendance-select:focus {
-
-  border-color: #2476ed;
-
-  box-shadow:
-    0 0 0 4px
-    rgba(36,118,237,.10);
-}
-
-
-/* TEXTAREA */
 
 .attendance-textarea {
 
   width: 100%;
 
-  min-height: 105px;
+  min-height: 95px;
 
   padding:
-    14px 16px;
+    11px 13px;
 
   resize: vertical;
 
   border:
-    1px solid #dfe4ea;
+    1px solid
+    #dce7ef;
 
-  border-radius: 12px;
+  border-radius: 11px;
 
-  background: #ffffff;
+  outline: 0;
 
-  color: #30353b;
+  background:
+    #fff;
+
+  color:
+    #294964;
 
   font-family: inherit;
 
-  font-size: 14px;
+  font-size: 10px;
 
   line-height: 1.5;
 
-  outline: none;
-
-  transition:
-    border-color .2s,
-    box-shadow .2s;
 }
 
 
 .attendance-textarea:focus {
 
-  border-color: #2476ed;
+  border-color:
+    #3a91e9;
 
   box-shadow:
-    0 0 0 4px
-    rgba(36,118,237,.10);
+    0 0 0 3px
+    rgba(58,145,233,.10);
+
 }
 
-
-.attendance-textarea::placeholder {
-
-  color: #8b929b;
-}
-
-
-/* COUNTER */
 
 .attendance-counter {
 
-  margin-top: 5px;
+  margin-top: 4px;
 
   text-align: right;
 
-  color: #9aa2ad;
+  color:
+    #9aacbb;
 
-  font-size: 10px;
-}
+  font-size: 8px;
 
-
-/* FOOTER */
-
-.attendance-modal-footer {
-
-  flex-shrink: 0;
-
-  display: flex;
-
-  justify-content: flex-end;
-
-  gap: 12px;
-
-  padding:
-    14px 25px;
-
-  border-top:
-    1px solid #e7ebef;
-
-  background:
-    #fbfcfd;
-}
-
-
-/* BUTTON */
-
-.attendance-btn {
-
-  min-height: 48px;
-
-  padding:
-    0 22px;
-
-  border-radius: 11px;
-
-  font-family: inherit;
-
-  font-size: 14px;
-
-  font-weight: 800;
-
-  cursor: pointer;
-
-  transition:
-    transform .15s,
-    box-shadow .15s,
-    opacity .15s;
-}
-
-
-.attendance-btn:active {
-
-  transform:
-    translateY(1px);
-}
-
-
-/* CANCEL */
-
-.attendance-btn-cancel {
-
-  border:
-    1px solid #dce2e8;
-
-  background: #ffffff;
-
-  color: #20252b;
-}
-
-
-.attendance-btn-cancel:hover {
-
-  background: #f5f7f9;
-}
-
-
-/* CONFIRM */
-
-.attendance-btn-confirm {
-
-  min-width: 210px;
-
-  border: 0;
-
-  background:
-    linear-gradient(
-      135deg,
-      #1769e0,
-      #2476ed
-    );
-
-  color: #ffffff;
-
-  box-shadow:
-    0 7px 18px
-    rgba(36,118,237,.25);
-}
-
-
-.attendance-btn-confirm:hover {
-
-  box-shadow:
-    0 10px 24px
-    rgba(36,118,237,.32);
-
-  transform:
-    translateY(-1px);
-}
-
-
-.attendance-btn-confirm:disabled {
-
-  opacity: .65;
-
-  cursor: not-allowed;
-
-  transform: none;
-
-  box-shadow: none;
-}
-
-
-.confirm-check-icon {
-
-  margin-right: 6px;
-
-  font-size: 17px;
 }
 
 
 /* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 700px) {
-
-  .attendance-modal {
-
-    padding: 8px;
-  }
-
-
-  .attendance-modal-dialog {
-
-    max-height:
-      calc(100vh - 16px);
-
-    border-radius: 16px;
-  }
-
-
-  .attendance-modal-header {
-
-    padding:
-      16px 17px;
-  }
-
-
-  .attendance-modal-title {
-
-    font-size: 17px;
-  }
-
-
-  .attendance-modal-subtitle {
-
-    display: none;
-  }
-
-
-  .attendance-modal-icon {
-
-    width: 38px;
-    height: 38px;
-
-    font-size: 19px;
-  }
-
-
-  .attendance-modal-body {
-
-    padding:
-      20px 17px 5px;
-  }
-
-
-  .attendance-field {
-
-    margin-bottom: 16px;
-  }
-
-
-  .attendance-label {
-
-    font-size: 13px;
-  }
-
-
-  .attendance-select {
-
-    min-height: 52px;
-
-    font-size: 14px;
-  }
-
-
-  .attendance-modal-footer {
-
-    padding:
-      12px 17px;
-
-    gap: 8px;
-  }
-
-
-  .attendance-btn {
-
-    flex: 1;
-
-    padding:
-      0 13px;
-
-    font-size: 13px;
-  }
-
-
-  .attendance-btn-confirm {
-
-    min-width: 0;
-  }
-
-}
-
-/* =========================================================
-   OFFICE HOUR - AUTO SCHEDULE
+   AUTO SCHEDULE
    ========================================================= */
 
 .attendance-office-schedule {
-  position: relative;
 
   display: flex;
+
   align-items: center;
-  gap: 13px;
 
-  min-height: 76px;
+  gap: 10px;
 
-  padding: 14px 15px;
+  padding:
+    12px;
 
-  border-radius: 14px;
+  border:
+    1px solid
+    #dcebf6;
+
+  border-radius: 12px;
 
   background:
-    linear-gradient(
-      135deg,
-      #eef6ff,
-      #f8fbff
-    );
+    #f5faff;
 
-  border: 1px solid #d9e8f8;
-
-  overflow: hidden;
 }
 
 
 .office-schedule-icon {
 
-  width: 42px;
-  height: 42px;
+  width: 37px;
 
-  flex: 0 0 42px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 12px;
-
-  background: #ffffff;
-
-  box-shadow:
-    0 5px 15px
-    rgba(22,69,143,.08);
-
-  font-size: 19px;
-}
-
-
-.office-schedule-content {
-  min-width: 0;
-}
-
-
-.office-schedule-day {
-
-  font-size: 10px;
-
-  font-weight: 700;
-
-  color: #64748b;
-
-  margin-bottom: 3px;
-}
-
-
-.office-schedule-hours {
-
-  font-size: 17px;
-
-  line-height: 1.2;
-
-  font-weight: 800;
-
-  color: #16458f;
-}
-
-
-.office-schedule-tolerance {
-
-  margin-top: 4px;
-
-  font-size: 9px;
-
-  font-weight: 600;
-
-  color: #64748b;
-}
-
-
-.office-schedule-auto {
-
-  position: absolute;
-
-  top: 10px;
-  right: 10px;
-
-  padding: 4px 7px;
-
-  border-radius: 6px;
-
-  background: #dff5e8;
-
-  color: #16803b;
-
-  font-size: 7px;
-
-  font-weight: 800;
-
-  letter-spacing: .5px;
-}
-
-
-.attendance-office-schedule[hidden] {
-  display: none !important;
-}
-
-
-@media (max-width: 700px) {
-
-  .attendance-office-schedule {
-    min-height: 70px;
-    padding: 12px;
-  }
-
-  .office-schedule-hours {
-    font-size: 15px;
-  }
-
-  .office-schedule-auto {
-    font-size: 6px;
-  }
-
-}
-
-/* =========================================================
-   LAMPIRAN SURAT DINAS
-   ========================================================= */
-
-#checkInDinasAttachmentField[hidden] {
-  display: none !important;
-}
-
-
-.attendance-file-box {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 12px;
-
-  min-height: 72px;
-
-  padding: 12px 14px;
-
-  border:
-    1px dashed
-    #cbd5e1;
-
-  border-radius: 12px;
-
-  background:
-    #f8fbff;
-
-  transition:
-    border-color .2s,
-    background .2s;
-}
-
-
-.attendance-file-box:hover {
-
-  border-color:
-    #2476ed;
-
-  background:
-    #f5f9ff;
-}
-
-
-.attendance-file-icon {
-
-  width: 42px;
-
-  height: 42px;
+  height: 37px;
 
   flex-shrink: 0;
 
@@ -2110,9 +2152,109 @@ body.attendance-modal-open {
   border-radius: 10px;
 
   background:
-    #eaf3ff;
+    #e6f3ff;
 
-  font-size: 19px;
+  font-size: 16px;
+
+}
+
+
+.office-schedule-content {
+
+  flex: 1;
+
+  min-width: 0;
+
+}
+
+
+.office-schedule-day {
+
+  font-size: 8px;
+
+  color:
+    var(--muted);
+
+}
+
+
+.office-schedule-hours {
+
+  margin-top: 2px;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  color:
+    #24577e;
+
+}
+
+
+.office-schedule-tolerance {
+
+  margin-top: 2px;
+
+  font-size: 8px;
+
+  color:
+    #8195a8;
+
+}
+
+
+.office-schedule-auto {
+
+  padding:
+    5px 7px;
+
+  border-radius: 6px;
+
+  background:
+    #e7f7ed;
+
+  color:
+    #168044;
+
+  font-size: 7px;
+
+  font-weight: 800;
+
+}
+
+
+/* =========================================================
+   FILE UPLOAD
+   ========================================================= */
+
+.attendance-file-box {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding:
+    11px;
+
+  border:
+    1px dashed
+    #bfd5e6;
+
+  border-radius: 11px;
+
+  background:
+    #f8fcff;
+
+}
+
+
+.attendance-file-icon {
+
+  font-size: 18px;
+
 }
 
 
@@ -2120,949 +2262,1638 @@ body.attendance-modal-open {
 
   flex: 1;
 
-  min-width: 0;
 }
 
 
 .attendance-file-title {
 
-  font-size: 13px;
+  font-size: 10px;
 
   font-weight: 800;
 
-  color: #26364d;
+  color:
+    #315875;
+
 }
 
 
-.attendance-file-desc {
+.attendance-file-desc,
+.attendance-file-format {
 
   margin-top: 2px;
 
-  font-size: 11px;
+  font-size: 8px;
 
-  color: #64748b;
-}
+  color:
+    #8295a7;
 
-
-.attendance-file-format {
-
-  margin-top: 3px;
-
-  font-size: 9px;
-
-  color: #94a3b8;
 }
 
 
 .attendance-file-button {
 
-  flex-shrink: 0;
-
   padding:
-    9px 14px;
+    7px 10px;
 
-  border-radius: 9px;
+  border-radius: 8px;
 
   background:
-    #eaf3ff;
+    #e9f4ff;
 
   color:
-    #1769e0;
+    #1167bf;
 
-  font-size: 11px;
+  font-size: 8px;
 
   font-weight: 800;
 
   cursor: pointer;
 
-  transition: .2s;
-}
-
-
-.attendance-file-button:hover {
-
-  background:
-    #dcecff;
 }
 
 
 .attendance-file-name {
 
-  margin-top: 7px;
+  margin-top: 5px;
 
-  padding-left: 4px;
+  color:
+    #547089;
 
-  font-size: 10px;
-
-  color: #475569;
+  font-size: 8px;
 
 }
 
 
 .attendance-file-name.error {
 
-  color: #dc2626;
+  color:
+    #dc2626;
 
-  font-weight: 700;
 }
+
 
 /* =========================================================
-   SWEETALERT2 - JNDA
+   MODAL FOOTER
    ========================================================= */
 
-.jnda-swal-popup {
+.attendance-modal-footer {
 
-  width: min(420px, calc(100vw - 32px)) !important;
+  flex-shrink: 0;
 
-  border-radius: 22px !important;
+  display: flex;
 
-  padding: 28px 24px !important;
+  justify-content: flex-end;
 
-  font-family:
-    Inter,
-    "Segoe UI",
-    Arial,
-    sans-serif !important;
+  gap: 9px;
 
-}
+  padding:
+    12px 20px;
 
-.jnda-swal-popup .swal2-title {
+  border-top:
+    1px solid
+    #e8eff4;
 
-  color: #172033 !important;
-
-  font-size: 20px !important;
-
-  font-weight: 800 !important;
+  background:
+    #fbfdff;
 
 }
 
-.jnda-swal-popup .swal2-html-container,
-.jnda-swal-popup .swal2-content {
 
-  color: #728096 !important;
+.attendance-btn {
 
-  font-size: 13px !important;
+  min-height: 43px;
 
-  line-height: 1.6 !important;
+  padding:
+    0 17px;
+
+  border-radius: 10px;
+
+  font-family: inherit;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  cursor: pointer;
 
 }
 
-.jnda-swal-popup .swal2-confirm {
 
-  min-width: 100px;
+.attendance-btn-cancel {
 
-  border-radius: 11px !important;
+  border:
+    1px solid
+    #dbe5ec;
 
-  padding: 11px 22px !important;
+  background:
+    #fff;
 
-  font-size: 12px !important;
+  color:
+    #54697b;
 
-  font-weight: 700 !important;
+}
+
+
+.attendance-btn-confirm {
+
+  min-width: 185px;
+
+  border: 0;
+
+  background:
+
+    linear-gradient(
+      135deg,
+      #0c72d7,
+      #0754a9
+    );
+
+  color: #fff;
 
   box-shadow:
-    0 7px 18px
-    rgba(22,69,143,.20) !important;
+    0 6px 16px
+    rgba(8,84,169,.18);
+
+}
+
+
+.attendance-btn:disabled {
+
+  opacity: .55;
+
+  cursor:
+    not-allowed;
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .jnda-sidebar {
+
+    transform:
+      translateX(-100%);
+
+  }
+
+
+  .jnda-sidebar.mobile-open {
+
+    transform:
+      translateX(0);
+
+    box-shadow:
+      12px 0 35px
+      rgba(0,0,0,.16);
+
+  }
+
+
+  .jnda-main {
+
+    margin-left: 0;
+
+  }
+
+
+  .mobile-menu-button {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+  }
+
+
+  .jnda-topbar {
+
+    height: 62px;
+
+    padding:
+      0 13px;
+
+  }
+
+
+  .jnda-content {
+
+    padding:
+      13px 13px 90px;
+
+  }
+
+
+  .top-user-text {
+
+    display: none;
+
+  }
+
+
+  .welcome-card {
+
+    min-height: 245px;
+
+    border-radius: 20px;
+
+    background-position:
+      63% center;
+
+  }
+
+
+  .welcome-content {
+
+    padding:
+      22px 19px;
+
+  }
+
+
+  .welcome-title {
+
+    font-size: 25px;
+
+  }
+
+
+  .welcome-clock {
+
+    top: 17px;
+
+    right: 17px;
+
+    min-width: 120px;
+
+    padding:
+      8px 10px;
+
+    border-radius: 11px;
+
+  }
+
+
+  .welcome-clock-time {
+
+    font-size: 17px;
+
+  }
+
+
+  .welcome-clock-zone {
+
+    font-size: 7px;
+
+  }
+
+
+  .dashboard-grid {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  .management-grid {
+
+    grid-template-columns:
+      1fr 1fr;
+
+  }
+
+
+  .mobile-bottom-nav {
+
+    position: fixed;
+
+    left: 10px;
+
+    right: 10px;
+
+    bottom: 10px;
+
+    z-index: 700;
+
+    height: 62px;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(3,1fr);
+
+    align-items: center;
+
+    padding:
+      5px;
+
+    border-radius: 18px;
+
+    background:
+      rgba(255,255,255,.95);
+
+    border:
+      1px solid
+      rgba(183,204,219,.55);
+
+    box-shadow:
+      0 10px 35px
+      rgba(16,63,96,.15);
+
+    backdrop-filter:
+      blur(15px);
+
+  }
+
+
+  .mobile-nav-item {
+
+    height: 52px;
+
+    border: 0;
+
+    border-radius: 13px;
+
+    background:
+      transparent;
+
+    color:
+      #8397a9;
+
+    font-family: inherit;
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+  }
+
+
+  .mobile-nav-item i {
+
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 16px;
+
+  }
+
+
+  .mobile-nav-item.active {
+
+    background:
+      #eaf4ff;
+
+    color:
+      #0967c9;
+
+  }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 560px) {
+
+  .navbar-logo.partner {
+
+    display: none;
+
+  }
+
+
+  .logo-divider {
+
+    display: none;
+
+  }
+
+
+  .navbar-logo.jn {
+
+    width: 98px;
+
+    height: 39px;
+
+  }
+
+
+  .attendance-actions {
+
+    grid-template-columns:
+      1fr;
+
+    gap: 9px;
+
+  }
+
+
+  .attendance-button {
+
+    min-height: 62px;
+
+    border-radius: 14px;
+
+    padding:
+      9px 12px;
+
+  }
+
+
+  .attendance-button-icon {
+
+    width: 37px;
+
+    height: 37px;
+
+    border-radius: 11px;
+
+  }
+
+
+  .attendance-button-title {
+
+    font-size: 11px;
+
+  }
+
+
+  .attendance-button-subtitle {
+
+    font-size: 7px;
+
+  }
+
+
+  .welcome-card {
+
+    min-height: 250px;
+
+  }
+
+
+  .welcome-title {
+
+    font-size: 23px;
+
+  }
+
+
+  .welcome-name {
+
+    font-size: 15px;
+
+  }
+
+
+  .welcome-meta {
+
+    font-size: 8px;
+
+  }
+
+
+  .today-status {
+
+    grid-template-columns:
+      1fr 1fr;
+
+  }
+
+
+  .placement-grid {
+
+    grid-template-columns:
+      1fr 1fr;
+
+  }
+
+
+  .dashboard-grid {
+
+    gap: 10px;
+
+    margin-top: 10px;
+
+  }
+
+
+  .card-body {
+
+    padding:
+      14px;
+
+  }
+
+
+  .card-header {
+
+    padding:
+      14px;
+
+  }
+
+
+  .attendance-modal {
+
+    align-items:
+      flex-end;
+
+    padding:
+      0;
+
+  }
+
+
+  .attendance-modal-dialog {
+
+    width: 100%;
+
+    max-height:
+      92vh;
+
+    border-radius:
+      22px 22px 0 0;
+
+  }
+
+
+  .attendance-modal-header {
+
+    padding:
+      15px;
+
+  }
+
+
+  .attendance-modal-body {
+
+    padding:
+      17px 15px 4px;
+
+  }
+
+
+  .attendance-modal-footer {
+
+    padding:
+      10px 15px;
+
+  }
+
+
+  .attendance-btn {
+
+    flex: 1;
+
+    min-height: 43px;
+
+  }
+
+
+  .attendance-btn-confirm {
+
+    min-width: 0;
+
+  }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 370px) {
+
+  .welcome-clock {
+
+    position: relative;
+
+    top: auto;
+    right: auto;
+
+    margin:
+      -5px 0 12px auto;
+
+    width:
+      fit-content;
+
+  }
+
+
+  .welcome-content {
+
+    padding:
+      18px 15px;
+
+  }
+
+
+  .welcome-card {
+
+    min-height:
+      260px;
+
+  }
+
+
+  .welcome-title {
+
+    font-size:
+      21px;
+
+  }
 
 }
 
 </style>
 
 
-<div class="jnda-app">
+<!-- =========================================================
+     DASHBOARD LOADING
+     ========================================================= -->
 
+<section
+  id="dashboardLoading"
+  class="dashboard-loading"
+>
 
-  <!-- =====================================================
-       SIDEBAR
-       ====================================================== -->
+  <div class="loading-spinner"></div>
 
-  <aside
-    id="jndaSidebar"
-    class="jnda-sidebar">
+  <div>
+    Memuat dashboard...
+  </div>
 
-    <nav class="sidebar-nav">
+</section>
 
-      <div class="nav-section-title">
-        Utama
-      </div>
 
+<!-- =========================================================
+     SIDEBAR
+     ========================================================= -->
 
-      <button
-        class="nav-item active"
-        onclick="navigateTo('dashboard')">
+<aside
+  id="jndaSidebar"
+  class="jnda-sidebar"
+>
 
-        <span class="nav-icon">
-          🏠
-        </span>
 
-        Dashboard
+  <div class="sidebar-brand">
 
-      </button>
+    <img
+      class="sidebar-brand-logo"
+      src="https://drive.google.com/thumbnail?id=1cWdr6D-5exT4PPHCA94zsrjyXvkK-tVp&sz=w500"
+      alt="JN"
+      referrerpolicy="no-referrer"
+    >
 
-
-      <!-- SEMUA PEGAWAI -->
-
-      <div id="employeeMenuGroup">
-
-        <button
-          class="nav-item"
-          onclick="navigateTo('attendance-history')">
-
-          <span class="nav-icon">
-            📋
-          </span>
-
-          Riwayat Kehadiran
-
-        </button>
-
-
-        <button
-          class="nav-item"
-          onclick="navigateTo('leave')">
-
-          <span class="nav-icon">
-            📅
-          </span>
-
-          Cuti / Izin
-
-        </button>
-
-      </div>
-
-      <!-- =========================================================
-              BRANCH ADMIN MENU
-          ========================================================= -->
-          <div id="scheduleMenuGroup" style="display:none;">
-
-            <div class="nav-section-title">
-              Operasional
-            </div>
-
-            <button
-              class="nav-item"
-              onclick="navigateTo('schedule')"
-            >
-              📅
-              <span>Manajemen Jadwal</span>
-            </button>
-
-          </div>
-
-
-      <!-- MANAGEMENT -->
-
-      <div
-        id="managementMenuGroup"
-        style="display:none;">
-
-        <div class="nav-section-title">
-          Monitoring
-        </div>
-
-
-        <button
-          class="nav-item"
-          onclick="navigateTo('report')">
-
-          <span class="nav-icon">
-            📊
-          </span>
-
-          Laporan
-
-        </button>
-
-
-        <button
-          class="nav-item"
-          onclick="navigateTo('monitoring')">
-
-          <span class="nav-icon">
-            👥
-          </span>
-
-          Monitoring
-
-        </button>
-
-      </div>
-
-
-      <!-- ADMIN -->
-
-      <div
-        id="adminMenuGroup"
-        style="display:none;">
-
-        <div class="nav-section-title">
-          Administrator
-        </div>
-
-
-        <button
-          class="nav-item"
-          onclick="navigateTo('users')">
-
-          <span class="nav-icon">
-            👤
-          </span>
-
-          User Management
-
-        </button>
-
-
-        <button
-          class="nav-item"
-          onclick="navigateTo('master')">
-
-          <span class="nav-icon">
-            ⚙️
-          </span>
-
-          Master Data
-
-        </button>
-
-
-        <button
-          class="nav-item"
-          onclick="navigateTo('backup')">
-
-          <span class="nav-icon">
-            💾
-          </span>
-
-          Backup
-
-        </button>
-
-      </div>
-
-    </nav>
-
-
-    <div class="sidebar-footer">
-
-      <button
-        class="logout-button"
-        onclick="logoutUser()">
-
-        🚪 &nbsp; Keluar
-
-      </button>
-
+    <div class="sidebar-brand-title">
+      JN Daily Attendance
     </div>
 
-  </aside>
+    <div class="sidebar-brand-subtitle">
+      PT. Jembatan Nusantara
+    </div>
 
-
-  <!-- MOBILE OVERLAY -->
-
-  <div
-    id="sidebarOverlay"
-    class="sidebar-overlay"
-    onclick="closeMobileSidebar()">
   </div>
 
 
-  <!-- =====================================================
-       MAIN
-       ====================================================== -->
+  <!-- =======================================================
+       SIDEBAR NAV
+       ======================================================= -->
 
-  <main class="jnda-main">
-
-
-    <!-- NAVBAR -->
-
-    <header class="jnda-topbar">
+  <nav class="sidebar-nav">
 
 
-      <div class="topbar-left">
-
-        <button
-          class="mobile-menu-button"
-          onclick="toggleMobileSidebar()">
-
-          ☰
-
-        </button>
+    <div class="nav-section-title">
+      Menu Utama
+    </div>
 
 
-        <!-- 3 LOGO DI NAVBAR -->
+    <button
+      type="button"
+      class="nav-item active"
+      data-menu="dashboard"
+      onclick="showDashboardMenu('dashboard')"
+    >
 
-        <div class="navbar-logos">
+      <span class="nav-icon">
+        <i class="fa-solid fa-house"></i>
+      </span>
 
-          <img
-            class="navbar-logo partner"
-            src="https://drive.google.com/thumbnail?id=1HCOqgfla9hUzaW3bF3beymYn8q64zAdA&sz=w250"
-            alt="Danantara">
+      <span>
+        Dashboard
+      </span>
 
-
-          <span class="logo-divider"></span>
-
-
-          <img
-            class="navbar-logo partner"
-            src="https://drive.google.com/thumbnail?id=1J5YLMEAbsoVkqFbWxeT2FTRcCYpooHzZ&sz=w250"
-            alt="ASDP">
-
-          <span class="logo-divider"></span>
-
-          <img
-            class="navbar-logo jn"
-            src="https://drive.google.com/thumbnail?id=1UiZRAwhuxTzgYAEKdDMF1-qTF8D9K_bH&sz=w400"
-            alt="PT Jembatan Nusantara">
-          
-
-        </div>
-
-      </div>
+    </button>
 
 
-      <div class="top-user">
+    <button
+      type="button"
+      class="nav-item"
+      data-menu="attendance"
+      onclick="showDashboardMenu('attendance')"
+    >
+
+      <span class="nav-icon">
+        <i class="fa-solid fa-calendar-check"></i>
+      </span>
+
+      <span>
+        Kehadiran
+      </span>
+
+    </button>
+
+
+    <button
+      type="button"
+      class="nav-item"
+      data-menu="schedule"
+      onclick="showDashboardMenu('schedule')"
+    >
+
+      <span class="nav-icon">
+        <i class="fa-solid fa-calendar-days"></i>
+      </span>
+
+      <span>
+        Jadwal
+      </span>
+
+    </button>
+
+
+    <button
+      type="button"
+      class="nav-item"
+      data-menu="profile"
+      onclick="showDashboardMenu('profile')"
+    >
+
+      <span class="nav-icon">
+        <i class="fa-solid fa-user"></i>
+      </span>
+
+      <span>
+        Profil
+      </span>
+
+    </button>
+
+
+    <div class="nav-section-title">
+      Lainnya
+    </div>
+
+
+    <button
+      type="button"
+      class="nav-item"
+      data-menu="leave"
+      onclick="showDashboardMenu('leave')"
+    >
+
+      <span class="nav-icon">
+        <i class="fa-solid fa-file-lines"></i>
+      </span>
+
+      <span>
+        Pengajuan
+      </span>
+
+    </button>
+
+
+    <button
+      type="button"
+      class="nav-item"
+      data-menu="correction"
+      onclick="showDashboardMenu('correction')"
+    >
+
+      <span class="nav-icon">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </span>
+
+      <span>
+        Koreksi Presensi
+      </span>
+
+    </button>
+
+
+  </nav>
+
+
+  <div class="sidebar-footer">
+
+    <button
+      type="button"
+      class="logout-button"
+      onclick="logout()"
+    >
+
+      <i class="fa-solid fa-right-from-bracket"></i>
+
+      &nbsp;
+
+      Keluar
+
+    </button>
+
+  </div>
+
+</aside>
+
+
+<!-- =========================================================
+     MOBILE SIDEBAR OVERLAY
+     ========================================================= -->
+
+<div
+  id="sidebarOverlay"
+  class="sidebar-overlay"
+  onclick="toggleSidebar()"
+></div>
+
+
+<!-- =========================================================
+     MAIN
+     ========================================================= -->
+
+<main class="jnda-main">
+
+
+  <!-- =======================================================
+       TOPBAR
+       ======================================================= -->
+
+  <header class="jnda-topbar">
+
+
+    <div class="topbar-left">
+
+
+      <button
+        type="button"
+        class="mobile-menu-button"
+        onclick="toggleSidebar()"
+        aria-label="Menu"
+      >
+
+        <i class="fa-solid fa-bars"></i>
+
+      </button>
+
+
+      <div class="navbar-logos">
+
+        <img
+          class="navbar-logo jn"
+          src="https://drive.google.com/thumbnail?id=1cWdr6D-5exT4PPHCA94zsrjyXvkK-tVp&sz=w500"
+          alt="Logo JN"
+          referrerpolicy="no-referrer"
+        >
+
+        <div class="logo-divider"></div>
 
         <div
-          id="topAvatar"
-          class="top-avatar">
-
-          P
-
-        </div>
-
-
-        <div class="top-user-text">
-
-          <div
-            id="topUserName"
-            class="top-user-name">
-
-            Pegawai
-
-          </div>
-
-
-          <div
-            id="topUserRole"
-            class="top-user-role">
-
-            PEGAWAI
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </header>
-
-
-    <!-- CONTENT -->
-
-    <section class="jnda-content">
-
-
-      <!-- LOADING -->
-
-      <div
-        id="dashboardLoading"
-        class="jnda-card dashboard-loading">
-
-        <div class="loading-spinner"></div>
-
-        <div>
-          Memuat dashboard...
+          class="navbar-logo partner"
+          style="
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#0b5fc6;
+            font-size:9px;
+            font-weight:800;
+          "
+        >
+          JNDA
         </div>
 
       </div>
 
 
-      <!-- DASHBOARD -->
+    </div>
+
+
+    <div class="top-user">
+
 
       <div
-        id="dashboardContent"
-        style="display:none;">
+        id="topAvatar"
+        class="top-avatar"
+      >
+        JN
+      </div>
 
 
-        <!-- HERO -->
+      <div class="top-user-text">
 
-        <section class="welcome-card">
+        <div
+          id="topUserName"
+          class="top-user-name"
+        >
+          Pegawai
+        </div>
 
-          <div class="welcome-content">
 
-            <div class="welcome-kicker">
-              JN Daily Attendance · V3
+        <div
+          id="topUserRole"
+          class="top-user-role"
+        >
+          Employee
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+  </header>
+
+
+  <!-- =======================================================
+       CONTENT
+       ======================================================= -->
+
+  <div
+    id="dashboardMain"
+    class="jnda-content"
+  >
+
+
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
+
+    <section class="welcome-card">
+
+
+      <div class="welcome-clock">
+
+
+        <div
+          id="clockTime"
+          class="welcome-clock-time"
+        >
+          --:--
+        </div>
+
+
+        <div class="welcome-clock-zone">
+          WIB · Asia/Jakarta
+        </div>
+
+
+      </div>
+
+
+      <div class="welcome-content">
+
+
+        <div class="welcome-kicker">
+
+          <i class="fa-solid fa-anchor"></i>
+
+          JN DAILY ATTENDANCE
+
+        </div>
+
+
+        <h1 class="welcome-title">
+
+          Selamat datang 👋
+
+        </h1>
+
+
+        <div
+          id="welcomeName"
+          class="welcome-name"
+        >
+          Pegawai
+        </div>
+
+
+        <div class="welcome-meta">
+
+
+          <span>
+
+            <i class="fa-solid fa-id-card"></i>
+
+            &nbsp;
+
+            <span id="welcomeEmployeeId">
+              -
+            </span>
+
+          </span>
+
+
+          <span>
+
+            <i class="fa-solid fa-location-dot"></i>
+
+            &nbsp;
+
+            <span id="welcomeContext">
+              Penempatan
+            </span>
+
+          </span>
+
+
+        </div>
+
+
+      </div>
+
+
+    </section>
+
+
+    <!-- =====================================================
+         ABSEN ACTION
+         ===================================================== -->
+
+    <section class="attendance-actions">
+
+
+      <button
+        type="button"
+        class="attendance-button check-in"
+        onclick="openCheckInModal()"
+      >
+
+        <span class="attendance-button-icon">
+
+          <i class="fa-solid fa-right-to-bracket"></i>
+
+        </span>
+
+
+        <span>
+
+          <span class="attendance-button-title">
+            Absen Masuk
+          </span>
+
+          <span class="attendance-button-subtitle">
+            Catat kehadiran Anda
+          </span>
+
+        </span>
+
+      </button>
+
+
+      <button
+        type="button"
+        class="attendance-button check-out"
+        onclick="openCheckOutModal()"
+      >
+
+        <span class="attendance-button-icon">
+
+          <i class="fa-solid fa-right-from-bracket"></i>
+
+        </span>
+
+
+        <span>
+
+          <span class="attendance-button-title">
+            Absen Pulang
+          </span>
+
+          <span class="attendance-button-subtitle">
+            Selesaikan sesi kerja
+          </span>
+
+        </span>
+
+      </button>
+
+
+    </section>
+
+
+    <!-- =====================================================
+         GRID
+         ===================================================== -->
+
+    <section class="dashboard-grid">
+
+
+      <!-- ===================================================
+           LEFT
+           =================================================== -->
+
+      <div>
+
+
+        <!-- PROFILE -->
+
+        <div class="jnda-card">
+
+
+          <div class="card-header">
+
+            <div class="card-title">
+              Profil Pegawai
+            </div>
+
+            <div class="card-subtitle">
+              Informasi akun yang sedang login
+            </div>
+
+          </div>
+
+
+          <div class="card-body">
+
+
+            <div class="profile-layout">
+
+
+              <div
+                id="profileAvatar"
+                class="profile-avatar"
+              >
+                JN
+              </div>
+
+
+              <div>
+
+                <div
+                  id="profileName"
+                  class="profile-name"
+                >
+                  Pegawai
+                </div>
+
+
+                <div
+                  id="profileEmployeeId"
+                  class="profile-nip"
+                >
+                  NIP: -
+                </div>
+
+
+                <div
+                  id="profileContext"
+                  class="profile-context"
+                >
+
+                </div>
+
+              </div>
+
+
             </div>
 
 
-            <h1
-              id="welcomeTitle"
-              class="welcome-title">
-
-              Selamat datang
-
-            </h1>
+          </div>
 
 
-            <div
-              id="welcomeName"
-              class="welcome-name">
+        </div>
 
-              Pegawai
 
+        <!-- TODAY -->
+
+        <div
+          class="jnda-card"
+          style="margin-top:12px;"
+        >
+
+
+          <div class="card-header">
+
+            <div class="card-title">
+              Kehadiran Hari Ini
             </div>
 
+            <div class="card-subtitle">
+              Ringkasan presensi Anda hari ini
+            </div>
 
-            <div class="welcome-meta">
+          </div>
 
-              <span>
-                🪪 NIP:
-                <strong
-                  id="welcomeEmployeeId">
+
+          <div class="card-body">
+
+
+            <div class="today-status">
+
+
+              <div class="status-box">
+
+                <div class="status-label">
+                  Absen Masuk
+                </div>
+
+                <div
+                  id="todayCheckIn"
+                  class="status-value"
+                >
                   -
-                </strong>
-              </span>
+                </div>
+
+              </div>
 
 
-              <span>
-                📍
-                <strong
-                  id="welcomeContext">
-                  Penempatan
-                </strong>
-              </span>
+              <div class="status-box">
+
+                <div class="status-label">
+                  Absen Pulang
+                </div>
+
+                <div
+                  id="todayCheckOut"
+                  class="status-value"
+                >
+                  -
+                </div>
+
+              </div>
+
+
+              <div class="status-box">
+
+                <div class="status-label">
+                  Durasi Kerja
+                </div>
+
+                <div
+                  id="todayWorkingHours"
+                  class="status-value"
+                >
+                  -
+                </div>
+
+              </div>
+
+
+              <div class="status-box">
+
+                <div class="status-label">
+                  Status
+                </div>
+
+                <div
+                  id="todayStatus"
+                  class="status-value"
+                >
+                  Belum Absen
+                </div>
+
+              </div>
+
 
             </div>
+
 
           </div>
 
-          <div class="welcome-clock">
-            <div
-              id="digitalClock"
-              class="welcome-clock-time"
-            >
-              --:--:--
+
+        </div>
+
+
+        <!-- RECENT -->
+
+        <div
+          class="jnda-card"
+          style="margin-top:12px;"
+        >
+
+
+          <div class="card-header">
+
+            <div class="card-title">
+              Aktivitas Kehadiran
             </div>
 
-            <div
-              id="digitalClockZone"
-              class="welcome-clock-zone"
-            >
-              WIB
-            </div>
-          </div>
-
-        </section>
-
-
-        <!-- ABSEN -->
-
-        <section class="attendance-actions">
-
-
-          <button
-            class="attendance-button check-in"
-            onclick="openCheckInModal()">
-
-            <div class="attendance-button-icon">
-              🟢
-            </div>
-
-            <div>
-
-              <div style="
-                font-size:10px;
-                opacity:.8;
-              ">
-                KEHADIRAN
-              </div>
-
-              <div style="
-                font-size:16px;
-                font-weight:800;
-              ">
-                Absen Masuk
-              </div>
-
-              <div style="
-                font-size:9px;
-                opacity:.75;
-                margin-top:3px;
-              ">
-                Catat lokasi dan waktu masuk
-              </div>
-
-            </div>
-
-          </button>
-
-
-          <button
-            type="button"
-            class="attendance-button check-out"
-            onclick="openCheckOutModal()"
-          >
-
-            <div class="attendance-button-icon">
-              🔴
-            </div>
-
-            <div>
-
-              <div style="
-                font-size:10px;
-                opacity:.8;
-              ">
-                KEHADIRAN
-              </div>
-
-              <div style="
-                font-size:16px;
-                font-weight:800;
-              ">
-                Absen Pulang
-              </div>
-
-              <div style="
-                font-size:9px;
-                opacity:.75;
-                margin-top:3px;
-              ">
-                Catat waktu kepulangan
-              </div>
-
-            </div>
-
-          </button>
-
-
-        </section>
-
-
-        <!-- MAIN GRID -->
-
-        <section class="dashboard-grid">
-
-
-          <!-- LEFT -->
-
-          <div>
-
-
-            <!-- PROFILE -->
-
-            <div class="jnda-card">
-
-              <div class="card-header">
-
-                <div class="card-title">
-                  Profil Pegawai
-                </div>
-
-                <div class="card-subtitle">
-                  Informasi akun dan penempatan
-                </div>
-
-              </div>
-
-
-              <div class="card-body">
-
-                <div class="profile-layout">
-
-                  <div
-                    id="profileAvatar"
-                    class="profile-avatar">
-
-                    P
-
-                  </div>
-
-
-                  <div>
-
-                    <div
-                      id="profileName"
-                      class="profile-name">
-
-                      Pegawai
-
-                    </div>
-
-
-                    <div
-                      id="profileEmployeeId"
-                      class="profile-nip">
-
-                      NIP: -
-
-                    </div>
-
-
-                    <div
-                      id="profileContext"
-                      class="profile-context">
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <!-- RECENT -->
-
-            <div
-              class="jnda-card"
-              style="margin-top:16px;">
-
-              <div class="card-header">
-
-                <div class="card-title">
-                  Riwayat Kehadiran
-                </div>
-
-                <div class="card-subtitle">
-                  Data terakhir
-                </div>
-
-              </div>
-
-
-              <div class="card-body">
-
-                <div class="attendance-table-wrapper">
-
-                  <table class="attendance-table">
-
-                    <thead>
-
-                      <tr>
-
-                        <th>Tanggal</th>
-                        <th>Masuk</th>
-                        <th>Pulang</th>
-                        <th>Durasi</th>
-                        <th>Status</th>
-
-                      </tr>
-
-                    </thead>
-
-
-                    <tbody
-                      id="recentAttendanceBody">
-
-                      <tr>
-
-                        <td colspan="5">
-                          Belum ada data.
-                        </td>
-
-                      </tr>
-
-                    </tbody>
-
-                  </table>
-
-                </div>
-
-              </div>
-
+            <div class="card-subtitle">
+              Riwayat presensi terbaru
             </div>
 
           </div>
 
 
-          <!-- RIGHT -->
-
-          <div>
+          <div class="card-body">
 
 
-            <!-- TODAY -->
-
-            <div class="jnda-card">
-
-              <div class="card-header">
-
-                <div class="card-title">
-                  Status Hari Ini
-                </div>
-
-                <div class="card-subtitle">
-                  Kehadiran hari ini
-                </div>
-
-              </div>
+            <div class="attendance-table-wrapper">
 
 
-              <div class="card-body">
-
-                <div class="today-status">
-
-                  <div class="status-box">
-
-                    <div class="status-label">
-                      Absen Masuk
-                    </div>
-
-                    <div
-                      id="todayCheckIn"
-                      class="status-value">
-                      -
-                    </div>
-
-                  </div>
+              <table
+                class="attendance-table"
+              >
 
 
-                  <div class="status-box">
+                <thead>
 
-                    <div class="status-label">
-                      Absen Pulang
-                    </div>
+                  <tr>
 
-                    <div
-                      id="todayCheckOut"
-                      class="status-value">
-                      -
-                    </div>
+                    <th>
+                      Tanggal
+                    </th>
 
-                  </div>
+                    <th>
+                      Masuk
+                    </th>
 
+                    <th>
+                      Pulang
+                    </th>
 
-                  <div class="status-box">
+                    <th>
+                      Durasi
+                    </th>
 
-                    <div class="status-label">
-                      Durasi Kerja
-                    </div>
-
-                    <div
-                      id="todayWorkingHours"
-                      class="status-value">
-                      -
-                    </div>
-
-                  </div>
-
-
-                  <div class="status-box">
-
-                    <div class="status-label">
+                    <th>
                       Status
-                    </div>
+                    </th>
 
-                    <div
-                      id="todayStatus"
-                      class="status-value">
-                      Belum Absen
-                    </div>
+                  </tr>
 
-                  </div>
+                </thead>
 
-                </div>
 
-              </div>
+                <tbody
+                  id="recentAttendanceBody"
+                >
+
+                  <tr>
+
+                    <td colspan="5">
+
+                      <div
+                        class="empty-state"
+                      >
+                        Memuat data...
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+
+              </table>
+
 
             </div>
 
 
-            <!-- PLACEMENT -->
-
-            <div
-              class="jnda-card"
-              style="margin-top:16px;">
-
-              <div class="card-header">
-
-                <div class="card-title">
-                  Penempatan Kerja
-                </div>
-
-                <div class="card-subtitle">
-                  Informasi otomatis dari database
-                </div>
-
-              </div>
+          </div>
 
 
-              <div class="card-body">
-
-                <div style="
-                  display:grid;
-                  gap:10px;
-                ">
+        </div>
 
 
-                  <div class="status-box">
-
-                    <div class="status-label">
-                      UNIT / CABANG
-                    </div>
-
-                    <div
-                      id="infoBranch"
-                      class="status-value"
-                      style="font-size:12px;">
-                      -
-                    </div>
-
-                  </div>
+      </div>
 
 
-                  <div class="status-box">
+      <!-- ===================================================
+           RIGHT
+           =================================================== -->
 
-                    <div class="status-label">
-                      KAPAL
-                    </div>
-
-                    <div
-                      id="infoShip"
-                      class="status-value"
-                      style="font-size:12px;">
-                      -
-                    </div>
-
-                  </div>
+      <div>
 
 
-                  <div class="status-box">
+        <!-- QUICK INFO -->
 
-                    <div class="status-label">
-                      JABATAN
-                    </div>
-
-                    <div
-                      id="infoPosition"
-                      class="status-value"
-                      style="font-size:12px;">
-                      -
-                    </div>
-
-                  </div>
+        <div class="jnda-card">
 
 
-                </div>
+          <div class="card-header">
 
-              </div>
+            <div class="card-title">
+              Penempatan Kerja
+            </div>
 
+            <div class="card-subtitle">
+              Informasi dari database pegawai
             </div>
 
           </div>
 
-        </section>
+
+          <div class="card-body">
 
 
-        <!-- MANAGEMENT -->
+            <div class="placement-grid">
+
+
+              <div class="placement-item">
+
+                <div class="placement-label">
+                  UNIT / CABANG
+                </div>
+
+                <div
+                  id="infoBranch"
+                  class="placement-value"
+                >
+                  -
+                </div>
+
+              </div>
+
+
+              <div class="placement-item">
+
+                <div class="placement-label">
+                  KAPAL
+                </div>
+
+                <div
+                  id="infoShip"
+                  class="placement-value"
+                >
+                  -
+                </div>
+
+              </div>
+
+
+              <div class="placement-item">
+
+                <div class="placement-label">
+                  JABATAN
+                </div>
+
+                <div
+                  id="infoPosition"
+                  class="placement-value"
+                >
+                  -
+                </div>
+
+              </div>
+
+
+              <div class="placement-item">
+
+                <div class="placement-label">
+                  SHIFT
+                </div>
+
+                <div
+                  id="infoShift"
+                  class="placement-value"
+                >
+                  -
+                </div>
+
+              </div>
+
+
+            </div>
+
+
+          </div>
+
+
+        </div>
+
+
+        <!-- INFO LOKASI -->
+
+        <div
+          class="jnda-card"
+          style="margin-top:12px;"
+        >
+
+
+          <div class="card-header">
+
+            <div class="card-title">
+              Info Presensi
+            </div>
+
+            <div class="card-subtitle">
+              Gunakan tombol presensi di atas
+            </div>
+
+          </div>
+
+
+          <div class="card-body">
+
+
+            <div class="quick-info-grid">
+
+
+              <div class="quick-info">
+
+                <div class="quick-info-icon">
+                  📍
+                </div>
+
+                <div class="quick-info-label">
+                  Lokasi
+                </div>
+
+                <div class="quick-info-value">
+                  GPS
+                </div>
+
+              </div>
+
+
+              <div class="quick-info">
+
+                <div class="quick-info-icon">
+                  🛡️
+                </div>
+
+                <div class="quick-info-label">
+                  Keamanan
+                </div>
+
+                <div class="quick-info-value">
+                  Session Aktif
+                </div>
+
+              </div>
+
+
+              <div class="quick-info">
+
+                <div class="quick-info-icon">
+                  🚢
+                </div>
+
+                <div class="quick-info-label">
+                  Operasional
+                </div>
+
+                <div class="quick-info-value">
+                  JN
+                </div>
+
+              </div>
+
+
+              <div class="quick-info">
+
+                <div class="quick-info-icon">
+                  ⏱️
+                </div>
+
+                <div class="quick-info-label">
+                  Waktu
+                </div>
+
+                <div class="quick-info-value">
+                  WIB
+                </div>
+
+              </div>
+
+
+            </div>
+
+
+          </div>
+
+
+        </div>
+
+
+        <!-- =================================================
+             MANAGEMENT
+             ================================================= -->
 
         <section
           id="managementSection"
-          class="management-section">
+          class="management-section"
+        >
+
 
           <div class="jnda-card">
+
 
             <div class="card-header">
 
@@ -3079,17 +3910,22 @@ body.attendance-modal-open {
 
             <div class="card-body">
 
+
               <div class="management-grid">
+
 
                 <div class="management-stat">
 
-                  <div class="management-stat-label">
+                  <div
+                    class="management-stat-label"
+                  >
                     Pegawai Aktif
                   </div>
 
                   <div
                     id="managementEmployees"
-                    class="management-stat-value">
+                    class="management-stat-value"
+                  >
                     0
                   </div>
 
@@ -3098,13 +3934,16 @@ body.attendance-modal-open {
 
                 <div class="management-stat">
 
-                  <div class="management-stat-label">
+                  <div
+                    class="management-stat-label"
+                  >
                     Hadir
                   </div>
 
                   <div
                     id="managementPresent"
-                    class="management-stat-value">
+                    class="management-stat-value"
+                  >
                     0
                   </div>
 
@@ -3113,13 +3952,16 @@ body.attendance-modal-open {
 
                 <div class="management-stat">
 
-                  <div class="management-stat-label">
+                  <div
+                    class="management-stat-label"
+                  >
                     Belum Absen
                   </div>
 
                   <div
                     id="managementAbsent"
-                    class="management-stat-value">
+                    class="management-stat-value"
+                  >
                     0
                   </div>
 
@@ -3128,695 +3970,893 @@ body.attendance-modal-open {
 
                 <div class="management-stat">
 
-                  <div class="management-stat-label">
+                  <div
+                    class="management-stat-label"
+                  >
                     Terlambat
                   </div>
 
                   <div
                     id="managementLate"
-                    class="management-stat-value">
+                    class="management-stat-value"
+                  >
                     0
                   </div>
 
                 </div>
 
+
               </div>
+
 
             </div>
 
+
           </div>
+
 
         </section>
 
 
-        <footer class="jnda-footer">
-
-          JN Daily Attendance · V3
-          <br>
-          PT Jembatan Nusantara
-
-        </footer>
-
       </div>
+
 
     </section>
 
-  </main>
 
-  <!-- =========================================================
-        MODAL ABSEN MASUK
-        ========================================================= -->
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
 
-    <div id="checkInModal" class="attendance-modal" aria-hidden="true">
+    <footer class="jnda-footer">
+
+      JN Daily Attendance · V3
+
+      <br>
+
+      PT Jembatan Nusantara
+
+    </footer>
+
+
+  </div>
+
+
+</main>
+
+
+<!-- =========================================================
+     MOBILE BOTTOM NAV
+     ========================================================= -->
+
+<nav
+  class="mobile-bottom-nav"
+  aria-label="Navigasi utama"
+>
+
+
+  <button
+    type="button"
+    class="mobile-nav-item active"
+    onclick="showDashboardMenu('dashboard')"
+  >
+
+    <i class="fa-solid fa-house"></i>
+
+    Home
+
+  </button>
+
+
+  <button
+    type="button"
+    class="mobile-nav-item"
+    onclick="showDashboardMenu('attendance')"
+  >
+
+    <i class="fa-solid fa-calendar-check"></i>
+
+    Kehadiran
+
+  </button>
+
+
+  <button
+    type="button"
+    class="mobile-nav-item"
+    onclick="showDashboardMenu('profile')"
+  >
+
+    <i class="fa-solid fa-user"></i>
+
+    Profil
+
+  </button>
+
+
+</nav>
+
+
+<!-- =========================================================
+     MODAL ABSEN MASUK
+     
+     ID DAN FIELD DIPERTAHANKAN
+     agar PAGE_Dashboard.html tetap bekerja.
+     ========================================================= -->
+
+<div
+  id="checkInModal"
+  class="attendance-modal"
+  aria-hidden="true"
+>
+
+
+  <div
+    class="attendance-modal-overlay"
+    onclick="closeCheckInModal()"
+  ></div>
+
+
+  <div
+    class="attendance-modal-dialog"
+    role="dialog"
+    aria-modal="true"
+  >
+
+
+    <div class="attendance-modal-header">
+
 
       <div
-        class="attendance-modal-overlay"
-        onclick="closeCheckInModal()"
-      ></div>
-
-
-      <div
-        class="attendance-modal-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="checkInModalTitle"
+        class="attendance-modal-title-wrap"
       >
 
-        <!-- HEADER -->
-        <div class="attendance-modal-header">
+        <div
+          class="attendance-modal-icon"
+        >
+          ✓
+        </div>
 
-          <div class="attendance-modal-title-wrap">
 
-            <div class="attendance-modal-icon">
-              ✓
-            </div>
+        <div>
 
-            <div>
-
-              <div
-                id="checkInModalTitle"
-                class="attendance-modal-title"
-              >
-                Pilih Status Kehadiran - Masuk
-              </div>
-
-              <div class="attendance-modal-subtitle">
-                Lengkapi informasi kehadiran sebelum melakukan absen
-              </div>
-
-            </div>
-
+          <div
+            id="checkInModalTitle"
+            class="attendance-modal-title"
+          >
+            Absen Masuk
           </div>
 
 
-          <button
-            type="button"
-            class="attendance-modal-close"
-            onclick="closeCheckInModal()"
-            aria-label="Tutup"
+          <div
+            class="attendance-modal-subtitle"
           >
-            ×
-          </button>
+            Lengkapi informasi kehadiran
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="attendance-modal-close"
+        onclick="closeCheckInModal()"
+      >
+        ×
+      </button>
+
+
+    </div>
+
+
+    <div class="attendance-modal-body">
+
+
+      <!-- MODE -->
+
+      <div class="attendance-field">
+
+
+        <label
+          for="checkInMode"
+          class="attendance-label"
+        >
+
+          Mode Absen
+
+          <span>*</span>
+
+        </label>
+
+
+        <div
+          class="attendance-select-wrap"
+        >
+
+          <select
+            id="checkInMode"
+            class="attendance-select"
+          >
+
+            <option value="">
+              Pilih Mode Absen
+            </option>
+
+            <option value="WFO">
+              📍 WFO (Kantor)
+            </option>
+
+            <option value="SHIP">
+              🚢 Hadir di Atas Kapal
+            </option>
+
+            <option value="DINAS_LUAR">
+              ✈️ Dinas Luar
+            </option>
+
+            <option value="WFH">
+              🏠 WFH
+            </option>
+
+          </select>
 
         </div>
 
 
-        <!-- BODY -->
-        <div class="attendance-modal-body">
-
-          <!-- MODE ABSEN -->
-          <div class="attendance-field">
-
-            <label
-              for="checkInMode"
-              class="attendance-label"
-            >
-              Mode Absen
-              <span>*</span>
-            </label>
-
-            <div class="attendance-select-wrap">
-
-              <select
-                id="checkInMode"
-                class="attendance-select"
-              >
-
-                <option value="">
-                  Pilih Mode Absen
-                </option>
-
-                <option value="WFO">
-                  📍 WFO (Kantor)
-                </option>
-
-                <option value="SHIP">
-                  🚢 Hadir di Atas Kapal (Crew / ABK)
-                </option>
-
-                <option value="DINAS_LUAR">
-                  ✈️ Dinas Luar
-                </option>
-
-                <option value="WFH">
-                  🏠 WFH (Work From Home)
-                </option>
-
-              </select>
-
-            </div>
-
-          </div>
+      </div>
 
 
-          <!-- TYPE PEGAWAI -->
-          <div class="attendance-field">
+      <!-- TYPE -->
 
-            <label
-              for="checkInEmployeeType"
-              class="attendance-label"
-            >
-              Type Pegawai
-              <span>*</span>
-            </label>
-
-            <div class="attendance-select-wrap">
-
-              <select
-                id="checkInEmployeeType"
-                class="attendance-select"
-              >
-
-                <option value="">
-                  Pilih Type Pegawai
-                </option>
-
-                <option value="OFFICE_HOUR">
-                  👤 Office Hour
-                </option>
-
-                <option value="OPERATIONAL">
-                  ⚙️ Petugas Operasional
-                </option>
-
-                <option value="CREW">
-                  🚢 Crew Kapal
-                </option>
-
-                <option value="SECURITY">
-                  🛡️ Security
-                </option>
-
-              </select>
-
-            </div>
-
-          </div>
+      <div class="attendance-field">
 
 
-          <!-- =====================================================
-              SHIFT & JAM KERJA
-              ===================================================== -->
+        <label
+          for="checkInEmployeeType"
+          class="attendance-label"
+        >
 
-          <div
-            class="attendance-field"
-            id="checkInShiftField"
+          Type Pegawai
+
+          <span>*</span>
+
+        </label>
+
+
+        <div
+          class="attendance-select-wrap"
+        >
+
+          <select
+            id="checkInEmployeeType"
+            class="attendance-select"
           >
 
-            <label
-              class="attendance-label"
-            >
-              Pilihan Shift & Jam Kerja
-              <span>*</span>
-            </label>
+            <option value="">
+              Pilih Type Pegawai
+            </option>
+
+            <option value="OFFICE_HOUR">
+              👤 Office Hour
+            </option>
+
+            <option value="OPERATIONAL">
+              ⚙️ Petugas Operasional
+            </option>
+
+            <option value="CREW">
+              🚢 Crew Kapal
+            </option>
+
+            <option value="SECURITY">
+              🛡️ Security
+            </option>
+
+          </select>
+
+        </div>
 
 
-            <!-- ===================================================
-                MANUAL SHIFT
-                Operational / Security
-                =================================================== -->
+      </div>
+
+
+      <!-- SHIFT -->
+
+      <div
+        class="attendance-field"
+        id="checkInShiftField"
+      >
+
+
+        <label
+          class="attendance-label"
+        >
+
+          Pilihan Shift & Jam Kerja
+
+          <span>*</span>
+
+        </label>
+
+
+        <div
+          id="checkInManualShift"
+          class="attendance-select-wrap"
+        >
+
+          <select
+            id="checkInShift"
+            class="attendance-select"
+          >
+
+            <option value="">
+              Pilih Jam Kerja
+            </option>
+
+            <option value="S003">
+              ⚙️ Operasional · 07:00 – 19:00
+            </option>
+
+            <option value="S004">
+              ⚙️ Operasional · 19:00 – 07:00
+            </option>
+
+            <option value="S005">
+              ⚙️ Operasional · 08:00 – 20:00
+            </option>
+
+            <option value="S006">
+              ⚙️ Operasional · 20:00 – 08:00
+            </option>
+
+            <option value="S007">
+              🛡️ Security · 07:00 – 19:00
+            </option>
+
+            <option value="S008">
+              🛡️ Security · 19:00 – 07:00
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- OFFICE -->
+
+        <div
+          id="checkInOfficeSchedule"
+          class="attendance-office-schedule"
+          hidden
+        >
+
+
+          <div
+            class="office-schedule-icon"
+          >
+            🕐
+          </div>
+
+
+          <div
+            class="office-schedule-content"
+          >
 
             <div
-              id="checkInManualShift"
-              class="attendance-select-wrap"
+              id="checkInOfficeDay"
+              class="office-schedule-day"
             >
-
-              <select
-                id="checkInShift"
-                class="attendance-select"
-              >
-
-                <option value="">
-                  Pilih Jam Kerja
-                </option>
-
-                <option value="S003">
-                  ⚙️ Operasional · 07:00 – 19:00
-                </option>
-
-                <option value="S004">
-                  ⚙️ Operasional · 19:00 – 07:00
-                </option>
-
-                <option value="S005">
-                  ⚙️ Operasional · 08:00 – 20:00
-                </option>
-
-                <option value="S006">
-                  ⚙️ Operasional · 20:00 – 08:00
-                </option>
-
-                <option value="S007">
-                  🛡️ Security · 07:00 – 19:00
-                </option>
-
-                <option value="S008">
-                  🛡️ Security · 19:00 – 07:00
-                </option>
-
-              </select>
-
+              Jadwal Hari Ini
             </div>
 
 
-            <!-- ===================================================
-                OFFICE HOUR
-                WFO / WFH / DINAS LUAR
-                =================================================== -->
-
             <div
-              id="checkInOfficeSchedule"
-              class="attendance-office-schedule"
-              hidden
+              id="checkInOfficeHours"
+              class="office-schedule-hours"
             >
-
-              <div class="office-schedule-icon">
-                🕐
-              </div>
-
-
-              <div class="office-schedule-content">
-
-                <div
-                  id="checkInOfficeDay"
-                  class="office-schedule-day"
-                >
-                  Jadwal Hari Ini
-                </div>
-
-
-                <div
-                  id="checkInOfficeHours"
-                  class="office-schedule-hours"
-                >
-                  -
-                </div>
-
-
-                <div
-                  id="checkInOfficeTolerance"
-                  class="office-schedule-tolerance"
-                >
-                  Toleransi keterlambatan 18 menit
-                </div>
-
-              </div>
-
-
-              <div class="office-schedule-auto">
-                OTOMATIS
-              </div>
-
+              -
             </div>
 
 
-            <!-- ===================================================
-                CREW KAPAL
-                =================================================== -->
-
             <div
-              id="checkInCrewSchedule"
-              class="attendance-office-schedule attendance-crew-schedule"
-              hidden
+              id="checkInOfficeTolerance"
+              class="office-schedule-tolerance"
             >
-
-              <div class="office-schedule-icon">
-                🚢
-              </div>
-
-
-              <div class="office-schedule-content">
-
-                <div
-                  id="checkInCrewDay"
-                  class="office-schedule-day"
-                >
-                  Crew Kapal
-                </div>
-
-
-                <div
-                  id="checkInCrewHours"
-                  class="office-schedule-hours"
-                >
-                  Jam kerja fleksibel
-                </div>
-
-
-                <div
-                  id="checkInCrewInfo"
-                  class="office-schedule-tolerance"
-                >
-                  Mengikuti operasional kapal
-                </div>
-
-              </div>
-
-
-              <div class="office-schedule-auto">
-                OTOMATIS
-              </div>
-
+              Toleransi keterlambatan
             </div>
 
           </div>
 
-          <!-- =====================================================
-              LAMPIRAN SURAT DINAS
-              HANYA UNTUK DINAS LUAR
-              ===================================================== -->
 
           <div
-            class="attendance-field"
-            id="checkInDinasAttachmentField"
+            class="office-schedule-auto"
+          >
+            OTOMATIS
+          </div>
+
+
+        </div>
+
+
+        <!-- CREW -->
+
+        <div
+          id="checkInCrewSchedule"
+          class="attendance-office-schedule"
+          hidden
+        >
+
+
+          <div
+            class="office-schedule-icon"
+          >
+            🚢
+          </div>
+
+
+          <div
+            class="office-schedule-content"
+          >
+
+            <div
+              id="checkInCrewDay"
+              class="office-schedule-day"
+            >
+              Crew Kapal
+            </div>
+
+
+            <div
+              id="checkInCrewHours"
+              class="office-schedule-hours"
+            >
+              Jam kerja fleksibel
+            </div>
+
+
+            <div
+              id="checkInCrewInfo"
+              class="office-schedule-tolerance"
+            >
+              Mengikuti operasional kapal
+            </div>
+
+          </div>
+
+
+          <div
+            class="office-schedule-auto"
+          >
+            OTOMATIS
+          </div>
+
+
+        </div>
+
+
+      </div>
+
+
+      <!-- DINAS -->
+
+      <div
+        class="attendance-field"
+        id="checkInDinasAttachmentField"
+        hidden
+      >
+
+
+        <label
+          for="checkInDinasAttachment"
+          class="attendance-label"
+        >
+
+          Lampiran Surat Dinas
+
+          <span>*</span>
+
+        </label>
+
+
+        <div
+          class="attendance-file-box"
+        >
+
+
+          <div
+            class="attendance-file-icon"
+          >
+            📎
+          </div>
+
+
+          <div
+            class="attendance-file-content"
+          >
+
+            <div
+              class="attendance-file-title"
+            >
+              Upload Surat Dinas
+            </div>
+
+            <div
+              class="attendance-file-desc"
+            >
+              Wajib untuk Dinas Luar
+            </div>
+
+            <div
+              class="attendance-file-format"
+            >
+              PDF, JPG, JPEG atau PNG · Maks. 5 MB
+            </div>
+
+          </div>
+
+
+          <label
+            for="checkInDinasAttachment"
+            class="attendance-file-button"
+          >
+            Pilih File
+          </label>
+
+
+          <input
+            type="file"
+            id="checkInDinasAttachment"
+            accept=".pdf,.jpg,.jpeg,.png"
             hidden
           >
 
-            <label
-              for="checkInDinasAttachment"
-              class="attendance-label"
-            >
-              Lampiran Surat Dinas
-              <span>*</span>
-            </label>
-
-
-            <div class="attendance-file-box">
-
-              <div class="attendance-file-icon">
-                📎
-              </div>
-
-
-              <div class="attendance-file-content">
-
-                <div class="attendance-file-title">
-                  Upload Surat Dinas
-                </div>
-
-                <div class="attendance-file-desc">
-                  Wajib dilampirkan untuk Dinas Luar
-                </div>
-
-                <div class="attendance-file-format">
-                  PDF, JPG, JPEG atau PNG · Maks. 5 MB
-                </div>
-
-              </div>
-
-
-              <label
-                for="checkInDinasAttachment"
-                class="attendance-file-button"
-              >
-                Pilih File
-              </label>
-
-
-              <input
-                type="file"
-                id="checkInDinasAttachment"
-                accept=".pdf,.jpg,.jpeg,.png"
-                hidden
-              >
-
-            </div>
-
-
-            <div
-              id="checkInDinasAttachmentName"
-              class="attendance-file-name"
-            >
-            </div>
-
-          </div>
-
-
-          <!-- KETERANGAN -->
-          <div class="attendance-field">
-
-            <label
-              for="checkInRemark"
-              class="attendance-label"
-            >
-              Keterangan Tambahan
-            </label>
-
-            <textarea
-              id="checkInRemark"
-              class="attendance-textarea"
-              rows="4"
-              maxlength="500"
-              placeholder="Keterangan tambahan (opsional)"
-            ></textarea>
-
-            <div class="attendance-counter">
-              <span id="checkInRemarkCounter">0</span>/500
-            </div>
-
-          </div>
 
         </div>
 
 
-        <!-- FOOTER -->
-        <div class="attendance-modal-footer">
+        <div
+          id="checkInDinasAttachmentName"
+          class="attendance-file-name"
+        ></div>
 
-          <button
-            type="button"
-            class="attendance-btn attendance-btn-cancel"
-            onclick="closeCheckInModal()"
-          >
-            Batal
-          </button>
-
-
-          <button
-            type="button"
-            id="confirmCheckInButton"
-            class="attendance-btn attendance-btn-confirm"
-            onclick="confirmCheckIn()"
-          >
-
-            <span class="confirm-check-icon">
-              ✓
-            </span>
-
-            <span>
-              Konfirmasi Absen
-            </span>
-
-          </button>
-
-        </div>
 
       </div>
 
+
+      <!-- REMARK -->
+
+      <div
+        class="attendance-field"
+      >
+
+
+        <label
+          for="checkInRemark"
+          class="attendance-label"
+        >
+          Keterangan Tambahan
+        </label>
+
+
+        <textarea
+          id="checkInRemark"
+          class="attendance-textarea"
+          rows="4"
+          maxlength="500"
+          placeholder="Keterangan tambahan (opsional)"
+        ></textarea>
+
+
+        <div
+          class="attendance-counter"
+        >
+
+          <span
+            id="checkInRemarkCounter"
+          >
+            0
+          </span>
+
+          /500
+
+        </div>
+
+
+      </div>
+
+
     </div>
 
-    <!-- =========================================================
+
+    <div
+      class="attendance-modal-footer"
+    >
+
+
+      <button
+        type="button"
+        class="attendance-btn attendance-btn-cancel"
+        onclick="closeCheckInModal()"
+      >
+        Batal
+      </button>
+
+
+      <button
+        type="button"
+        id="confirmCheckInButton"
+        class="attendance-btn attendance-btn-confirm"
+        onclick="confirmCheckIn()"
+      >
+
+        <span>
+          ✓
+        </span>
+
+        <span>
+          Konfirmasi Absen
+        </span>
+
+      </button>
+
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
      MODAL ABSEN PULANG
      ========================================================= -->
 
+<div
+  id="checkOutModal"
+  class="attendance-modal"
+  aria-hidden="true"
+>
+
+
+  <div
+    class="attendance-modal-overlay"
+    onclick="closeCheckOutModal()"
+  ></div>
+
+
+  <div
+    class="attendance-modal-dialog"
+    role="dialog"
+    aria-modal="true"
+  >
+
+
     <div
-      id="checkOutModal"
-      class="attendance-modal"
-      aria-hidden="true"
+      class="attendance-modal-header"
     >
 
-      <div
-        class="attendance-modal-overlay"
-        onclick="closeCheckOutModal()"
-      ></div>
-
 
       <div
-        class="attendance-modal-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="checkOutModalTitle"
+        class="attendance-modal-title-wrap"
       >
 
-        <!-- HEADER -->
-        <div class="attendance-modal-header">
-
-          <div class="attendance-modal-title-wrap">
-
-            <div class="attendance-modal-icon">
-              ✓
-            </div>
-
-            <div>
-
-              <div
-                id="checkOutModalTitle"
-                class="attendance-modal-title"
-              >
-                Konfirmasi Absen Pulang
-              </div>
-
-              <div class="attendance-modal-subtitle">
-                Pastikan Anda ingin menyelesaikan sesi kehadiran hari ini
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <button
-            type="button"
-            class="attendance-modal-close"
-            onclick="closeCheckOutModal()"
-            aria-label="Tutup"
-          >
-            ×
-          </button>
-
+        <div
+          class="attendance-modal-icon"
+        >
+          ✓
         </div>
 
 
-        <!-- BODY -->
-        <div class="attendance-modal-body">
+        <div>
 
-          <!-- INFO KEHADIRAN -->
           <div
-            class="attendance-office-schedule"
-            style="margin-bottom:20px;"
+            id="checkOutModalTitle"
+            class="attendance-modal-title"
           >
-
-            <div class="office-schedule-icon">
-              🕐
-            </div>
-
-
-            <div class="office-schedule-content">
-
-              <div class="office-schedule-day">
-                Absen Masuk
-              </div>
-
-              <div
-                id="checkOutCheckInTime"
-                class="office-schedule-hours"
-              >
-                -
-              </div>
-
-              <div
-                id="checkOutWorkDate"
-                class="office-schedule-tolerance"
-              >
-                -
-              </div>
-
-            </div>
-
-
-            <div class="office-schedule-auto">
-              OPEN
-            </div>
-
+            Absen Pulang
           </div>
 
 
-          <!-- STATUS -->
-          <div class="attendance-field">
-
-            <label class="attendance-label">
-              Status Kehadiran
-            </label>
-
-            <div
-              style="
-                display:flex;
-                align-items:center;
-                gap:10px;
-                padding:14px 16px;
-                border-radius:12px;
-                background:#fff7ed;
-                border:1px solid #fed7aa;
-                color:#c2410c;
-                font-size:13px;
-                font-weight:700;
-              "
-            >
-
-              <span style="font-size:18px;">
-                🟠
-              </span>
-
-              <span>
-                Sesi absensi masih aktif
-              </span>
-
-            </div>
-
-          </div>
-
-
-          <!-- KETERANGAN -->
-          <div class="attendance-field">
-
-            <label
-              for="checkOutRemark"
-              class="attendance-label"
-            >
-              Keterangan Tambahan
-            </label>
-
-            <textarea
-              id="checkOutRemark"
-              class="attendance-textarea"
-              rows="4"
-              maxlength="500"
-              placeholder="Keterangan tambahan saat absen pulang (opsional)"
-            ></textarea>
-
-            <div class="attendance-counter">
-              <span id="checkOutRemarkCounter">0</span>/500
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- FOOTER -->
-        <div class="attendance-modal-footer">
-
-          <button
-            type="button"
-            class="attendance-btn attendance-btn-cancel"
-            onclick="closeCheckOutModal()"
+          <div
+            class="attendance-modal-subtitle"
           >
-            Batal
-          </button>
-
-
-          <button
-            type="button"
-            id="confirmCheckOutButton"
-            class="attendance-btn attendance-btn-confirm"
-            onclick="confirmCheckOut()"
-          >
-
-            <span class="confirm-check-icon">
-              ✓
-            </span>
-
-            <span>
-              Konfirmasi Absen Pulang
-            </span>
-
-          </button>
+            Selesaikan sesi kehadiran hari ini
+          </div>
 
         </div>
 
       </div>
 
+
+      <button
+        type="button"
+        class="attendance-modal-close"
+        onclick="closeCheckOutModal()"
+      >
+        ×
+      </button>
+
+
     </div>
 
 
+    <div
+      class="attendance-modal-body"
+    >
+
+
+      <div
+        class="attendance-office-schedule"
+        style="margin-bottom:16px;"
+      >
+
+
+        <div
+          class="office-schedule-icon"
+        >
+          🕐
+        </div>
+
+
+        <div
+          class="office-schedule-content"
+        >
+
+          <div
+            class="office-schedule-day"
+          >
+            Absen Masuk
+          </div>
+
+
+          <div
+            id="checkOutCheckInTime"
+            class="office-schedule-hours"
+          >
+            -
+          </div>
+
+
+          <div
+            id="checkOutWorkDate"
+            class="office-schedule-tolerance"
+          >
+            -
+          </div>
+
+        </div>
+
+
+        <div
+          class="office-schedule-auto"
+        >
+          OPEN
+        </div>
+
+
+      </div>
+
+
+      <div
+        class="attendance-field"
+      >
+
+
+        <label
+          class="attendance-label"
+        >
+          Status Kehadiran
+        </label>
+
+
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            gap:9px;
+            padding:12px;
+            border-radius:11px;
+            background:#fff7ed;
+            border:1px solid #fed7aa;
+            color:#c2410c;
+            font-size:10px;
+            font-weight:700;
+          "
+        >
+
+          🟠
+
+          <span>
+            Sesi absensi masih aktif
+          </span>
+
+        </div>
+
+
+      </div>
+
+
+      <div
+        class="attendance-field"
+      >
+
+
+        <label
+          for="checkOutRemark"
+          class="attendance-label"
+        >
+          Keterangan Tambahan
+        </label>
+
+
+        <textarea
+          id="checkOutRemark"
+          class="attendance-textarea"
+          rows="4"
+          maxlength="500"
+          placeholder="Keterangan tambahan saat absen pulang (opsional)"
+        ></textarea>
+
+
+        <div
+          class="attendance-counter"
+        >
+
+          <span
+            id="checkOutRemarkCounter"
+          >
+            0
+          </span>
+
+          /500
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div
+      class="attendance-modal-footer"
+    >
+
+
+      <button
+        type="button"
+        class="attendance-btn attendance-btn-cancel"
+        onclick="closeCheckOutModal()"
+      >
+        Batal
+      </button>
+
+
+      <button
+        type="button"
+        id="confirmCheckOutButton"
+        class="attendance-btn attendance-btn-confirm"
+        onclick="confirmCheckOut()"
+      >
+
+        <span>
+          ✓
+        </span>
+
+        <span>
+          Konfirmasi Absen Pulang
+        </span>
+
+      </button>
+
+
+    </div>
+
+
+  </div>
 
 </div>
