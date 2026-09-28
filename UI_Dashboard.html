@@ -545,6 +545,21 @@ body {
 }
 
 
+.navbar-title {
+
+  color: #0b5fc6;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: .15px;
+
+  white-space: nowrap;
+
+}
+
+
 /* =========================================================
    TOP USER
    ========================================================= */
@@ -1139,6 +1154,108 @@ body {
 
   padding:
     17px 18px;
+
+}
+
+
+/* =========================================================
+   QUICK DASHBOARD SHORTCUTS
+   ========================================================= */
+
+.dashboard-shortcuts {
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 10px;
+
+  margin-top: 10px;
+
+}
+
+.dashboard-shortcut {
+
+  min-height: 48px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 8px 12px;
+
+  border: 1px solid #e1edf6;
+
+  border-radius: 13px;
+
+  background: rgba(255,255,255,.92);
+
+  color: #315875;
+
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  box-shadow: 0 6px 18px rgba(30,84,130,.06);
+
+  transition: .18s ease;
+
+}
+
+.dashboard-shortcut:hover {
+
+  transform: translateY(-1px);
+
+  border-color: #c9e2f5;
+
+  box-shadow: 0 9px 22px rgba(30,84,130,.09);
+
+}
+
+.dashboard-shortcut-icon {
+
+  width: 32px;
+
+  height: 32px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  background: #eaf4ff;
+
+  color: #0b5fc6;
+
+  font-size: 13px;
+
+}
+
+.dashboard-shortcut-title {
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+}
+
+.dashboard-shortcut-subtitle {
+
+  margin-top: 2px;
+
+  font-size: 7px;
+
+  color: #8a9cad;
 
 }
 
@@ -2462,11 +2579,7 @@ body.attendance-modal-open {
 
   .mobile-menu-button {
 
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
+    display: none !important;
 
   }
 
@@ -2586,7 +2699,7 @@ body.attendance-modal-open {
     display: grid;
 
     grid-template-columns:
-      repeat(3,1fr);
+      repeat(4,1fr);
 
     align-items: center;
 
@@ -2624,7 +2737,7 @@ body.attendance-modal-open {
       transparent;
 
     color:
-      #8397a9;
+      #71869a;
 
     font-family: inherit;
 
@@ -2634,16 +2747,31 @@ body.attendance-modal-open {
 
     cursor: pointer;
 
+    transition:
+      background .18s ease,
+      color .18s ease,
+      transform .18s ease;
+
   }
 
 
   .mobile-nav-item i {
 
-    display: block;
+    display: flex;
 
-    margin-bottom: 4px;
+    align-items: center;
+
+    justify-content: center;
+
+    width: 30px;
+
+    height: 27px;
+
+    margin: 0 auto 3px;
 
     font-size: 16px;
+
+    color: currentColor;
 
   }
 
@@ -2655,6 +2783,16 @@ body.attendance-modal-open {
 
     color:
       #0967c9;
+
+    box-shadow:
+      inset 0 0 0 1px #d9ebfb;
+
+  }
+
+  .mobile-nav-item:active {
+
+    transform:
+      scale(.96);
 
   }
 
@@ -2786,6 +2924,20 @@ body.attendance-modal-open {
     gap: 10px;
 
     margin-top: 10px;
+
+  }
+
+  .dashboard-shortcuts {
+
+    gap: 8px;
+
+  }
+
+  .dashboard-shortcut {
+
+    min-height: 46px;
+
+    padding: 7px 9px;
 
   }
 
@@ -3170,18 +3322,8 @@ body.attendance-modal-open {
 
         <div class="logo-divider"></div>
 
-        <div
-          class="navbar-logo partner"
-          style="
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            color:#0b5fc6;
-            font-size:9px;
-            font-weight:800;
-          "
-        >
-          JNDA
+        <div class="navbar-title">
+          JN Daily Attendance
         </div>
 
       </div>
@@ -3395,6 +3537,60 @@ body.attendance-modal-open {
 
 
     <!-- =====================================================
+         QUICK SHORTCUTS
+         ===================================================== -->
+
+    <section class="dashboard-shortcuts">
+
+      <button
+        type="button"
+        class="dashboard-shortcut"
+        onclick="navigateTo('attendance')"
+      >
+
+        <span class="dashboard-shortcut-icon">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </span>
+
+        <span>
+          <span class="dashboard-shortcut-title">
+            Riwayat Presensi
+          </span>
+
+          <span class="dashboard-shortcut-subtitle">
+            Lihat riwayat kehadiran
+          </span>
+        </span>
+
+      </button>
+
+
+      <button
+        type="button"
+        class="dashboard-shortcut"
+        onclick="navigateTo('leave')"
+      >
+
+        <span class="dashboard-shortcut-icon">
+          <i class="fa-solid fa-file-pen"></i>
+        </span>
+
+        <span>
+          <span class="dashboard-shortcut-title">
+            Cuti / Izin
+          </span>
+
+          <span class="dashboard-shortcut-subtitle">
+            Ajukan cuti atau izin
+          </span>
+        </span>
+
+      </button>
+
+    </section>
+
+
+    <!-- =====================================================
          GRID
          ===================================================== -->
 
@@ -3587,12 +3783,37 @@ body.attendance-modal-open {
 
           <div class="card-header">
 
-            <div class="card-title">
-              Aktivitas Kehadiran
-            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
 
-            <div class="card-subtitle">
-              Riwayat presensi terbaru
+              <div>
+                <div class="card-title">
+                  Aktivitas Kehadiran
+                </div>
+
+                <div class="card-subtitle">
+                  Riwayat presensi terbaru
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onclick="navigateTo('attendance')"
+                style="
+                  border:0;
+                  background:#eaf4ff;
+                  color:#0b5fc6;
+                  border-radius:8px;
+                  padding:6px 9px;
+                  font-family:inherit;
+                  font-size:8px;
+                  font-weight:800;
+                  cursor:pointer;
+                  white-space:nowrap;
+                "
+              >
+                Lihat Semua
+              </button>
+
             </div>
 
           </div>
@@ -4034,45 +4255,41 @@ body.attendance-modal-open {
   aria-label="Navigasi utama"
 >
 
-
   <button
     type="button"
     class="mobile-nav-item active"
     onclick="navigateTo('dashboard')"
   >
-
     <i class="fa-solid fa-house"></i>
-
     Home
-
   </button>
-
 
   <button
     type="button"
     class="mobile-nav-item"
     onclick="navigateTo('attendance')"
   >
-
-    <i class="fa-solid fa-calendar-check"></i>
-
-    Kehadiran
-
+    <i class="fa-solid fa-clock-rotate-left"></i>
+    Riwayat
   </button>
 
+  <button
+    type="button"
+    class="mobile-nav-item"
+    onclick="navigateTo('leave')"
+  >
+    <i class="fa-solid fa-file-pen"></i>
+    Cuti / Izin
+  </button>
 
   <button
     type="button"
     class="mobile-nav-item"
     onclick="navigateTo('profile')"
   >
-
     <i class="fa-solid fa-user"></i>
-
     Profil
-
   </button>
-
 
 </nav>
 
