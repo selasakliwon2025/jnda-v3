@@ -2986,7 +2986,7 @@ body.attendance-modal-open {
       type="button"
       class="nav-item active"
       data-menu="dashboard"
-      onclick="showDashboardMenu('dashboard')"
+      onclick="navigateTo('dashboard')"
     >
 
       <span class="nav-icon">
@@ -3004,7 +3004,7 @@ body.attendance-modal-open {
       type="button"
       class="nav-item"
       data-menu="attendance"
-      onclick="showDashboardMenu('attendance')"
+      onclick="navigateTo('attendance')"
     >
 
       <span class="nav-icon">
@@ -3022,7 +3022,7 @@ body.attendance-modal-open {
       type="button"
       class="nav-item"
       data-menu="schedule"
-      onclick="showDashboardMenu('schedule')"
+      onclick="navigateTo('schedule')"
     >
 
       <span class="nav-icon">
@@ -3040,7 +3040,7 @@ body.attendance-modal-open {
       type="button"
       class="nav-item"
       data-menu="profile"
-      onclick="showDashboardMenu('profile')"
+      onclick="navigateTo('profile')"
     >
 
       <span class="nav-icon">
@@ -3063,7 +3063,7 @@ body.attendance-modal-open {
       type="button"
       class="nav-item"
       data-menu="leave"
-      onclick="showDashboardMenu('leave')"
+      onclick="navigateTo('leave')"
     >
 
       <span class="nav-icon">
@@ -3081,7 +3081,7 @@ body.attendance-modal-open {
       type="button"
       class="nav-item"
       data-menu="correction"
-      onclick="showDashboardMenu('correction')"
+      onclick="navigateTo('correction')"
     >
 
       <span class="nav-icon">
@@ -3103,7 +3103,7 @@ body.attendance-modal-open {
     <button
       type="button"
       class="logout-button"
-      onclick="logout()"
+      onclick="logoutUser()"
     >
 
       <i class="fa-solid fa-right-from-bracket"></i>
@@ -3126,7 +3126,7 @@ body.attendance-modal-open {
 <div
   id="sidebarOverlay"
   class="sidebar-overlay"
-  onclick="toggleSidebar()"
+  onclick="toggleMobileSidebar()"
 ></div>
 
 
@@ -3150,7 +3150,7 @@ body.attendance-modal-open {
       <button
         type="button"
         class="mobile-menu-button"
-        onclick="toggleSidebar()"
+        onclick="toggleMobileSidebar()"
         aria-label="Menu"
       >
 
@@ -3255,7 +3255,7 @@ body.attendance-modal-open {
         </div>
 
 
-        <div class="welcome-clock-zone">
+        <div id="clockTimeZone" class="welcome-clock-zone">
           WIB · Asia/Jakarta
         </div>
 
@@ -4038,7 +4038,7 @@ body.attendance-modal-open {
   <button
     type="button"
     class="mobile-nav-item active"
-    onclick="showDashboardMenu('dashboard')"
+    onclick="navigateTo('dashboard')"
   >
 
     <i class="fa-solid fa-house"></i>
@@ -4051,7 +4051,7 @@ body.attendance-modal-open {
   <button
     type="button"
     class="mobile-nav-item"
-    onclick="showDashboardMenu('attendance')"
+    onclick="navigateTo('attendance')"
   >
 
     <i class="fa-solid fa-calendar-check"></i>
@@ -4064,7 +4064,7 @@ body.attendance-modal-open {
   <button
     type="button"
     class="mobile-nav-item"
-    onclick="showDashboardMenu('profile')"
+    onclick="navigateTo('profile')"
   >
 
     <i class="fa-solid fa-user"></i>
