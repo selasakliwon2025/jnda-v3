@@ -1,1 +1,357 @@
+function renderManagement(
+      management
+    ) {
 
+      if (!management) {
+        return;
+      }
+
+
+      setText(
+        'managementEmployees',
+        firstValidValue(
+          management.activeEmployees,
+          management.totalEmployees,
+          management.employeeCount,
+          0
+        )
+      );
+
+
+      setText(
+        'managementPresent',
+        firstValidValue(
+          management.presentToday,
+          management.present,
+          0
+        )
+      );
+
+
+      setText(
+        'managementAbsent',
+        firstValidValue(
+          management.absentToday,
+          management.absent,
+          0
+        )
+      );
+
+
+      setText(
+        'managementLate',
+        firstValidValue(
+          management.lateToday,
+          management.late,
+          0
+        )
+      );
+
+    }
+
+
+    /* =======================================================
+       ROLE MENUS
+       ======================================================= */
+
+    function configureRoleMenus(
+      employeeId,
+      roleName
+    ) {
+
+      const normalized =
+        normalizeRole(
+          roleName
+        );
+
+
+      const hasEmployee =
+        !!employeeId &&
+        employeeId !== '-';
+
+      const branchAdminRoles = [
+        'ADMIN CABANG'
+      ];
+
+      const isBranchAdmin =
+        branchAdminRoles.includes(normalized);
+
+
+      const managementRoles = [
+        'DIREKSI',
+        'DIRECTOR',
+        'DIREKTUR',
+        'MANAGER',
+        'BRANCH MANAGER',
+        'ADMIN',
+        'ADMIN HR',
+        'ADMINISTRATOR'
+      ];
+
+
+      const adminRoles = [
+        'ADMIN',
+        'ADMIN HR',
+        'ADMINISTRATOR'
+      ];
+
+
+      const isManagement =
+        managementRoles.includes(
+          normalized
+        );
+
+
+      const isAdmin =
+        adminRoles.includes(
+          normalized
+        );
+
+
+      /*
+       * Employee menu:
+       *
+       * ADMIN dan ADMIN_HR juga masuk
+       * karena mereka tetap pegawai.
+       */
+
+      const employeeMenu =
+        document.getElementById(
+          'employeeMenuGroup'
+        );
+
+
+      if (employeeMenu) {
+
+        employeeMenu.style.display =
+          hasEmployee
+            ? 'block'
+            : 'none';
+
+      }
+
+
+      const managementMenu =
+        document.getElementById(
+          'managementMenuGroup'
+        );
+
+
+      if (managementMenu) {
+
+        managementMenu.style.display =
+          isManagement
+            ? 'block'
+            : 'none';
+
+      }
+
+
+      const adminMenu =
+        document.getElementById(
+          'adminMenuGroup'
+        );
+
+
+      if (adminMenu) {
+
+        adminMenu.style.display =
+          isAdmin
+            ? 'block'
+            : 'none';
+
+      }
+
+      const scheduleMenu =
+        document.getElementById(
+          'scheduleMenuGroup'
+        );
+
+      if (scheduleMenu) {
+        scheduleMenu.style.display =
+          isBranchAdmin
+            ? 'block'
+            : 'none';
+      }
+
+
+      const managementSection =
+        document.getElementById(
+          'managementSection'
+        );
+
+
+      if (managementSection) {
+
+        managementSection.style.display =
+          isManagement
+            ? 'block'
+            : 'none';
+
+      }
+
+
+      /*
+       * Render management data
+       */
+
+      if (isManagement) {
+
+        renderManagement(
+          DASHBOARD_DATA.management || {}
+        );
+
+      }
+
+    }
+
+
+    /* =======================================================
+       ATTENDANCE NAVIGATION
+       ======================================================= */
+
+    function openAttendance(
+      mode
+    ) {
+
+      closeMobileSidebar();
+
+
+      navigateTo(
+        'attendance',
+        mode
+      );
+
+    }
+
+
+    /* =======================================================
+       NAVIGATION MPA
+       ======================================================= */
+
+    function navigateTo(page, mode) {
+
+      closeMobileSidebar();
+
+      let url =
+        WEB_APP_URL +
+        '?page=' +
+        encodeURIComponent(page);
+
+      if (mode) {
+
+        url +=
+          '&mode=' +
+          encodeURIComponent(mode);
+
+      }
+
+      window.open(
+        url,
+        '_top'
+      );
+
+    }
+
+
+    /* =======================================================
+       LOGIN REDIRECT
+       ======================================================= */
+
+    function redirectToLogin() {
+
+      localStorage.removeItem(
+        'JNDA_SESSION_TOKEN'
+      );
+
+      const url =
+        WEB_APP_URL +
+        '?page=login';
+
+      window.open(
+        url,
+        '_top'
+      );
+
+    }
+
+
+    
+
+
+    /* =======================================================
+       LOGOUT
+       ======================================================= */
+
+    function logoutUser() {
+
+      /*
+       * Cegah logout dipanggil dua kali dari desktop/mobile.
+       */
+      if (window.JNDA_LOGOUT_PROCESSING) {
+        return;
+      }
+
+      window.JNDA_LOGOUT_PROCESSING = true;
+
+      const token =
+        SESSION_TOKEN ||
+        localStorage.getItem(
+          'JNDA_SESSION_TOKEN'
+        ) ||
+        '';
+
+      if (typeof closeMobileSidebar === 'function') {
+        closeMobileSidebar();
+      }
+
+      /*
+       * Jika session memang sudah tidak ada,
+       * langsung kembali ke login.
+       */
+      if (!token) {
+        localStorage.removeItem(
+          'JNDA_SESSION_TOKEN'
+        );
+        SESSION_TOKEN = '';
+        CURRENT_SESSION = null;
+        redirectToLogin();
+        return;
+      }
+
+      /*
+       * Konfirmasi logout.
+       * Token BARU dihapus setelah user menekan "Ya, Keluar".
+       * Jadi tombol "Batal" tetap membawa user ke dashboard.
+       */
+      if (typeof Swal !== 'undefined') {
+
+        Swal.fire({
+          title: 'Keluar dari aplikasi?',
+          text: 'Sesi Anda akan diakhiri.',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Ya, Keluar',
+          cancelButtonText: 'Batal',
+          confirmButtonColor: '#d93a43',
+          reverseButtons: true,
+          allowOutsideClick: false,
+          customClass: {
+            popup: 'jnda-swal-popup'
+          }
+        }).then(function(result) {
+
+          if (!result.isConfirmed) {
+            window.JNDA_LOGOUT_PROCESSING = false;
+            return;
+          }
+
+          completeLogout(token);
+
+        });
+
+        return;
+      }
+
+      completeLogout(token);
+    }
