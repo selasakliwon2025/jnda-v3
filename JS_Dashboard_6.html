@@ -1,1 +1,338 @@
+function openCheckOutModal() {
 
+      SESSION_TOKEN =
+        localStorage.getItem(
+          'JNDA_SESSION_TOKEN'
+        ) || SESSION_TOKEN;
+
+
+      if (!SESSION_TOKEN) {
+
+        console.warn(
+          'JNDA CHECK-OUT: SESSION TOKEN TIDAK DITEMUKAN'
+        );
+
+        showAttendanceMessage(
+          'Session tidak tersedia. Silakan refresh halaman.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      const modal =
+        document.getElementById(
+          'checkOutModal'
+        );
+
+
+      if (!modal) {
+
+        console.error(
+          'JNDA: checkOutModal tidak ditemukan.'
+        );
+
+        return;
+      }
+
+
+      /* -------------------------------------------------------
+        RESET
+        ------------------------------------------------------- */
+
+      const remark =
+        document.getElementById(
+          'checkOutRemark'
+        );
+
+      if (remark) {
+
+        remark.value = '';
+
+        updateCheckOutRemarkCounter();
+
+      }
+
+
+      const button =
+        document.getElementById(
+          'confirmCheckOutButton'
+        );
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.innerHTML = `
+          <span class="confirm-check-icon">
+            ✓
+          </span>
+
+          <span>
+            Konfirmasi Absen Pulang
+          </span>
+        `;
+
+      }
+
+
+      /* -------------------------------------------------------
+        TAMPILKAN LOADING
+        ------------------------------------------------------- */
+
+      Swal.fire({
+
+        title: 'Memeriksa Kehadiran...',
+
+        text: 'Mohon tunggu sebentar.',
+
+        allowOutsideClick: false,
+
+        allowEscapeKey: false,
+
+        showConfirmButton: false,
+
+        didOpen: function () {
+
+          Swal.showLoading();
+
+        }
+
+      });
+
+
+      /* -------------------------------------------------------
+        CEK SESSION / ATTENDANCE
+        ------------------------------------------------------- */
+
+      google.script.run
+
+        .withSuccessHandler(
+          handleCheckOutAttendance
+        )
+
+        .withFailureHandler(
+          handleCheckOutOpenError
+        )
+
+        .getOpenAttendance(
+          SESSION_TOKEN
+        );
+
+    }
+
+    function handleCheckOutAttendance(result) {
+
+      console.log(
+        'JNDA Check-Out Attendance:',
+        result
+      );
+
+
+      if (
+        !result ||
+        result.success === false
+      ) {
+
+        if (
+          typeof Swal !== 'undefined' &&
+          Swal.isVisible()
+        ) {
+
+          Swal.close();
+
+        }
+
+
+        showAttendanceMessage(
+          result && result.message
+            ? result.message
+            : 'Data kehadiran tidak dapat diperiksa.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      const attendance =
+        result.attendance || null;
+
+
+      /* -------------------------------------------------------
+        BELUM ABSEN
+        ------------------------------------------------------- */
+
+      if (
+        !attendance ||
+        String(
+          attendance.status || ''
+        ).toUpperCase() !== 'OPEN'
+      ) {
+
+        Swal.close();
+
+
+        Swal.fire({
+
+          icon: 'warning',
+
+          title: 'Belum Ada Sesi Aktif',
+
+          text:
+            'Anda tidak memiliki sesi absen masuk yang masih aktif.',
+
+          confirmButtonText: 'Mengerti',
+
+          confirmButtonColor: '#16458f',
+
+          customClass: {
+            popup: 'jnda-swal-popup'
+          }
+
+        });
+
+        return;
+      }
+
+
+      /* -------------------------------------------------------
+        ISI DATA MODAL
+        ------------------------------------------------------- */
+
+      const checkInTime =
+        document.getElementById(
+          'checkOutCheckInTime'
+        );
+
+      const workDate =
+        document.getElementById(
+          'checkOutWorkDate'
+        );
+
+
+      if (checkInTime) {
+
+        checkInTime.textContent =
+          attendance.checkInDisplay ||
+          formatTime(
+            attendance.checkInAt
+          ) ||
+          '-';
+
+      }
+
+
+      if (workDate) {
+
+        workDate.textContent =
+          attendance.workDate
+            ? 'Tanggal kerja · ' +
+              formatDate(
+                attendance.workDate
+              )
+            : 'Tanggal kerja · -';
+
+      }
+
+
+      Swal.close();
+
+
+      /* -------------------------------------------------------
+        SHOW MODAL
+        ------------------------------------------------------- */
+
+      const modal =
+        document.getElementById(
+          'checkOutModal'
+        );
+
+
+      modal.classList.add(
+        'show'
+      );
+
+      modal.setAttribute(
+        'aria-hidden',
+        'false'
+      );
+
+      document.body.classList.add(
+        'attendance-modal-open'
+      );
+
+    }
+
+    function handleCheckOutOpenError(error) {
+
+      console.error(
+        'JNDA Check-Out Open Error:',
+        error
+      );
+
+
+      if (
+        typeof Swal !== 'undefined' &&
+        Swal.isVisible()
+      ) {
+
+        Swal.close();
+
+      }
+
+
+      const message =
+        error && error.message
+          ? String(error.message).trim()
+          : 'Gagal memeriksa sesi absensi.';
+
+
+      Swal.fire({
+
+        icon: 'error',
+
+        title: 'Tidak Dapat Memeriksa Absen',
+
+        text: message,
+
+        confirmButtonText: 'Mengerti',
+
+        confirmButtonColor: '#16458f',
+
+        customClass: {
+          popup: 'jnda-swal-popup'
+        }
+
+      });
+
+    }
+
+    function closeCheckOutModal() {
+
+      const modal =
+        document.getElementById(
+          'checkOutModal'
+        );
+
+
+      if (!modal) {
+        return;
+      }
+
+
+      modal.classList.remove(
+        'show'
+      );
+
+      modal.setAttribute(
+        'aria-hidden',
+        'true'
+      );
+
+      document.body.classList.remove(
+        'attendance-modal-open'
+      );
+
+    }
