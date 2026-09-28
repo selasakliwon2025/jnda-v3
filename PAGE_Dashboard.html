@@ -47,8 +47,13 @@
     let CURRENT_SESSION = null;
     let DASHBOARD_DATA = null;
 
+    /*
+     * URL Web App dibuat sebagai string JavaScript biasa.
+     * Hindari scriptlet GAS di dalam <script> agar HtmlService
+     * tidak menghasilkan "Malformed HTML content".
+     */
     const WEB_APP_URL =
-      <?!= JSON.stringify(WEB_APP_URL) ?>;
+      'https://script.google.com/macros/s/AKfycbyZlvCcB12RfizFTPaw5nVLZK07dsTRh2SX7ZFyWeINoxTsXn-GBxtiSfpaq-LGgBcZMw/exec';
 
 
     /* =======================================================
@@ -1422,72 +1427,136 @@
        LOGOUT
        ======================================================= */
 
-      function logoutUser() {
+    function logoutUser() {
 
-        const token =
-          SESSION_TOKEN ||
-          localStorage.getItem(
-            'JNDA_SESSION_TOKEN'
-          );
+      /*
+       * Cegah logout dipanggil dua kali dari desktop/mobile.
+       */
+      if (window.JNDA_LOGOUT_PROCESSING) {
+        return;
+      }
 
-        /*
-        * Hapus token lokal terlebih dahulu.
-        */
-        localStorage.removeItem(
+      window.JNDA_LOGOUT_PROCESSING = true;
+
+      const token =
+        SESSION_TOKEN ||
+        localStorage.getItem(
           'JNDA_SESSION_TOKEN'
+        ) ||
+        '';
+
+      /*
+       * Hapus token lokal lebih dulu.
+       * Jika server gagal sekalipun, browser ini tidak
+       * akan tetap memakai session lama.
+       */
+      localStorage.removeItem(
+        'JNDA_SESSION_TOKEN'
+      );
+
+      SESSION_TOKEN = '';
+      CURRENT_SESSION = null;
+
+      if (typeof closeMobileSidebar === 'function') {
+        closeMobileSidebar();
+      }
+
+      /*
+       * Tidak ada token -> langsung kembali ke login.
+       */
+      if (!token) {
+        redirectToLogin();
+        return;
+      }
+
+      /*
+       * Konfirmasi logout. Jika SweetAlert tidak tersedia,
+       * proses tetap dilanjutkan tanpa bergantung pada CDN.
+       */
+      if (typeof Swal !== 'undefined') {
+
+        Swal.fire({
+          title: 'Keluar dari aplikasi?',
+          text: 'Sesi Anda akan diakhiri.',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Ya, Keluar',
+          cancelButtonText: 'Batal',
+          confirmButtonColor: '#d93a43',
+          reverseButtons: true,
+          allowOutsideClick: false,
+          customClass: {
+            popup: 'jnda-swal-popup'
+          }
+        }).then(function(result) {
+
+          if (!result.isConfirmed) {
+            window.JNDA_LOGOUT_PROCESSING = false;
+            /*
+             * Token sudah dihapus, jadi kembali ke login
+             * agar state browser tetap konsisten.
+             */
+            redirectToLogin();
+            return;
+          }
+
+          executeLogoutRequest(token);
+
+        });
+
+        return;
+      }
+
+      executeLogoutRequest(token);
+    }
+
+
+    function executeLogoutRequest(token) {
+
+      if (!token) {
+        redirectToLogin();
+        return;
+      }
+
+      if (
+        typeof google === 'undefined' ||
+        !google.script ||
+        !google.script.run
+      ) {
+        redirectToLogin();
+        return;
+      }
+
+      google.script.run
+
+        .withSuccessHandler(
+          function () {
+            redirectToLogin();
+          }
+        )
+
+        .withFailureHandler(
+          function (error) {
+
+            console.error(
+              'Logout server error:',
+              error
+            );
+
+            /*
+             * Token lokal sudah dihapus.
+             * Tetap arahkan user ke login.
+             */
+            redirectToLogin();
+
+          }
+        )
+
+        .destroySession(
+          token
         );
 
-        SESSION_TOKEN = '';
-
-
-        /*
-        * Kalau tidak ada token,
-        * langsung kembali ke login.
-        */
-        if (!token) {
-
-          redirectToLogin();
-
-          return;
-
-        }
-
-
-        /*
-        * Hapus session di server.
-        */
-        google.script.run
-
-          .withSuccessHandler(
-            function () {
-
-              redirectToLogin();
-
-            }
-          )
-
-          .withFailureHandler(
-            function (error) {
-
-              console.error(
-                'Logout server error:',
-                error
-              );
-
-              /*
-              * Walaupun server gagal,
-              * token lokal sudah dihapus.
-              */
-              redirectToLogin();
-
-            }
-          )
-
-          .destroySession(
-            token
-          );
-
-      }
+    }
 
 
     /* =======================================================
