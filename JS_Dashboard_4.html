@@ -1,1 +1,560 @@
+function formatWorkingMinutes(
+      value
+    ) {
 
+      if (
+        value === undefined ||
+        value === null ||
+        value === '' ||
+        value === '-'
+      ) {
+
+        return '-';
+
+      }
+
+
+      /*
+       * V3 menggunakan WORKING_MINUTES
+       * sebagai nilai authoritative.
+       */
+
+      const minutes =
+        Number(value);
+
+
+      if (
+        !isFinite(minutes) ||
+        minutes < 0
+      ) {
+
+        return '-';
+
+      }
+
+
+      const hours =
+        Math.floor(
+          minutes / 60
+        );
+
+
+      const mins =
+        Math.round(
+          minutes % 60
+        );
+
+
+      return (
+        hours +
+        ' jam ' +
+        String(mins).padStart(
+          2,
+          '0'
+        ) +
+        ' mnt'
+      );
+
+    }
+
+
+    /* =======================================================
+       STATUS
+       ======================================================= */
+
+    function formatAttendanceStatus(
+      status
+    ) {
+
+      const value =
+        String(
+          status || ''
+        )
+          .trim()
+          .toUpperCase();
+
+
+      const map = {
+
+        PRESENT:
+          'Hadir',
+
+        HADIR:
+          'Hadir',
+
+        COMPLETE:
+          'Lengkap',
+
+        COMPLETED:
+          'Lengkap',
+
+        OPEN:
+          'Belum Pulang',
+
+        OPEN_OVERDUE:
+          'Belum Pulang',
+
+        LATE:
+          'Terlambat',
+
+        ABSENT:
+          'Tidak Hadir',
+
+        BELUM_ABSEN:
+          'Belum Absen'
+
+      };
+
+
+      return (
+        map[value] ||
+        status ||
+        '-'
+      );
+
+    }
+
+
+    function getStatusClass(
+      status
+    ) {
+
+      const value =
+        String(
+          status || ''
+        )
+          .trim()
+          .toUpperCase();
+
+
+      if (
+        [
+          'PRESENT',
+          'HADIR',
+          'COMPLETE',
+          'COMPLETED'
+        ].includes(
+          value
+        )
+      ) {
+
+        return 'success';
+
+      }
+
+
+      if (
+        [
+          'LATE',
+          'OPEN',
+          'OPEN_OVERDUE'
+        ].includes(
+          value
+        )
+      ) {
+
+        return 'warning';
+
+      }
+
+
+      if (
+        [
+          'ABSENT',
+          'ERROR',
+          'REJECTED'
+        ].includes(
+          value
+        )
+      ) {
+
+        return 'danger';
+
+      }
+
+
+      return 'warning';
+
+    }
+
+
+    function applyStatusClass(
+      id,
+      status
+    ) {
+
+      const element =
+        document.getElementById(
+          id
+        );
+
+
+      if (!element) {
+        return;
+      }
+
+
+      element.classList.remove(
+        'success',
+        'warning',
+        'danger'
+      );
+
+
+      element.classList.add(
+        getStatusClass(
+          status
+        )
+      );
+
+    }
+
+
+    /* =======================================================
+       HTML SECURITY
+       ======================================================= */
+
+    function escapeHtml(
+      value
+    ) {
+
+      return String(
+        value == null
+          ? ''
+          : value
+      )
+        .replace(
+          /&/g,
+          '&amp;'
+        )
+        .replace(
+          /</g,
+          '&lt;'
+        )
+        .replace(
+          />/g,
+          '&gt;'
+        )
+        .replace(
+          /"/g,
+          '&quot;'
+        )
+        .replace(
+          /'/g,
+          '&#039;'
+        );
+
+    }
+
+    /* =======================================================
+       CLOSE SIDEBAR WHEN ESC PRESSED
+       ======================================================= */
+
+    document.addEventListener(
+      'keydown',
+      function (event) {
+
+        if (
+          event.key === 'Escape'
+        ) {
+
+          closeMobileSidebar();
+
+        }
+
+      }
+    );
+
+
+    /* =======================================================
+       AUTO CLOSE AFTER NAVIGATION CLICK
+       ======================================================= */
+
+    window.addEventListener(
+      'resize',
+      function () {
+
+        if (
+          window.innerWidth > 900
+        ) {
+
+          closeMobileSidebar();
+
+        }
+
+      }
+    );
+
+    /* =========================================================
+      ABSEN MASUK - MODAL
+      ========================================================= */
+
+    function openCheckInModal() {
+
+      console.log(
+        'JNDA: Membuka modal Absen Masuk'
+      );
+
+
+      const modal =
+        document.getElementById(
+          'checkInModal'
+        );
+
+
+      if (!modal) {
+
+        console.error(
+          'JNDA: #checkInModal tidak ditemukan.'
+        );
+
+        return;
+      }
+
+
+      /*
+      * Pastikan token masih tersedia.
+      *
+      * Tidak redirect ke login.
+      */
+
+      SESSION_TOKEN =
+        localStorage.getItem(
+          'JNDA_SESSION_TOKEN'
+        ) || SESSION_TOKEN;
+
+
+      if (!SESSION_TOKEN) {
+
+        showAttendanceMessage(
+          'Session tidak tersedia. Silakan refresh halaman.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      /*
+      * Reset form
+      */
+
+      resetCheckInForm();
+
+      updateCheckInShiftUI();
+
+
+      /*
+      * Tampilkan modal
+      */
+
+      modal.classList.add('show');
+
+      modal.setAttribute(
+        'aria-hidden',
+        'false'
+      );
+
+
+      document.body.classList.add(
+        'attendance-modal-open'
+      );
+
+
+      /*
+      * Fokus ke dropdown pertama
+      */
+
+      setTimeout(
+        function () {
+
+          const mode =
+            document.getElementById(
+              'checkInMode'
+            );
+
+          if (mode) {
+            mode.focus();
+          }
+
+        },
+        100
+      );
+
+    }
+
+
+    /* =========================================================
+      CLOSE MODAL
+      ========================================================= */
+
+    function closeCheckInModal() {
+
+      const modal =
+        document.getElementById(
+          'checkInModal'
+        );
+
+
+      if (!modal) {
+        return;
+      }
+
+
+      modal.classList.remove(
+        'show'
+      );
+
+
+      modal.setAttribute(
+        'aria-hidden',
+        'true'
+      );
+
+
+      document.body.classList.remove(
+        'attendance-modal-open'
+      );
+
+    }
+
+
+    /* =========================================================
+      RESET FORM
+      ========================================================= */
+
+    function resetCheckInForm() {
+
+      const mode =
+        document.getElementById(
+          'checkInMode'
+        );
+
+      const employeeType =
+        document.getElementById(
+          'checkInEmployeeType'
+        );
+
+      const shift =
+        document.getElementById(
+          'checkInShift'
+        );
+
+      const remark =
+        document.getElementById(
+          'checkInRemark'
+        );
+
+      if (mode) {
+        mode.value = '';
+      }
+
+
+      if (employeeType) {
+        employeeType.value = '';
+      }
+
+      /* =====================================================
+        DEFAULT UNTUK PEGAWAI YANG MEMILIKI SHIP_ID
+        ===================================================== */
+
+      const employee =
+        DASHBOARD_DATA?.employee || {};
+
+
+      const shipId =
+        String(
+          employee.shipId ||
+          employee.SHIP_ID ||
+          ''
+        ).trim();
+
+
+      if (shipId) {
+
+        if (mode) {
+
+          mode.value =
+            'SHIP';
+
+        }
+
+
+        if (employeeType) {
+
+          employeeType.value =
+            'CREW';
+
+        }
+
+      } 
+
+      if (shift) {
+        shift.value = '';
+      }
+
+
+      if (remark) {
+
+        remark.value = '';
+
+        updateRemarkCounter();
+      }
+
+
+      const button =
+        document.getElementById(
+          'confirmCheckInButton'
+        );
+
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.innerHTML = `
+          <span class="confirm-check-icon">
+            ✓
+          </span>
+          <span>
+            Konfirmasi Absen
+          </span>
+        `;
+      }
+
+      const dinasAttachment =
+        document.getElementById(
+          'checkInDinasAttachment'
+        );
+
+
+      const dinasAttachmentName =
+        document.getElementById(
+          'checkInDinasAttachmentName'
+        );
+
+
+      if (dinasAttachment) {
+
+        dinasAttachment.value = '';
+
+      }
+
+
+      if (dinasAttachmentName) {
+
+        dinasAttachmentName.textContent = '';
+
+        dinasAttachmentName.classList.remove(
+          'error'
+        );
+
+      }
+
+    }
+
+   
+
+    /* =======================================================
+      CHECK-IN - UPDATE SHIFT UI
+      ======================================================= */
