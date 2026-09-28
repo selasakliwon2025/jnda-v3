@@ -1,1 +1,536 @@
+function completeLogout(token) {
 
+      /*
+       * Hapus token lokal setelah user benar-benar
+       * mengonfirmasi logout.
+       */
+      localStorage.removeItem(
+        'JNDA_SESSION_TOKEN'
+      );
+
+      SESSION_TOKEN = '';
+      CURRENT_SESSION = null;
+
+      /*
+       * Jika API google.script.run tidak tersedia,
+       * tetap arahkan ke login karena token lokal
+       * sudah dibersihkan.
+       */
+      if (
+        typeof google === 'undefined' ||
+        !google.script ||
+        !google.script.run
+      ) {
+        redirectToLogin();
+        return;
+      }
+
+      google.script.run
+
+        .withSuccessHandler(
+          function () {
+
+            redirectToLogin();
+
+          }
+        )
+
+        .withFailureHandler(
+          function (error) {
+
+            console.error(
+              'Logout server error:',
+              error
+            );
+
+            /*
+             * Token lokal sudah terhapus.
+             * Tetap arahkan user ke login.
+             */
+            redirectToLogin();
+
+          }
+        )
+
+        .destroySession(
+          token
+        );
+
+    }
+
+
+    /* =======================================================
+       MOBILE SIDEBAR
+       ======================================================= */
+
+    function toggleMobileSidebar() {
+
+      const sidebar =
+        document.getElementById(
+          'jndaSidebar'
+        );
+
+
+      const overlay =
+        document.getElementById(
+          'sidebarOverlay'
+        );
+
+
+      if (!sidebar) {
+        return;
+      }
+
+
+      const opening =
+        !sidebar.classList.contains(
+          'mobile-open'
+        );
+
+
+      if (opening) {
+
+        sidebar.classList.add(
+          'mobile-open'
+        );
+
+
+        if (overlay) {
+
+          overlay.classList.add(
+            'mobile-open'
+          );
+
+        }
+
+      } else {
+
+        closeMobileSidebar();
+
+      }
+
+    }
+
+
+    function closeMobileSidebar() {
+
+      const sidebar =
+        document.getElementById(
+          'jndaSidebar'
+        );
+
+
+      const overlay =
+        document.getElementById(
+          'sidebarOverlay'
+        );
+
+
+      if (sidebar) {
+
+        sidebar.classList.remove(
+          'mobile-open'
+        );
+
+      }
+
+
+      if (overlay) {
+
+        overlay.classList.remove(
+          'mobile-open'
+        );
+
+      }
+
+    }
+
+
+    /* =======================================================
+   DIGITAL CLOCK
+   ======================================================= */
+
+      let EMPLOYEE_TIMEZONE = 'Asia/Jakarta';
+      let EMPLOYEE_TIMEZONE_LABEL = 'WIB';
+
+
+      function startClock() {
+
+        updateClock();
+
+        setInterval(
+          updateClock,
+          1000
+        );
+
+      }
+
+
+      function updateClock() {
+
+        const now = new Date();
+
+        const timeText =
+          new Intl.DateTimeFormat(
+            'id-ID',
+            {
+              timeZone: EMPLOYEE_TIMEZONE,
+
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+
+              hour12: false
+            }
+          ).format(now);
+
+
+        const clock =
+          document.getElementById(
+            'clockTime'
+          );
+
+
+        if (clock) {
+
+          clock.textContent =
+            timeText;
+
+        }
+
+
+        const zone =
+          document.getElementById(
+            'clockTimeZone'
+          );
+
+
+        if (zone) {
+
+          zone.textContent =
+            EMPLOYEE_TIMEZONE_LABEL;
+
+        }
+
+
+        /* tanggal dashboard */
+
+        const dateText =
+          new Intl.DateTimeFormat(
+            'id-ID',
+            {
+              timeZone: EMPLOYEE_TIMEZONE,
+
+              weekday: 'long',
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric'
+            }
+          ).format(now);
+
+
+        const pageDate =
+          document.getElementById(
+            'pageDate'
+          );
+
+
+        if (pageDate) {
+
+          pageDate.textContent =
+            dateText;
+
+        }
+
+      }
+
+
+    /* =======================================================
+       LOADING
+       ======================================================= */
+
+    function hideDashboardLoading() {
+
+      const loading =
+        document.getElementById(
+          'dashboardLoading'
+        );
+
+
+      const content =
+        document.getElementById(
+          'dashboardMain'
+        );
+
+
+      if (loading) {
+
+        loading.style.display =
+          'none';
+
+      }
+
+
+      if (content) {
+
+        content.style.display =
+          'block';
+
+      }
+
+    }
+
+
+    /* =======================================================
+       HELPERS
+       ======================================================= */
+
+    function setText(
+      id,
+      value
+    ) {
+
+      const element =
+        document.getElementById(
+          id
+        );
+
+
+      if (!element) {
+        return;
+      }
+
+
+      element.textContent =
+        value == null
+          ? '-'
+          : String(value);
+
+    }
+
+
+    function setInitial(
+      id,
+      name
+    ) {
+
+      const element =
+        document.getElementById(
+          id
+        );
+
+
+      if (!element) {
+        return;
+      }
+
+
+      const text =
+        String(
+          name || 'P'
+        ).trim();
+
+
+      element.textContent =
+        text
+          ? text
+              .charAt(0)
+              .toUpperCase()
+          : 'P';
+
+    }
+
+
+    function firstValidValue() {
+
+      const values =
+        Array.from(
+          arguments
+        );
+
+
+      for (
+        let i = 0;
+        i < values.length;
+        i++
+      ) {
+
+        const value =
+          values[i];
+
+
+        if (
+          value !== undefined &&
+          value !== null &&
+          String(value).trim() !== ''
+        ) {
+
+          return value;
+
+        }
+
+      }
+
+
+      return '-';
+
+    }
+
+
+    function normalizeRole(
+      role
+    ) {
+
+      return String(
+        role || ''
+      )
+        .trim()
+        .toUpperCase()
+        .replace(/[_-]+/g, ' ')
+        .replace(/\s+/g, ' ');
+
+    }
+
+
+    function formatRoleName(
+      role
+    ) {
+
+      const normalized =
+        normalizeRole(
+          role
+        );
+
+
+      if (!normalized) {
+        return 'Pegawai';
+      }
+
+
+      return normalized;
+
+    }
+
+
+    /* =======================================================
+       DATE / TIME
+       ======================================================= */
+
+    function formatDate(
+      value
+    ) {
+
+      if (
+        !value ||
+        value === '-'
+      ) {
+
+        return '-';
+
+      }
+
+
+      try {
+
+        const date =
+          new Date(value);
+
+
+        if (
+          isNaN(
+            date.getTime()
+          )
+        ) {
+
+          return String(value);
+
+        }
+
+
+        return new Intl.DateTimeFormat(
+          'id-ID',
+          {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            timeZone: 'Asia/Jakarta'
+          }
+        ).format(date);
+
+      } catch (error) {
+
+        return String(value);
+
+      }
+
+    }
+
+
+    function formatTime(
+      value
+    ) {
+
+      if (
+        !value ||
+        value === '-'
+      ) {
+
+        return '-';
+
+      }
+
+
+      /*
+       * Jika server sudah mengirim
+       * format HH:mm / HH:mm:ss.
+       */
+
+      if (
+        typeof value === 'string' &&
+        /^\d{1,2}:\d{2}/.test(
+          value
+        )
+      ) {
+
+        return value.substring(
+          0,
+          5
+        );
+
+      }
+
+
+      try {
+
+        const date =
+          new Date(value);
+
+
+        if (
+          isNaN(
+            date.getTime()
+          )
+        ) {
+
+          return String(value);
+
+        }
+
+
+        return new Intl.DateTimeFormat(
+          'id-ID',
+          {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            timeZone: 'Asia/Jakarta'
+          }
+        ).format(date);
+
+      } catch (error) {
+
+        return String(value);
+
+      }
+
+    }
