@@ -1,1 +1,579 @@
+======================================================= */
 
+    let SESSION_TOKEN = '';
+    let CURRENT_SESSION = null;
+    let DASHBOARD_DATA = null;
+
+    /*
+     * URL Web App dibuat sebagai string JavaScript biasa.
+     * Hindari scriptlet GAS di dalam <script> agar HtmlService
+     * tidak menghasilkan "Malformed HTML content".
+     */
+    const WEB_APP_URL =
+      'https://script.google.com/macros/s/AKfycbyZlvCcB12RfizFTPaw5nVLZK07dsTRh2SX7ZFyWeINoxTsXn-GBxtiSfpaq-LGgBcZMw/exec';
+
+
+    /* =======================================================
+       INITIALIZATION
+       ======================================================= */
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      function () {
+
+        startDashboard();
+
+        startClock();
+
+        initAttendanceModal();
+
+        initDinasAttachment();
+
+      }
+    );
+
+    function initAttendanceModal() {
+
+      const remark =
+        document.getElementById(
+          'checkInRemark'
+        );
+
+
+      if (remark) {
+
+        remark.addEventListener(
+          'input',
+          updateRemarkCounter
+        );
+
+      }
+
+      const checkInMode =
+        document.getElementById(
+          'checkInMode'
+        );
+
+
+      const checkInEmployeeType =
+        document.getElementById(
+          'checkInEmployeeType'
+        );
+
+
+      if (checkInMode) {
+
+        checkInMode.addEventListener(
+          'change',
+          updateCheckInShiftUI
+        );
+
+      }
+
+
+      if (checkInEmployeeType) {
+
+        checkInEmployeeType.addEventListener(
+          'change',
+          updateCheckInShiftUI
+        );
+
+      }
+
+      const checkOutRemark =
+        document.getElementById(
+          'checkOutRemark'
+        );
+
+      if (checkOutRemark) {
+
+        checkOutRemark.addEventListener(
+          'input',
+          updateCheckOutRemarkCounter
+        );
+
+      }
+
+
+      /*
+      * ESC untuk menutup modal
+      */
+
+      document.addEventListener(
+        'keydown',
+        function (event) {
+
+          if (
+            event.key === 'Escape'
+          ) {
+
+            const modal =
+              document.getElementById(
+                'checkInModal'
+              );
+
+            if (
+              modal &&
+              modal.classList.contains('show')
+            ) {
+
+              closeCheckInModal();
+
+            }
+
+          }
+
+        }
+      );
+
+    }
+
+
+    /* =======================================================
+       START DASHBOARD
+       ======================================================= */
+
+    function startDashboard() {
+
+      SESSION_TOKEN =
+        localStorage.getItem(
+          'JNDA_SESSION_TOKEN'
+        );
+
+
+      if (!SESSION_TOKEN) {
+
+        console.warn(
+          'JNDA CHECK-OUT: SESSION TOKEN TIDAK DITEMUKAN'
+        );
+
+        showAttendanceMessage(
+          'Session tidak tersedia. Silakan refresh halaman.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      google.script.run
+        .withSuccessHandler(
+          handleDashboardSuccess
+        )
+        .withFailureHandler(
+          handleDashboardError
+        )
+        .getDashboardData(
+          SESSION_TOKEN
+        );
+
+    }
+
+
+    /* =======================================================
+       SUCCESS
+       ======================================================= */
+
+    function handleDashboardSuccess(result) {
+
+      if (
+        !result ||
+        result.success === false
+      ) {
+
+        redirectToLogin();
+
+        return;
+
+      }
+
+
+      DASHBOARD_DATA =
+        result.data || result;
+
+
+      CURRENT_SESSION =
+        DASHBOARD_DATA.session ||
+        result.session ||
+        null;
+
+
+      renderDashboard(
+        DASHBOARD_DATA
+      );
+
+    }
+
+
+    /* =======================================================
+       ERROR
+       ======================================================= */
+
+    function handleDashboardError(error) {
+
+        console.error(
+          'Dashboard error:',
+          error
+        );
+
+        const loading =
+          document.getElementById(
+            'dashboardLoading'
+          );
+
+        if (loading) {
+
+          loading.style.display = 'flex';
+
+          loading.innerHTML = `
+
+            <div style="
+              width:100%;
+              max-width:420px;
+              padding:30px;
+              border-radius:20px;
+              background:#ffffff;
+              box-shadow:0 15px 45px rgba(15,23,42,.12);
+              text-align:center;
+            ">
+
+              <div style="
+                font-size:38px;
+                margin-bottom:12px;
+              ">
+                ⚠️
+              </div>
+
+              <div style="
+                font-size:18px;
+                font-weight:800;
+                color:#172033;
+              ">
+                Dashboard gagal dimuat
+              </div>
+
+              <div style="
+                margin-top:8px;
+                font-size:12px;
+                color:#728096;
+                line-height:1.6;
+              ">
+                Terjadi masalah saat mengambil
+                data dashboard.
+              </div>
+
+              <button
+                type="button"
+                onclick="location.reload()"
+                style="
+                  margin-top:18px;
+                  border:0;
+                  border-radius:10px;
+                  padding:11px 18px;
+                  background:#16458f;
+                  color:#fff;
+                  font-weight:700;
+                  cursor:pointer;
+                "
+              >
+                Coba Lagi
+              </button>
+
+            </div>
+
+          `;
+
+        }
+
+      }
+
+
+    /* =======================================================
+       RENDER DASHBOARD
+       ======================================================= */
+
+    function renderDashboard(data) {
+
+      console.log(
+        'JNDA Dashboard Data:',
+        data
+      );
+
+
+      const employee =
+        data.employee || {};
+
+
+      const user =
+        data.user || {};
+
+
+      const role =
+        data.role || {};
+
+      const management =
+        data.management || {};
+
+
+      /*
+       * =====================================================
+       * USER NAME
+       * =====================================================
+       */
+
+      const employeeName =
+        firstValidValue(
+          employee.fullName,
+          employee.employeeName,
+          employee.name,
+          user.fullName,
+          user.name,
+          user.username,
+          'Pegawai'
+        );
+
+
+      const employeeId =
+        firstValidValue(
+          employee.employeeId,
+          employee.EMPLOYEE_ID,
+          user.employeeId,
+          user.EMPLOYEE_ID,
+          '-'
+        );
+
+
+      const employeeNip =
+        firstValidValue(
+          employee.nip,
+          employee.NIP,
+          employeeId,
+          '-'
+        );
+
+
+      /*
+       * =====================================================
+       * ROLE
+       * =====================================================
+       */
+
+      const roleName =
+        firstValidValue(
+          role.name,
+          role.roleName,
+          role.ROLE_NAME,
+          user.roleName,
+          user.role,
+          ''
+        );
+
+
+      /*
+       * =====================================================
+       * CONTEXT
+       * =====================================================
+       */
+
+      const organization =
+        data.organization || {};
+
+
+      const branchName =
+        firstValidValue(
+          organization.branch,
+          employee.branchName,
+          employee.BRANCH_NAME,
+          employee.branch,
+          '-'
+        );
+
+
+      const shipName =
+        firstValidValue(
+          organization.ship,
+          employee.shipName,
+          employee.SHIP_NAME,
+          employee.ship,
+          '-'
+        );
+
+
+      const positionName =
+        firstValidValue(
+          organization.position,
+          employee.positionName,
+          employee.POSITION_NAME,
+          employee.position,
+          '-'
+        );
+
+      const shiftName =
+        firstValidValue(
+          organization.shift,
+          employee.shiftName,
+          employee.SHIFT_NAME,
+          employee.shift,
+          '-'
+        );
+
+
+      /*
+       * =====================================================
+       * HERO
+       * =====================================================
+       */
+
+      setText(
+        'welcomeName',
+        employeeName
+      );
+
+
+      setText(
+        'welcomeEmployeeId',
+        employeeId
+      );
+
+
+      setText(
+        'welcomeContext',
+        buildWorkContext(
+          branchName,
+          shipName
+        )
+      );
+
+
+      /*
+       * =====================================================
+       * PROFILE
+       * =====================================================
+       */
+
+      setText(
+        'profileName',
+        employeeName
+      );
+
+
+      setText(
+        'profileEmployeeId',
+        'NIP: ' + employeeNip
+      );
+
+
+      setInitial(
+        'profileAvatar',
+        employeeName
+      );
+
+
+      setInitial(
+        'topAvatar',
+        employeeName
+      );
+
+
+      setText(
+        'topUserName',
+        employeeName
+      );
+
+
+      setText(
+        'topUserRole',
+        formatRoleName(roleName)
+      );
+
+
+      renderProfileContext(
+        branchName,
+        shipName,
+        positionName,
+        shiftName
+      );
+
+
+      /*
+       * =====================================================
+       * INFO PENEMPATAN
+       * =====================================================
+       */
+
+      setText(
+        'infoBranch',
+        branchName
+      );
+
+
+      setText(
+        'infoShip',
+        shipName
+      );
+
+
+      setText(
+        'infoPosition',
+        positionName
+      );
+
+
+      setText(
+        'infoShift',
+        shiftName
+      );
+
+
+      /* =====================================================
+        ATTENDANCE
+        ===================================================== */
+
+      /*
+      * Attendance sengaja tidak diambil dari
+      * getDashboardData() agar dashboard ringan.
+      *
+      * Data attendance dimuat terpisah setelah
+      * informasi pegawai selesai ditampilkan.
+      */
+
+      renderTodayAttendance({
+        today: null
+      });
+
+      renderRecentAttendance({
+        recent: []
+      });
+
+      /*
+      * Load attendance setelah dashboard utama
+      * selesai dirender.
+      */
+      loadTodayAttendance();
+
+
+      /*
+       * =====================================================
+       * ROLE MENU
+       * =====================================================
+       */
+
+      configureRoleMenus(
+        employeeId,
+        roleName
+      );
+
+
+      /*
+       * =====================================================
+       * SHOW DASHBOARD
+       * =====================================================
+       */
+
+      hideDashboardLoading();
+
+    }
+
+    /* =======================================================
+      LOAD TODAY ATTENDANCE
+      ======================================================= */
