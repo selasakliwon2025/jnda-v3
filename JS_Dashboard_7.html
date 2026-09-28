@@ -1,1 +1,552 @@
+function confirmCheckOut() {
 
+      SESSION_TOKEN =
+        localStorage.getItem(
+          'JNDA_SESSION_TOKEN'
+        ) || SESSION_TOKEN;
+
+
+      if (!SESSION_TOKEN) {
+
+        console.warn(
+          'JNDA CHECK-OUT: SESSION TOKEN TIDAK DITEMUKAN'
+        );
+
+        showAttendanceMessage(
+          'Session tidak tersedia. Silakan refresh halaman.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      const remark =
+        document.getElementById(
+          'checkOutRemark'
+        )?.value.trim() || '';
+
+
+      const button =
+        document.getElementById(
+          'confirmCheckOutButton'
+        );
+
+
+      if (button) {
+
+        button.disabled = true;
+
+        button.innerHTML =
+          '⏳ Memproses...';
+
+      }
+
+
+      Swal.fire({
+
+        title: 'Memproses Absen Pulang...',
+
+        text: 'Mohon tunggu sebentar.',
+
+        allowOutsideClick: false,
+
+        allowEscapeKey: false,
+
+        showConfirmButton: false,
+
+        didOpen: function () {
+
+          Swal.showLoading();
+
+        }
+
+      });
+
+
+      const payload = {
+
+        remark:
+          remark
+
+      };
+
+
+      console.log(
+        'JNDA Check-Out Payload:',
+        payload
+      );
+
+
+      google.script.run
+
+        .withSuccessHandler(
+          handleCheckOutSuccess
+        )
+
+        .withFailureHandler(
+          handleCheckOutError
+        )
+
+        .checkOut(
+          SESSION_TOKEN,
+          payload
+        );
+
+    }
+
+    function handleCheckOutSuccess(result) {
+
+      console.log(
+        'JNDA Check-Out Response:',
+        result
+      );
+
+
+      const button =
+        document.getElementById(
+          'confirmCheckOutButton'
+        );
+
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.innerHTML = `
+          <span class="confirm-check-icon">
+            ✓
+          </span>
+
+          <span>
+            Konfirmasi Absen Pulang
+          </span>
+        `;
+
+      }
+
+
+      if (
+        typeof Swal !== 'undefined' &&
+        Swal.isVisible()
+      ) {
+
+        Swal.close();
+
+      }
+
+
+      /* -------------------------------------------------------
+        SERVER MENOLAK
+        ------------------------------------------------------- */
+
+      if (
+        result &&
+        result.success === false
+      ) {
+
+        closeCheckOutModal();
+
+
+        Swal.fire({
+
+          icon: 'warning',
+
+          title: 'Absen Pulang Ditolak',
+
+          text:
+            result.message ||
+            'Absen pulang tidak dapat diproses.',
+
+          confirmButtonText: 'Mengerti',
+
+          confirmButtonColor: '#16458f',
+
+          customClass: {
+            popup: 'jnda-swal-popup'
+          }
+
+        });
+
+        return;
+      }
+
+
+      /* -------------------------------------------------------
+        SUCCESS
+        ------------------------------------------------------- */
+
+      closeCheckOutModal();
+
+
+      /* Refresh status dashboard */
+      loadTodayAttendance();
+
+
+      Swal.fire({
+
+        icon: 'success',
+
+        title: 'Absen Pulang Berhasil',
+
+        text:
+          result && result.message
+            ? result.message
+            : 'Absen pulang berhasil dicatat.',
+
+        showConfirmButton: false,
+
+        timer: 2000,
+
+        timerProgressBar: true,
+
+        customClass: {
+          popup: 'jnda-swal-popup'
+        }
+
+      });
+
+    }
+
+
+    function handleCheckOutError(error) {
+
+      console.error(
+        'JNDA Check-Out Error:',
+        error
+      );
+
+
+      const button =
+        document.getElementById(
+          'confirmCheckOutButton'
+        );
+
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.innerHTML = `
+          <span class="confirm-check-icon">
+            ✓
+          </span>
+
+          <span>
+            Konfirmasi Absen Pulang
+          </span>
+        `;
+
+      }
+
+
+      if (
+        typeof Swal !== 'undefined' &&
+        Swal.isVisible()
+      ) {
+
+        Swal.close();
+
+      }
+
+
+      closeCheckOutModal();
+
+
+      const message =
+        error && error.message
+          ? String(error.message).trim()
+          : 'Terjadi kesalahan saat menyimpan absen pulang.';
+
+
+      Swal.fire({
+
+        icon: 'error',
+
+        title: 'Absen Pulang Tidak Dapat Diproses',
+
+        text: message,
+
+        confirmButtonText: 'Mengerti',
+
+        confirmButtonColor: '#16458f',
+
+        customClass: {
+          popup: 'jnda-swal-popup'
+        }
+
+      });
+
+    }
+
+    function updateCheckOutRemarkCounter() {
+
+      const input =
+        document.getElementById(
+          'checkOutRemark'
+        );
+
+      const counter =
+        document.getElementById(
+          'checkOutRemarkCounter'
+        );
+
+
+      if (!input || !counter) {
+        return;
+      }
+
+
+      counter.textContent =
+        input.value.length;
+
+    }
+
+
+
+
+    /* =========================================================
+      CHECK IN SUCCESS
+      ========================================================= */
+
+    function handleCheckInSuccess(result) {
+
+      console.log(
+        'JNDA Check-In Response:',
+        result
+      );
+
+      const button =
+        document.getElementById(
+          'confirmCheckInButton'
+        );
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.classList.remove(
+          'loading'
+        );
+
+        button.innerHTML =
+          '✓ Konfirmasi Absen';
+
+      }
+
+
+      /*
+      * =====================================================
+      * SERVER MENOLAK ABSEN
+      * =====================================================
+      *
+      * Backend checkIn() dapat mengembalikan:
+      *
+      * {
+      *   success: false,
+      *   code: 'ALREADY_CHECKED_IN',
+      *   message: '...'
+      * }
+      *
+      * Jangan dianggap sebagai success.
+      */
+
+      if (
+        result &&
+        result.success === false
+      ) {
+
+        /*
+        * Tutup modal attendance.
+        */
+
+        closeCheckInModal();
+
+
+        /*
+        * Tampilkan pesan asli dari backend.
+        */
+
+        Swal.fire({
+
+          icon: 'warning',
+
+          title:
+            'Absen Masuk Ditolak',
+
+          text:
+            result.message ||
+            'Absensi masuk tidak dapat diproses.',
+
+          confirmButtonText:
+            'Mengerti',
+
+          confirmButtonColor:
+            '#16458f',
+
+          customClass: {
+            popup:
+              'jnda-swal-popup'
+          }
+
+        });
+
+
+        /*
+        * STOP.
+        *
+        * Jangan jalankan:
+        * loadTodayAttendance()
+        * success alert
+        */
+
+        return;
+      }
+
+
+      /*
+      * =====================================================
+      * SUCCESS
+      * =====================================================
+      */
+
+      closeCheckInModal();
+
+
+      /*
+      * Refresh attendance.
+      */
+
+      loadTodayAttendance();
+
+
+      /*
+      * Notifikasi berhasil.
+      */
+
+      Swal.fire({
+
+        icon: 'success',
+
+        title:
+          'Absen Berhasil',
+
+        text:
+          result &&
+          result.message
+            ? result.message
+            : 'Absensi masuk berhasil dicatat.',
+
+        showConfirmButton:
+          false,
+
+        timer:
+          2000,
+
+        timerProgressBar:
+          true,
+
+        customClass: {
+          popup:
+            'jnda-swal-popup'
+        }
+
+      });
+
+    }
+
+
+    /* =========================================================
+      CHECK IN ERROR
+      ========================================================= */
+
+    function handleCheckInError(error) {
+
+      console.warn(
+        'JNDA Check-In ditolak:',
+        error && error.message
+          ? error.message
+          : error
+      );
+
+      const button =
+        document.getElementById(
+          'confirmCheckInButton'
+        );
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.classList.remove(
+          'loading'
+        );
+
+        button.innerHTML =
+          '✓ Konfirmasi Absen';
+
+      }
+
+      /*
+      * Ambil pesan asli dari backend.
+      */
+      let message =
+        'Terjadi kesalahan saat menyimpan absensi.';
+
+      if (
+        error &&
+        error.message
+      ) {
+
+        message =
+          String(
+            error.message
+          ).trim();
+
+      }
+
+      /*
+      * Tutup loading SweetAlert jika
+      * sebelumnya digunakan.
+      */
+      if (
+        typeof Swal !== 'undefined' &&
+        Swal.isVisible()
+      ) {
+
+        Swal.close();
+
+      }
+
+      /*
+      * Tutup modal attendance terlebih dahulu.
+      */
+      closeCheckInModal();
+
+      /*
+      * Tampilkan error asli dari backend.
+      */
+      Swal.fire({
+
+        icon: 'error',
+
+        title: 'Absen Tidak Dapat Diproses',
+
+        text: message,
+
+        confirmButtonText: 'Mengerti',
+
+        confirmButtonColor: '#16458f',
+
+        customClass: {
+          popup: 'jnda-swal-popup'
+        }
+
+      });
+
+    }
+
+
+    /* =========================================================
+      REMARK COUNTER
+      ========================================================= */
