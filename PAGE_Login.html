@@ -9,14 +9,14 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
   >
 
   <title><?= APP.name ?></title>
 
 
   <!-- ======================================================
-       FONT
+       GOOGLE FONT
        ====================================================== -->
 
   <link
@@ -31,8 +31,18 @@
   >
 
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet"
+  >
+
+
+  <!-- ======================================================
+       FONT AWESOME
+       ====================================================== -->
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
   >
 
 
@@ -51,41 +61,137 @@
 
     html,
     body {
+
       width: 100%;
       min-height: 100%;
+
     }
 
 
     body {
 
-      font-family: 'Inter', sans-serif;
-
-      background:
-        radial-gradient(
-          circle at 10% 10%,
-          rgba(59, 130, 246, 0.13),
-          transparent 30%
-        ),
-        radial-gradient(
-          circle at 90% 90%,
-          rgba(14, 165, 233, 0.12),
-          transparent 32%
-        ),
-        #f5f8fc;
-
-      color: #172033;
+      font-family: 'Poppins', sans-serif;
 
       min-height: 100vh;
 
-      overflow-x: hidden;
+      overflow: hidden;
+
+      color: #174a83;
+
+      background: #bfe8fa;
+
     }
 
 
     /* ======================================================
-       MAIN
+       FULL SCREEN BACKGROUND
+       ====================================================== */
+
+    .login-background {
+
+      position: fixed;
+
+      inset: 0;
+
+      width: 100%;
+      height: 100%;
+
+      z-index: 0;
+
+      background-image:
+
+        linear-gradient(
+          180deg,
+          rgba(84, 165, 219, 0.05) 0%,
+          rgba(255,255,255,0.00) 55%,
+          rgba(220,245,255,0.08) 100%
+        ),
+
+        url(
+          'https://lh3.googleusercontent.com/d/1l2t4wTl9ivGfQoP53dJgn3Vmicyy90s4'
+        );
+
+      background-size: cover;
+
+      background-position: center center;
+
+      background-repeat: no-repeat;
+
+    }
+
+
+    /* ======================================================
+       BACKGROUND SOFT LIGHT
+       ====================================================== */
+
+    .login-background::after {
+
+      content: "";
+
+      position: absolute;
+
+      inset: 0;
+
+      background:
+
+        linear-gradient(
+          180deg,
+          rgba(255,255,255,0.08),
+          rgba(255,255,255,0.00) 45%,
+          rgba(255,255,255,0.08)
+        );
+
+      pointer-events: none;
+
+    }
+
+
+    /* ======================================================
+       WAVE BOTTOM
+       ====================================================== */
+
+    .wave-bottom {
+
+      position: fixed;
+
+      left: 0;
+
+      bottom: 0;
+
+      width: 100%;
+
+      height: 23vh;
+
+      z-index: 2;
+
+      pointer-events: none;
+
+      background-image:
+
+        url(
+          'https://lh3.googleusercontent.com/d/1771Mi5aQptbbIVJsM-kqtJVZaY0YG5a2'
+        );
+
+      background-size: cover;
+
+      background-position: center bottom;
+
+      background-repeat: no-repeat;
+
+    }
+
+
+    /* ======================================================
+       PAGE WRAPPER
        ====================================================== */
 
     .login-page {
+
+      position: relative;
+
+      z-index: 3;
+
+      width: 100%;
 
       min-height: 100vh;
 
@@ -95,114 +201,40 @@
 
       justify-content: center;
 
-      padding: 30px;
-    }
+      padding: 20px;
 
-
-    .login-container {
-
-      width: 100%;
-
-      max-width: 1050px;
-
-      min-height: 620px;
-
-      display: grid;
-
-      grid-template-columns:
-        1.05fr
-        0.95fr;
-
-      background: #ffffff;
-
-      border-radius: 30px;
-
-      overflow: hidden;
-
-      box-shadow:
-        0 25px 70px
-        rgba(15, 23, 42, 0.10);
     }
 
 
     /* ======================================================
-       LEFT PANEL
+       BRAND HEADER
        ====================================================== */
 
-    .brand-panel {
+    .brand-header {
 
-      position: relative;
+      position: fixed;
 
-      overflow: hidden;
+      top: 25px;
 
-      padding: 55px;
+      left: 50%;
 
-      display: flex;
+      transform: translateX(-50%);
 
-      flex-direction: column;
+      width: 100%;
 
-      justify-content: space-between;
+      max-width: 700px;
 
-      background:
-        linear-gradient(
-          145deg,
-          #0f4c81 0%,
-          #1769aa 48%,
-          #1e88c9 100%
-        );
+      padding: 0 15px;
 
-      color: white;
-    }
+      text-align: center;
 
+      z-index: 5;
 
-    .brand-panel::before {
+      color: #0b3d91;
 
-      content: '';
+      text-shadow:
+        0 1px 3px rgba(255,255,255,0.85);
 
-      position: absolute;
-
-      width: 360px;
-
-      height: 360px;
-
-      border-radius: 50%;
-
-      background:
-        rgba(255,255,255,0.07);
-
-      top: -150px;
-
-      right: -130px;
-    }
-
-
-    .brand-panel::after {
-
-      content: '';
-
-      position: absolute;
-
-      width: 280px;
-
-      height: 280px;
-
-      border-radius: 50%;
-
-      background:
-        rgba(255,255,255,0.05);
-
-      bottom: -130px;
-
-      left: -100px;
-    }
-
-
-    .brand-content,
-    .brand-footer {
-
-      position: relative;
-
-      z-index: 2;
     }
 
 
@@ -210,339 +242,305 @@
        LOGO
        ====================================================== */
 
-    .logo-wrapper {
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 14px;
-
-      margin-bottom: 55px;
-    }
-
-
-    .logo-box {
-
-      width: 52px;
-
-      height: 52px;
-
-      border-radius: 16px;
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: center;
-
-      background:
-        rgba(255,255,255,0.16);
-
-      border:
-        1px solid
-        rgba(255,255,255,0.20);
-
-      backdrop-filter:
-        blur(10px);
-
-      font-size: 21px;
-
-      font-weight: 800;
-
-      letter-spacing: -1px;
-    }
-
-
-    .logo-text {
-
-      font-size: 15px;
-
-      font-weight: 700;
-
-      letter-spacing: .3px;
-    }
-
-
-    .logo-version {
+    .brand-logo {
 
       display: block;
 
-      font-size: 10px;
+      width: auto;
 
-      font-weight: 500;
+      height: 68px;
 
-      opacity: .70;
+      max-width: 180px;
 
-      margin-top: 3px;
+      object-fit: contain;
 
-      letter-spacing: 1px;
+      margin: 0 auto 5px auto;
+
+      filter:
+
+        drop-shadow(
+          0 3px 7px
+          rgba(0,0,0,0.15)
+        );
+
     }
 
 
     /* ======================================================
-       BRAND TEXT
+       APP TITLE
        ====================================================== */
 
     .brand-title {
 
-      font-size: 42px;
+      margin: 0;
 
-      line-height: 1.12;
-
-      font-weight: 800;
-
-      letter-spacing: -1.8px;
-
-      max-width: 430px;
-
-      margin-bottom: 20px;
-    }
-
-
-    .brand-description {
-
-      max-width: 410px;
-
-      font-size: 15px;
-
-      line-height: 1.8;
-
-      color:
-        rgba(255,255,255,.78);
-    }
-
-
-    /* ======================================================
-       BRAND INFO
-       ====================================================== */
-
-    .brand-info {
-
-      margin-top: 40px;
-
-      display: flex;
-
-      flex-direction: column;
-
-      gap: 14px;
-    }
-
-
-    .brand-info-item {
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 12px;
-
-      font-size: 13px;
-
-      color:
-        rgba(255,255,255,.86);
-    }
-
-
-    .info-icon {
-
-      width: 30px;
-
-      height: 30px;
-
-      border-radius: 10px;
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: center;
-
-      background:
-        rgba(255,255,255,.12);
-
-      font-size: 13px;
-    }
-
-
-    .brand-footer {
-
-      font-size: 11px;
-
-      color:
-        rgba(255,255,255,.55);
-    }
-
-
-    /* ======================================================
-       RIGHT PANEL
-       ====================================================== */
-
-    .form-panel {
-
-      padding: 55px;
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: center;
-
-      background: #ffffff;
-    }
-
-
-    .login-form-wrapper {
-
-      width: 100%;
-
-      max-width: 370px;
-    }
-
-
-    .welcome-label {
-
-      font-size: 12px;
-
-      font-weight: 700;
-
-      color: #2385c4;
-
-      text-transform: uppercase;
-
-      letter-spacing: 1.4px;
-
-      margin-bottom: 10px;
-    }
-
-
-    .form-title {
-
-      font-size: 30px;
+      font-size: 27px;
 
       line-height: 1.2;
 
-      font-weight: 800;
+      font-weight: 700;
 
-      letter-spacing: -1px;
+      letter-spacing: -0.6px;
 
-      color: #172033;
+      color: #0b3d91;
 
-      margin-bottom: 10px;
-    }
-
-
-    .form-subtitle {
-
-      font-size: 13px;
-
-      line-height: 1.7;
-
-      color: #7b8798;
-
-      margin-bottom: 32px;
     }
 
 
     /* ======================================================
-       FORM
+       COMPANY
+       ====================================================== */
+
+    .brand-company {
+
+      margin: 3px 0 0 0;
+
+      font-size: 13px;
+
+      font-weight: 400;
+
+      color: #315b83;
+
+    }
+
+
+    /* ======================================================
+       SLOGAN
+       ====================================================== */
+
+    .brand-slogan {
+
+      margin-top: 12px;
+
+      color: #0b3d91;
+
+      font-family: Georgia, 'Times New Roman', serif;
+
+      font-size: 16px;
+
+      font-style: italic;
+
+      line-height: 1.45;
+
+    }
+
+
+    /* ======================================================
+       LOGIN CARD
+       ====================================================== */
+
+    .login-card {
+
+      position: relative;
+
+      z-index: 6;
+
+      width: 100%;
+
+      max-width: 450px;
+
+      margin-top: 210px;
+
+      padding: 29px 29px 23px;
+
+      border-radius: 25px;
+
+      background:
+        rgba(255,255,255,0.94);
+
+      border:
+        1px solid
+        rgba(255,255,255,0.85);
+
+      box-shadow:
+
+        0 22px 60px
+        rgba(22,75,120,0.18);
+
+      backdrop-filter:
+        blur(10px);
+
+      -webkit-backdrop-filter:
+        blur(10px);
+
+    }
+
+
+    /* ======================================================
+       WELCOME TITLE
+       ====================================================== */
+
+    .welcome-title {
+
+      color: #174a83;
+
+      font-size: 25px;
+
+      line-height: 1.25;
+
+      font-weight: 700;
+
+      margin-bottom: 7px;
+
+    }
+
+
+    .welcome-title .wave-hand {
+
+      display: inline-block;
+
+      font-size: 22px;
+
+      margin-left: 3px;
+
+    }
+
+
+    /* ======================================================
+       SUBTITLE
+       ====================================================== */
+
+    .welcome-subtitle {
+
+      color: #73869b;
+
+      font-size: 12px;
+
+      line-height: 1.65;
+
+      margin-bottom: 23px;
+
+    }
+
+
+    /* ======================================================
+       FORM GROUP
        ====================================================== */
 
     .form-group {
 
-      margin-bottom: 19px;
+      margin-bottom: 13px;
+
     }
 
 
-    .form-label {
-
-      display: block;
-
-      font-size: 12px;
-
-      font-weight: 700;
-
-      color: #374151;
-
-      margin-bottom: 8px;
-    }
-
+    /* ======================================================
+       INPUT WRAPPER
+       ====================================================== */
 
     .input-wrapper {
 
       position: relative;
+
+      width: 100%;
+
+      height: 49px;
+
+      border:
+
+        1px solid
+        #d9e5ef;
+
+      border-radius: 11px;
+
+      background:
+        rgba(255,255,255,0.92);
+
+      transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+
+      overflow: hidden;
+
     }
 
+
+    .input-wrapper:focus-within {
+
+      border-color: #3188e8;
+
+      box-shadow:
+
+        0 0 0 3px
+        rgba(49,136,232,0.10);
+
+    }
+
+
+    /* ======================================================
+       INPUT ICON
+       ====================================================== */
 
     .input-icon {
 
       position: absolute;
 
-      left: 15px;
+      left: 0;
 
-      top: 50%;
+      top: 0;
 
-      transform: translateY(-50%);
+      width: 48px;
 
-      width: 18px;
+      height: 100%;
 
-      color: #9aa6b5;
+      display: flex;
 
-      pointer-events: none;
+      align-items: center;
+
+      justify-content: center;
+
+      color: #71879c;
 
       font-size: 15px;
 
-      text-align: center;
+      pointer-events: none;
+
     }
 
+
+    /* ======================================================
+       INPUT
+       ====================================================== */
 
     .form-input {
 
       width: 100%;
 
-      height: 50px;
+      height: 100%;
 
-      border:
-        1px solid
-        #e2e8f0;
+      border: 0;
 
-      border-radius: 13px;
+      outline: 0;
 
-      background: #f9fbfd;
+      background: transparent;
 
       padding:
-        0 15px 0 45px;
+        0 48px 0 47px;
 
-      font-family: inherit;
+      font-family:
+        'Poppins',
+        sans-serif;
 
-      font-size: 13px;
+      font-size: 12px;
 
-      color: #172033;
+      color: #315675;
 
-      outline: none;
-
-      transition:
-        border-color .2s ease,
-        box-shadow .2s ease,
-        background .2s ease;
     }
 
 
     .form-input::placeholder {
 
-      color: #aab3c0;
+      color: #8ca0b3;
+
+      opacity: 1;
+
     }
 
 
     .form-input:focus {
 
-      background: #ffffff;
+      outline: none;
 
-      border-color: #4aa3df;
-
-      box-shadow:
-        0 0 0 4px
-        rgba(74,163,223,.10);
     }
 
 
@@ -554,33 +552,114 @@
 
       position: absolute;
 
-      right: 13px;
+      top: 0;
 
-      top: 50%;
+      right: 0;
 
-      transform: translateY(-50%);
+      width: 47px;
+
+      height: 100%;
 
       border: 0;
 
       background: transparent;
 
-      color: #9aa6b5;
+      color: #7a90a5;
 
       cursor: pointer;
 
-      width: 30px;
+      display: flex;
 
-      height: 30px;
+      align-items: center;
 
-      border-radius: 8px;
+      justify-content: center;
+
+      font-size: 14px;
+
     }
 
 
     .password-toggle:hover {
 
-      background: #f1f5f9;
+      color: #1976d2;
 
-      color: #4b5563;
+    }
+
+
+    /* ======================================================
+       REMEMBER ROW
+       ====================================================== */
+
+    .remember-row {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-top: 15px;
+
+      margin-bottom: 21px;
+
+    }
+
+
+    .remember {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 7px;
+
+      color: #5e748a;
+
+      font-size: 11px;
+
+      cursor: pointer;
+
+    }
+
+
+    .remember input {
+
+      width: 17px;
+
+      height: 17px;
+
+      margin: 0;
+
+      cursor: pointer;
+
+      accent-color: #237ce5;
+
+    }
+
+
+    .forgot-password {
+
+      border: 0;
+
+      background: transparent;
+
+      color: #1976e2;
+
+      font-family: inherit;
+
+      font-size: 11px;
+
+      cursor: pointer;
+
+      padding: 0;
+
+    }
+
+
+    .forgot-password:hover {
+
+      text-decoration: underline;
+
     }
 
 
@@ -592,41 +671,42 @@
 
       width: 100%;
 
-      height: 52px;
+      height: 51px;
 
       border: 0;
 
-      border-radius: 14px;
-
-      margin-top: 8px;
+      border-radius: 12px;
 
       background:
+
         linear-gradient(
           135deg,
-          #1769aa,
-          #238bd0
+          #2d8af1,
+          #176bd5
         );
 
-      color: white;
+      color: #ffffff;
 
-      font-family: inherit;
+      font-family:
+        'Poppins',
+        sans-serif;
 
-      font-size: 13px;
+      font-size: 14px;
 
-      font-weight: 700;
-
-      letter-spacing: .2px;
+      font-weight: 600;
 
       cursor: pointer;
 
       box-shadow:
-        0 10px 25px
-        rgba(23,105,170,.20);
+
+        0 9px 20px
+        rgba(24,108,216,0.23);
 
       transition:
         transform .2s ease,
         box-shadow .2s ease,
         opacity .2s ease;
+
     }
 
 
@@ -636,8 +716,10 @@
         translateY(-1px);
 
       box-shadow:
-        0 13px 30px
-        rgba(23,105,170,.25);
+
+        0 12px 25px
+        rgba(24,108,216,0.29);
+
     }
 
 
@@ -645,26 +727,24 @@
 
       transform:
         translateY(0);
+
     }
 
 
     .login-button:disabled {
 
-      cursor: not-allowed;
+      opacity: .7;
 
-      opacity: .65;
+      cursor: not-allowed;
 
       transform: none;
 
-      box-shadow: none;
     }
 
 
-    /* ======================================================
-       LOADING
-       ====================================================== */
-
     .button-content {
+
+      height: 100%;
 
       display: flex;
 
@@ -673,8 +753,13 @@
       justify-content: center;
 
       gap: 9px;
+
     }
 
+
+    /* ======================================================
+       SPINNER
+       ====================================================== */
 
     .spinner {
 
@@ -693,6 +778,7 @@
 
       animation:
         spin .7s linear infinite;
+
     }
 
 
@@ -706,50 +792,58 @@
 
 
     /* ======================================================
-       MESSAGE
+       SECURITY BOX
        ====================================================== */
 
-    .login-message {
+    .security-box {
 
-      display: none;
+      margin-top: 15px;
 
-      margin-top: 17px;
+      min-height: 60px;
 
-      padding: 12px 14px;
+      padding: 11px 13px;
 
-      border-radius: 11px;
+      border-radius: 12px;
 
-      font-size: 12px;
+      border:
+        1px solid
+        #e2edf5;
+
+      background:
+
+        linear-gradient(
+          135deg,
+          rgba(247,251,255,.97),
+          rgba(251,253,255,.97)
+        );
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 9px;
+
+      text-align: center;
+
+      color: #75899d;
+
+      font-size: 10px;
 
       line-height: 1.5;
+
     }
 
 
-    .login-message.error {
+    .security-box i {
 
-      display: block;
+      color: #197ce5;
 
-      background: #fff1f2;
+      font-size: 17px;
 
-      color: #be123c;
+      flex-shrink: 0;
 
-      border:
-        1px solid
-        #fecdd3;
-    }
-
-
-    .login-message.success {
-
-      display: block;
-
-      background: #ecfdf5;
-
-      color: #047857;
-
-      border:
-        1px solid
-        #a7f3d0;
     }
 
 
@@ -757,195 +851,413 @@
        FOOTER
        ====================================================== */
 
-    .form-footer {
+    .login-footer {
+
+      margin-top: 17px;
 
       text-align: center;
 
-      margin-top: 28px;
+    }
 
-      font-size: 10px;
 
-      color: #a1aab7;
+    .ship-icon {
 
-      line-height: 1.7;
+      color: #2586df;
+
+      font-size: 20px;
+
+      margin-bottom: 4px;
+
+    }
+
+
+    .footer-text {
+
+      margin: 0;
+
+      color: #7b91a7;
+
+      font-size: 8px;
+
+      font-weight: 500;
+
+      letter-spacing: 2px;
+
     }
 
 
     /* ======================================================
-       RESPONSIVE TABLET
+       MESSAGE
        ====================================================== */
 
-    @media (max-width: 850px) {
+    .login-message {
 
-      .login-container {
+      display: none;
 
-        max-width: 650px;
+      margin-top: 13px;
 
-        grid-template-columns: 1fr;
+      padding: 9px 11px;
+
+      border-radius: 9px;
+
+      font-size: 10px;
+
+      line-height: 1.5;
+
+    }
+
+
+    .login-message.error {
+
+      display: block;
+
+      color: #b42318;
+
+      background: #fff1f0;
+
+      border:
+        1px solid
+        #ffd4d0;
+
+    }
+
+
+    .login-message.success {
+
+      display: block;
+
+      color: #067647;
+
+      background: #ecfdf3;
+
+      border:
+        1px solid
+        #abefc6;
+
+    }
+
+
+    /* ======================================================
+       DESKTOP
+       ====================================================== */
+
+    @media (min-width: 1200px) {
+
+      .brand-header {
+
+        top: 27px;
+
       }
 
 
-      .brand-panel {
+      .brand-logo {
 
-        min-height: 330px;
+        height: 74px;
 
-        padding: 38px;
       }
 
 
       .brand-title {
 
-        font-size: 32px;
+        font-size: 29px;
+
       }
 
 
-      .brand-description {
+      .login-card {
 
-        max-width: 520px;
-      }
+        max-width: 450px;
 
+        margin-top: 215px;
 
-      .brand-info {
-
-        display: none;
-      }
-
-
-      .brand-footer {
-
-        margin-top: 30px;
-      }
-
-
-      .form-panel {
-
-        padding: 45px 38px;
       }
 
     }
 
 
     /* ======================================================
-       RESPONSIVE MOBILE
+       TABLET
        ====================================================== */
 
-    @media (max-width: 520px) {
+    @media (max-width: 767px) {
 
       body {
 
-        background: #f5f8fc;
+        overflow-y: auto;
+
+        overflow-x: hidden;
+
       }
 
 
       .login-page {
 
-        padding: 0;
-      }
-
-
-      .login-container {
-
-        min-height: 100vh;
-
-        border-radius: 0;
-
-        box-shadow: none;
-
-        grid-template-columns: 1fr;
-      }
-
-
-      .brand-panel {
-
-        min-height: 245px;
+        align-items: flex-start;
 
         padding:
-          28px 24px 30px;
+          0 0 25px;
 
-        justify-content: flex-start;
       }
 
 
-      .logo-wrapper {
+      .brand-header {
 
-        margin-bottom: 32px;
+        top: 17px;
+
       }
 
 
-      .logo-box {
+      .brand-logo {
 
-        width: 45px;
+        height: 57px;
 
-        height: 45px;
-
-        border-radius: 13px;
       }
 
 
       .brand-title {
 
-        font-size: 27px;
+        font-size: 22px;
 
-        letter-spacing: -1px;
-
-        margin-bottom: 10px;
       }
 
 
-      .brand-description {
+      .brand-company {
 
-        font-size: 12px;
+        font-size: 11px;
 
-        line-height: 1.6;
-
-        max-width: 310px;
       }
 
 
-      .brand-footer {
+      .brand-slogan {
 
-        display: none;
+        margin-top: 8px;
+
+        font-size: 13px;
+
       }
 
 
-      .form-panel {
+      .login-card {
+
+        width:
+          calc(100% - 30px);
+
+        max-width: 450px;
+
+        margin-top: 190px;
 
         padding:
-          34px 24px 30px;
+          25px 21px 20px;
 
-        align-items: flex-start;
       }
 
 
-      .welcome-label {
+      .wave-bottom {
+
+        height: 20vh;
+
+      }
+
+    }
+
+
+    /* ======================================================
+       MOBILE
+       ====================================================== */
+
+    @media (max-width: 480px) {
+
+      .login-background {
+
+        background-position:
+          center center;
+
+      }
+
+
+      .brand-header {
+
+        top: 13px;
+
+        padding:
+          0 10px;
+
+      }
+
+
+      .brand-logo {
+
+        height: 48px;
+
+      }
+
+
+      .brand-title {
+
+        font-size: 18px;
+
+      }
+
+
+      .brand-company {
 
         font-size: 10px;
+
       }
 
 
-      .form-title {
+      .brand-slogan {
 
-        font-size: 25px;
+        font-size: 11px;
+
+        line-height: 1.35;
+
+        margin-top: 6px;
+
       }
 
 
-      .form-subtitle {
+      .login-card {
 
-        font-size: 12px;
+        width:
+          calc(100% - 24px);
 
-        margin-bottom: 26px;
+        margin-top: 168px;
+
+        padding:
+          22px 17px 18px;
+
+        border-radius: 22px;
+
+      }
+
+
+      .welcome-title {
+
+        font-size: 21px;
+
+      }
+
+
+      .welcome-title .wave-hand {
+
+        font-size: 19px;
+
+      }
+
+
+      .welcome-subtitle {
+
+        font-size: 11px;
+
+        margin-bottom: 19px;
+
+      }
+
+
+      .input-wrapper {
+
+        height: 47px;
+
       }
 
 
       .form-input {
 
-        height: 50px;
+        font-size: 11px;
+
+      }
+
+
+      .remember {
+
+        font-size: 10px;
+
+      }
+
+
+      .forgot-password {
+
+        font-size: 10px;
+
       }
 
 
       .login-button {
 
-        height: 50px;
+        height: 48px;
+
+        font-size: 13px;
+
+      }
+
+
+      .security-box {
+
+        font-size: 9px;
+
+        min-height: 56px;
+
+      }
+
+
+      .wave-bottom {
+
+        height: 18vh;
+
+      }
+
+    }
+
+
+    /* ======================================================
+       SMALL PHONE
+       ====================================================== */
+
+    @media (max-width: 360px) {
+
+      .brand-logo {
+
+        height: 43px;
+
+      }
+
+
+      .brand-title {
+
+        font-size: 16px;
+
+      }
+
+
+      .brand-company {
+
+        font-size: 9px;
+
+      }
+
+
+      .brand-slogan {
+
+        font-size: 10px;
+
+      }
+
+
+      .login-card {
+
+        margin-top: 153px;
+
+        padding:
+          19px 15px 17px;
+
+      }
+
+
+      .welcome-title {
+
+        font-size: 19px;
+
       }
 
     }
@@ -958,273 +1270,313 @@
 <body>
 
 
+  <!-- ======================================================
+       BACKGROUND KAPAL
+       ====================================================== -->
+
+  <div class="login-background"></div>
+
+
+  <!-- ======================================================
+       GELOMBANG BAWAH
+       ====================================================== -->
+
+  <div class="wave-bottom"></div>
+
+
+  <!-- ======================================================
+       BRAND HEADER
+       ====================================================== -->
+
+  <header class="brand-header">
+
+
+    <!--
+      LOGO JN
+
+      Google Drive file:
+      1cWdr6D-5exT4PPHCA94zsrjyXvkK-tVp
+
+      Pastikan file:
+      Anyone with the link -> Viewer
+    -->
+
+    <img
+      class="brand-logo"
+      src="https://drive.google.com/thumbnail?id=1cWdr6D-5exT4PPHCA94zsrjyXvkK-tVp&sz=w500"
+      alt="Logo JN"
+      referrerpolicy="no-referrer"
+    >
+
+
+    <h1 class="brand-title">
+
+      JN Daily Attendance
+
+    </h1>
+
+
+    <p class="brand-company">
+
+      PT. Jembatan Nusantara
+
+    </p>
+
+
+    <p class="brand-slogan">
+
+      Bersama Melangkah<br>
+
+      Menuju Masa Depan
+
+    </p>
+
+
+  </header>
+
+
+  <!-- ======================================================
+       LOGIN PAGE
+       ====================================================== -->
+
   <main class="login-page">
 
 
-    <section class="login-container">
+    <section class="login-card">
 
 
       <!-- ==================================================
-           BRAND PANEL
+           WELCOME
            ================================================== -->
 
-      <div class="brand-panel">
+      <h2 class="welcome-title">
+
+        Selamat Datang
+
+        <span class="wave-hand">
+          👋
+        </span>
+
+      </h2>
 
 
-        <div class="brand-content">
+      <p class="welcome-subtitle">
+
+        Silakan login untuk melanjutkan<br>
+
+        ke aplikasi presensi.
+
+      </p>
 
 
-          <div class="logo-wrapper">
+      <!-- ==================================================
+           LOGIN FORM
+           ================================================== -->
 
-            <div class="logo-box">
-              JN
-            </div>
-
-            <div class="logo-text">
-
-              JN Daily Attendance
-
-              <span class="logo-version">
-                <?= APP.shortName ?> • <?= APP.version ?>
-              </span>
-
-            </div>
-
-          </div>
+      <form
+        id="loginForm"
+        onsubmit="handleLogin(event)"
+      >
 
 
-          <h1 class="brand-title">
-            Presensi kerja
-            menjadi lebih mudah.
-          </h1>
+        <!-- ================================================
+             USERNAME
+             ================================================= -->
+
+        <div class="form-group">
 
 
-          <p class="brand-description">
-
-            Sistem presensi digital untuk membantu
-            pegawai melakukan pencatatan kehadiran
-            secara cepat, akurat, dan terintegrasi.
-
-          </p>
+          <div class="input-wrapper">
 
 
-          <div class="brand-info">
+            <span class="input-icon">
+
+              <i class="fa-solid fa-user"></i>
+
+            </span>
 
 
-            <div class="brand-info-item">
-
-              <div class="info-icon">
-                ✓
-              </div>
-
-              <span>
-                Presensi berbasis lokasi
-              </span>
-
-            </div>
-
-
-            <div class="brand-info-item">
-
-              <div class="info-icon">
-                ◷
-              </div>
-
-              <span>
-                Pencatatan waktu otomatis
-              </span>
-
-            </div>
-
-
-            <div class="brand-info-item">
-
-              <div class="info-icon">
-                🔒
-              </div>
-
-              <span>
-                Data kehadiran terintegrasi
-              </span>
-
-            </div>
+            <input
+              id="username"
+              class="form-input"
+              type="text"
+              autocomplete="username"
+              placeholder="NIP / Email / Username"
+              required
+            >
 
 
           </div>
 
+
+        </div>
+
+
+        <!-- ================================================
+             PASSWORD
+             ================================================= -->
+
+        <div class="form-group">
+
+
+          <div class="input-wrapper">
+
+
+            <span class="input-icon">
+
+              <i class="fa-solid fa-lock"></i>
+
+            </span>
+
+
+            <input
+              id="password"
+              class="form-input"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Password"
+              required
+            >
+
+
+            <button
+              type="button"
+              class="password-toggle"
+              id="passwordToggle"
+              onclick="togglePassword()"
+              aria-label="Tampilkan password"
+            >
+
+              <i
+                id="passwordIcon"
+                class="fa-solid fa-eye-slash"
+              ></i>
+
+            </button>
+
+
+          </div>
+
+
         </div>
 
 
-        <div class="brand-footer">
+        <!-- ================================================
+             REMEMBER
+             ================================================= -->
 
-          © <?= new Date().getFullYear() ?>
-          JN Daily Attendance ·
-          Internal Attendance System
+        <div class="remember-row">
+
+
+          <label class="remember">
+
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked
+            >
+
+            <span>
+              Ingat saya
+            </span>
+
+          </label>
+
+
+          <button
+            type="button"
+            class="forgot-password"
+            onclick="forgotPassword()"
+          >
+
+            Lupa password?
+
+          </button>
+
 
         </div>
+
+
+        <!-- ================================================
+             LOGIN BUTTON
+             ================================================= -->
+
+        <button
+          type="submit"
+          class="login-button"
+          id="loginButton"
+        >
+
+          <span
+            class="button-content"
+            id="buttonContent"
+          >
+
+            <i class="fa-solid fa-right-to-bracket"></i>
+
+            <span>
+              Login
+            </span>
+
+          </span>
+
+        </button>
+
+
+      </form>
+
+
+      <!-- ==================================================
+           MESSAGE
+           ================================================== -->
+
+      <div
+        id="loginMessage"
+        class="login-message"
+      ></div>
+
+
+      <!-- ==================================================
+           SECURITY
+           ================================================== -->
+
+      <div class="security-box">
+
+
+        <i class="fa-solid fa-shield-halved"></i>
+
+
+        <span>
+
+          Gunakan akun resmi perusahaan<br>
+
+          untuk keamanan data Anda.
+
+        </span>
 
 
       </div>
 
 
       <!-- ==================================================
-           FORM PANEL
+           FOOTER
            ================================================== -->
 
-      <div class="form-panel">
+      <div class="login-footer">
 
 
-        <div class="login-form-wrapper">
+        <div class="ship-icon">
 
-
-          <div class="welcome-label">
-            Selamat datang
-          </div>
-
-
-          <h2 class="form-title">
-            Masuk ke akun Anda
-          </h2>
-
-
-          <p class="form-subtitle">
-
-            Gunakan username dan password
-            untuk melanjutkan ke JNDA.
-
-          </p>
-
-
-          <!-- =================================================
-               USERNAME
-               ================================================= -->
-
-          <form
-            id="loginForm"
-            onsubmit="handleLogin(event)"
-          >
-
-
-            <div class="form-group">
-
-              <label
-                class="form-label"
-                for="username"
-              >
-                Username
-              </label>
-
-
-              <div class="input-wrapper">
-
-                <span class="input-icon">
-                  ◉
-                </span>
-
-
-                <input
-                  id="username"
-                  class="form-input"
-                  type="text"
-                  autocomplete="username"
-                  placeholder="Masukkan username"
-                  required
-                >
-
-              </div>
-
-            </div>
-
-
-            <!-- ===============================================
-                 PASSWORD
-                 =============================================== -->
-
-            <div class="form-group">
-
-              <label
-                class="form-label"
-                for="password"
-              >
-                Password
-              </label>
-
-
-              <div class="input-wrapper">
-
-                <span class="input-icon">
-                  ●
-                </span>
-
-
-                <input
-                  id="password"
-                  class="form-input"
-                  type="password"
-                  autocomplete="current-password"
-                  placeholder="Masukkan password"
-                  required
-                >
-
-
-                <button
-                  type="button"
-                  class="password-toggle"
-                  id="passwordToggle"
-                  onclick="togglePassword()"
-                  aria-label="Tampilkan password"
-                >
-                  ◉
-                </button>
-
-              </div>
-
-            </div>
-
-
-            <!-- ===============================================
-                 LOGIN BUTTON
-                 =============================================== -->
-
-            <button
-              type="submit"
-              class="login-button"
-              id="loginButton"
-            >
-
-              <span
-                class="button-content"
-                id="buttonContent"
-              >
-                <span>Masuk</span>
-              </span>
-
-            </button>
-
-
-          </form>
-
-
-          <!-- =================================================
-               MESSAGE
-               ================================================= -->
-
-          <div
-            id="loginMessage"
-            class="login-message"
-          ></div>
-
-
-          <div class="form-footer">
-
-            <?= APP.name ?> · <?= APP.version ?><br>
-
-            Sistem Presensi Internal
-
-          </div>
-
+          <i class="fa-solid fa-ship"></i>
 
         </div>
+
+
+        <p class="footer-text">
+
+          JN DAILY ATTENDANCE
+
+        </p>
 
 
       </div>
@@ -1236,53 +1588,81 @@
   </main>
 
 
+  <!-- ======================================================
+       JAVASCRIPT
+       ====================================================== -->
+
   <script>
 
-    /* ========================================================
-       LOGIN UI
-       ======================================================== */
 
+    /* ======================================================
+       TOGGLE PASSWORD
+       ====================================================== */
 
-    /**
-     * Toggle password.
-     */
     function togglePassword() {
 
       const password =
         document.getElementById('password');
 
-      const button =
-        document.getElementById('passwordToggle');
+      const icon =
+        document.getElementById('passwordIcon');
 
 
-      if (password.type === 'password') {
+      if (
+        password.type === 'password'
+      ) {
 
         password.type = 'text';
 
-        button.textContent = '◉';
 
-        button.setAttribute(
-          'aria-label',
-          'Sembunyikan password'
+        icon.classList.remove(
+          'fa-eye-slash'
         );
 
-      } else {
+
+        icon.classList.add(
+          'fa-eye'
+        );
+
+      }
+
+      else {
 
         password.type = 'password';
 
-        button.textContent = '◉';
 
-        button.setAttribute(
-          'aria-label',
-          'Tampilkan password'
+        icon.classList.remove(
+          'fa-eye'
         );
+
+
+        icon.classList.add(
+          'fa-eye-slash'
+        );
+
       }
+
     }
 
 
-    /**
-     * Handle login.
-     */
+    /* ======================================================
+       FORGOT PASSWORD
+       ====================================================== */
+
+    function forgotPassword() {
+
+      showMessage(
+        'Silakan hubungi administrator untuk melakukan reset password.',
+        'error'
+      );
+
+    }
+
+
+    /* ======================================================
+       LOGIN
+       ====================================================== */
+
     function handleLogin(event) {
 
       event.preventDefault();
@@ -1301,7 +1681,14 @@
           .value;
 
 
-      if (!username || !password) {
+      /* ====================================================
+         VALIDATION
+         ==================================================== */
+
+      if (
+        !username ||
+        !password
+      ) {
 
         showMessage(
           'Username dan password wajib diisi.',
@@ -1309,11 +1696,28 @@
         );
 
         return;
+
       }
 
 
+      /* ====================================================
+         LOADING
+         ==================================================== */
+
       setLoading(true);
 
+
+      clearMessage();
+
+
+      /* ====================================================
+         BACKEND GAS V3
+
+         TIDAK DIUBAH.
+
+         Fungsi login() merupakan fungsi yang sudah
+         digunakan PAGE_Login V3.
+         ==================================================== */
 
       google.script.run
 
@@ -1329,45 +1733,52 @@
           username,
           password
         );
+
     }
 
 
-    /**
-     * Login success.
-     */
+    /* ======================================================
+       LOGIN SUCCESS
+       ====================================================== */
+
     function handleLoginSuccess(result) {
+
 
       setLoading(false);
 
 
-      if (!result || !result.success) {
+      /* ====================================================
+         LOGIN GAGAL
+         ==================================================== */
+
+      if (
+        !result ||
+        !result.success
+      ) {
 
         showMessage(
-          result && result.message
+
+          result &&
+          result.message
+
             ? result.message
+
             : 'Login gagal.',
+
           'error'
+
         );
 
         return;
+
       }
 
 
-      /*
-       * ======================================================
-       * PENTING
-       *
-       * Kita hanya menyimpan SESSION TOKEN.
-       *
-       * Jangan simpan:
-       * - password
-       * - employee_id sebagai identitas
-       * - role
-       * - permission
-       *
-       * Server tetap menjadi sumber kebenaran.
-       * ======================================================
-       */
+      /* ====================================================
+         SESSION TOKEN
+
+         Tetap mengikuti mekanisme PAGE_Login V3.
+         ==================================================== */
 
       try {
 
@@ -1376,21 +1787,30 @@
           result.sessionToken
         );
 
-      } catch (error) {
+      }
+
+      catch (error) {
 
         console.error(
-          'Gagal menyimpan session token:',
+          'SESSION STORAGE ERROR:',
           error
         );
+
 
         showMessage(
           'Browser tidak mengizinkan penyimpanan session.',
           'error'
         );
 
+
         return;
+
       }
 
+
+      /* ====================================================
+         SUCCESS MESSAGE
+         ==================================================== */
 
       showMessage(
         'Login berhasil. Membuka dashboard...',
@@ -1398,24 +1818,31 @@
       );
 
 
-      /*
-       * Sedikit delay agar user sempat melihat
-       * notifikasi berhasil.
-       */
+      /* ====================================================
+         REDIRECT
 
-      setTimeout(function() {
+         Tetap menggunakan WEB_APP_URL dari V3.
+         ==================================================== */
 
-        window.top.location.href =
-          '<?= WEB_APP_URL ?>?page=dashboard';
+      setTimeout(
+        function() {
 
-      }, 500);
+          window.top.location.href =
+            '<?= WEB_APP_URL ?>?page=dashboard';
+
+        },
+        500
+      );
+
     }
 
 
-    /**
-     * Login failure.
-     */
+    /* ======================================================
+       LOGIN FAILURE
+       ====================================================== */
+
     function handleLoginFailure(error) {
+
 
       setLoading(false);
 
@@ -1430,44 +1857,75 @@
         'Terjadi kesalahan saat login. Silakan coba lagi.',
         'error'
       );
+
     }
 
 
-    /**
-     * Loading state.
-     */
+    /* ======================================================
+       LOADING STATE
+       ====================================================== */
+
     function setLoading(loading) {
 
+
       const button =
-        document.getElementById('loginButton');
+        document.getElementById(
+          'loginButton'
+        );
+
 
       const content =
-        document.getElementById('buttonContent');
+        document.getElementById(
+          'buttonContent'
+        );
 
 
-      button.disabled = loading;
+      button.disabled =
+        loading;
 
 
       if (loading) {
 
+
         content.innerHTML = `
+
           <span class="spinner"></span>
-          <span>Memproses...</span>
+
+          <span>
+            Memproses...
+          </span>
+
         `;
 
-      } else {
+      }
+
+      else {
+
 
         content.innerHTML = `
-          <span>Masuk</span>
+
+          <i class="fa-solid fa-right-to-bracket"></i>
+
+          <span>
+            Login
+          </span>
+
         `;
+
       }
+
     }
 
 
-    /**
-     * Message.
-     */
-    function showMessage(message, type) {
+    /* ======================================================
+       SHOW MESSAGE
+       ====================================================== */
+
+    function showMessage(
+      message,
+      type
+    ) {
+
 
       const element =
         document.getElementById(
@@ -1475,26 +1933,63 @@
         );
 
 
-      element.textContent = message;
+      element.textContent =
+        message;
+
 
       element.className =
-        'login-message ' + type;
+        'login-message ' +
+        type;
+
     }
 
 
-    /**
-     * Fokus username ketika halaman dibuka.
-     */
+    /* ======================================================
+       CLEAR MESSAGE
+       ====================================================== */
+
+    function clearMessage() {
+
+
+      const element =
+        document.getElementById(
+          'loginMessage'
+        );
+
+
+      element.textContent =
+        '';
+
+
+      element.className =
+        'login-message';
+
+    }
+
+
+    /* ======================================================
+       INITIAL FOCUS
+       ====================================================== */
+
     window.addEventListener(
       'load',
       function() {
 
-        document
-          .getElementById('username')
-          .focus();
+        const username =
+          document.getElementById(
+            'username'
+          );
+
+
+        if (window.innerWidth > 600) {
+
+          username.focus();
+
+        }
 
       }
     );
+
 
   </script>
 
