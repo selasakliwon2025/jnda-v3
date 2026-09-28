@@ -51,8 +51,7 @@ function getAppTimezone() {
  */
 function include(filename) {
   return HtmlService
-    .createTemplateFromFile(filename)
-    .evaluate()
+    .createHtmlOutputFromFile(filename)
     .getContent();
 }
 
