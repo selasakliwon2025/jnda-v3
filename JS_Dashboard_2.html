@@ -256,28 +256,100 @@ function renderManagement(
 
 
     /* =======================================================
-       LOGIN REDIRECT
-       ======================================================= */
+        LOGIN REDIRECT
+        ======================================================= */
 
-    function redirectToLogin() {
+      function redirectToLogin() {
 
-      localStorage.removeItem(
-        'JNDA_SESSION_TOKEN'
-      );
-
-      const url =
-        WEB_APP_URL +
-        '?page=login';
-
-      window.open(
-        url,
-        '_top'
-      );
-
-    }
+        /*
+        * Hapus session lokal terlebih dahulu.
+        */
+        localStorage.removeItem(
+          'JNDA_SESSION_TOKEN'
+        );
 
 
-    
+        /*
+        * Ambil URL Web App dasar.
+        */
+        let baseUrl =
+          WEB_APP_URL;
+
+
+        /*
+        * Bersihkan parameter lama.
+        *
+        * Contoh:
+        *
+        * https://.../exec?page=dashboard
+        *
+        * menjadi:
+        *
+        * https://.../exec
+        */
+        try {
+
+          const url =
+            new URL(baseUrl);
+
+
+          url.search = '';
+
+          url.hash = '';
+
+
+          /*
+          * Set halaman login.
+          */
+          url.searchParams.set(
+            'page',
+            'login'
+          );
+
+
+          baseUrl =
+            url.toString();
+
+        }
+
+        catch (error) {
+
+          console.error(
+            'JNDA LOGIN REDIRECT ERROR:',
+            error
+          );
+
+
+          /*
+          * Fallback sederhana.
+          */
+          baseUrl =
+            String(
+              WEB_APP_URL
+            ).split('?')[0];
+
+
+          baseUrl +=
+            '?page=login';
+
+        }
+
+
+        console.log(
+          'JNDA LOGOUT: redirect ke login:',
+          baseUrl
+        );
+
+
+        /*
+        * Navigasi ke halaman login.
+        */
+        window.open(
+          baseUrl,
+          '_top'
+        );
+
+      }
 
 
     /* =======================================================
