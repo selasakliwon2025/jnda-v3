@@ -1917,6 +1917,40 @@ function handleLoginSuccess(result) {
    OPEN DASHBOARD
    ====================================================== */
 
+function getAppUrl() {
+  const url = new URL(window.location.href);
+
+  // Hapus query string dan hash dari URL halaman saat ini.
+  // Dengan demikian URL deployment selalu mengikuti deployment
+  // yang sedang dibuka user.
+  url.search = '';
+  url.hash = '';
+
+  return url.toString();
+}
+
+
+function buildAppUrl(page, params = {}) {
+  const url = new URL(getAppUrl());
+
+  if (page) {
+    url.searchParams.set('page', page);
+  }
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (
+      value !== undefined &&
+      value !== null &&
+      value !== ''
+    ) {
+      url.searchParams.set(key, value);
+    }
+  });
+
+  return url.toString();
+}
+
+
 function openDashboard() {
 
   console.log(
@@ -1925,7 +1959,7 @@ function openDashboard() {
 
 
   const dashboardUrl =
-    '<?= WEB_APP_URL ?>?page=dashboard';
+    buildAppUrl('dashboard');
 
 
   console.log(
