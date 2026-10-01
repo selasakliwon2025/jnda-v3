@@ -234,18 +234,17 @@ function renderManagement(
 
       closeMobileSidebar();
 
-      let url =
-        WEB_APP_URL +
-        '?page=' +
-        encodeURIComponent(page);
+      const url = buildAppUrl(
+        page,
+        mode
+          ? { mode: mode }
+          : {}
+      );
 
-      if (mode) {
-
-        url +=
-          '&mode=' +
-          encodeURIComponent(mode);
-
-      }
+      console.log(
+        'JNDA NAVIGATE:',
+        url
+      );
 
       window.open(
         url,
@@ -262,90 +261,37 @@ function renderManagement(
       function redirectToLogin() {
 
         /*
-        * Hapus session lokal terlebih dahulu.
-        */
+         * Hapus session lokal terlebih dahulu.
+         */
         localStorage.removeItem(
           'JNDA_SESSION_TOKEN'
         );
 
-
-        /*
-        * Ambil URL Web App dasar.
-        */
-        let baseUrl =
-          WEB_APP_URL;
+        SESSION_TOKEN = '';
+        CURRENT_SESSION = null;
 
 
         /*
-        * Bersihkan parameter lama.
-        *
-        * Contoh:
-        *
-        * https://.../exec?page=dashboard
-        *
-        * menjadi:
-        *
-        * https://.../exec
-        */
-        try {
-
-          const url =
-            new URL(baseUrl);
-
-
-          url.search = '';
-
-          url.hash = '';
-
-
-          /*
-          * Set halaman login.
-          */
-          url.searchParams.set(
-            'page',
-            'login'
-          );
-
-
-          baseUrl =
-            url.toString();
-
-        }
-
-        catch (error) {
-
-          console.error(
-            'JNDA LOGIN REDIRECT ERROR:',
-            error
-          );
-
-
-          /*
-          * Fallback sederhana.
-          */
-          baseUrl =
-            String(
-              WEB_APP_URL
-            ).split('?')[0];
-
-
-          baseUrl +=
-            '?page=login';
-
-        }
+         * Gunakan deployment yang sedang dibuka user.
+         * Tidak ada lagi hardcoded WEB_APP_URL.
+         */
+        const loginUrl =
+          getAppUrl();
 
 
         console.log(
           'JNDA LOGOUT: redirect ke login:',
-          baseUrl
+          loginUrl
         );
 
 
         /*
-        * Navigasi ke halaman login.
-        */
+         * Navigasi ke halaman login.
+         * Router GAS akan menggunakan halaman login
+         * ketika parameter ?page= tidak ada.
+         */
         window.open(
-          baseUrl,
+          loginUrl,
           '_top'
         );
 
