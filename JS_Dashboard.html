@@ -19,17 +19,7 @@
 
     function getAppUrl() {
 
-      const url = new URL(
-        window.location.href
-      );
-
-      // Buang query lama seperti ?page=dashboard
-      url.search = '';
-
-      // Buang hash jika ada
-      url.hash = '';
-
-      return url.toString();
+      return window.JNDA_WEB_APP_URL || '';
 
     }
 
