@@ -5027,4 +5027,80 @@ body.attendance-modal-open {
 
 
       <div
-        class="attendance-field"
+        class="attendance-field">
+                <label
+          for="checkOutRemark"
+          class="attendance-label"
+        >
+          Keterangan Tambahan
+        </label>
+
+
+        <textarea
+          id="checkOutRemark"
+          class="attendance-textarea"
+          rows="4"
+          maxlength="500"
+          placeholder="Keterangan tambahan saat absen pulang (opsional)"
+        ></textarea>
+
+
+        <div
+          class="attendance-counter"
+        >
+
+          <span
+            id="checkOutRemarkCounter"
+          >
+            0
+          </span>
+
+          /500
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+    <div
+      class="attendance-modal-footer"
+    >
+
+
+      <button
+        type="button"
+        class="attendance-btn attendance-btn-cancel"
+        onclick="closeCheckOutModal()"
+      >
+        Batal
+      </button>
+
+
+      <button
+        type="button"
+        id="confirmCheckOutButton"
+        class="attendance-btn attendance-btn-confirm"
+        onclick="confirmCheckOut()"
+      >
+
+        <span>
+          ✓
+        </span>
+
+        <span>
+          Konfirmasi Absen Pulang
+        </span>
+
+      </button>
+
+
+    </div>
+
+
+  </div>
+
+</div>
