@@ -8,13 +8,72 @@
     let CURRENT_SESSION = null;
     let DASHBOARD_DATA = null;
 
-    /*
-     * URL Web App dibuat sebagai string JavaScript biasa.
-     * Hindari scriptlet GAS di dalam tag script agar HtmlService
-     * tidak menghasilkan "Malformed HTML content".
-     */
-    const WEB_APP_URL =
-      'https://script.google.com/macros/s/AKfycbyZlvCcB12RfizFTPaw5nVLZK07dsTRh2SX7ZFyWeINoxTsXn-GBxtiSfpaq-LGgBcZMw/exec';
+    /* =======================================================
+       DEPLOYMENT-INDEPENDENT APP URL
+       =======================================================
+
+       URL aplikasi TIDAK di-hardcode.
+       URL dasar diambil dari halaman deployment yang sedang aktif.
+       Jadi setiap New deployment tetap menggunakan URL yang benar.
+       ======================================================= */
+
+    function getAppUrl() {
+
+      const url = new URL(
+        window.location.href
+      );
+
+      // Buang query lama seperti ?page=dashboard
+      url.search = '';
+
+      // Buang hash jika ada
+      url.hash = '';
+
+      return url.toString();
+
+    }
+
+
+    function buildAppUrl(
+      page,
+      params = {}
+    ) {
+
+      const url = new URL(
+        getAppUrl()
+      );
+
+      if (page) {
+
+        url.searchParams.set(
+          'page',
+          page
+        );
+
+      }
+
+      Object.entries(params).forEach(
+        ([key, value]) => {
+
+          if (
+            value !== undefined &&
+            value !== null &&
+            value !== ''
+          ) {
+
+            url.searchParams.set(
+              key,
+              value
+            );
+
+          }
+
+        }
+      );
+
+      return url.toString();
+
+    }
 
 
     /* =======================================================
